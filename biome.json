@@ -1,0 +1,42 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+  "files": { "ignoreUnknown": true },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "all": true,
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "off"
+      },
+      "correctness": {
+        "noEmptyCharacterClassInRegex": "off"
+      },
+      "performance": {
+        "noBarrelFile": "off",
+        "noReExportAll": "off"
+      },
+      "style": {
+        "noNamespaceImport": "off",
+        "noNonNullAssertion": "off",
+        "noParameterProperties": "off",
+        "useBlockStatements": "off",
+        "useEnumInitializers": "off"
+      },
+      "suspicious": {
+        "noConstEnum": "off",
+        "noThenProperty": "off"
+      }
+    }
+  }
+}

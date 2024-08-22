@@ -1,0 +1,12 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "module": "ES2015",
+    "moduleResolution": "Bundler",
+    "target": "ESNext",
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true
+  }
+}

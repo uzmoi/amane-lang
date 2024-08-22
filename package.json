@@ -2,11 +2,27 @@
   "name": "amane",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "files": ["dist", "CHANGELOG.md"],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup",
+    "check": "biome check",
+    "test": "vitest",
+    "spell": "cspell --no-progress ."
   },
   "keywords": [],
   "author": "uzmoi",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "@vitest/coverage-v8": "^2.0.5",
+    "@vitest/ui": "^2.0.5",
+    "cspell": "^8.14.2",
+    "lefthook": "^1.7.14",
+    "tsup": "^8.2.4",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
 }
