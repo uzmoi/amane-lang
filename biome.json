@@ -38,5 +38,18 @@
         "noThenProperty": "off"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "include": ["*.test.ts", "*.config.ts"],
+      "linter": {
+        "rules": {
+          "style": { "all": false },
+          "suspicious": {
+            "noAssignInExpressions": "off"
+          }
+        }
+      }
+    }
+  ]
 }
