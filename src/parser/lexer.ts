@@ -16,7 +16,12 @@ export const keywords = new Set([
   "return",
 ] as const);
 
-export type TokenType = "Ident" | "Keyword" | "Whitespace" | "Comment";
+export type TokenType =
+  | "Ident"
+  | "Keyword"
+  | "String"
+  | "Whitespace"
+  | "Comment";
 
 export interface Token {
   type: TokenType;
@@ -71,6 +76,18 @@ export class Lexer implements IterableIterator<Token> {
     return this.#token(isKeyword ? "Keyword" : "Ident");
   }
 
+  #readString() {
+    this.#readRe(/([^"\\]|\\.)*\\?/uy);
+
+    const char = this.#peek();
+    if (char === undefined) return; // end of input
+
+    this.#index++;
+
+    // TODO: (char === "$") embed ident
+    // TODO: (char === "{") embed expression
+  }
+
   #readLine() {
     this.#readRe(/.*/y);
   }
@@ -107,6 +124,12 @@ export class Lexer implements IterableIterator<Token> {
     if (this.#isAhead("//")) {
       this.#readLine();
       return this.#token("Comment");
+    }
+
+    if (char === '"') {
+      this.#index++;
+      this.#readString();
+      return this.#token("String");
     }
 
     if (this.#isAhead("/*")) {

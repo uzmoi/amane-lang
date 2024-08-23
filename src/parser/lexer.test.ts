@@ -50,6 +50,29 @@ describe("Ident / Keyword", () => {
   });
 });
 
+describe("String", () => {
+  test("empty", () => {
+    const source = '""';
+    expect(lex(source)).toEqual(tokens(["String", source]));
+  });
+  test("string", () => {
+    const source = '"Hello world!"';
+    expect(lex(source)).toEqual(tokens(["String", source]));
+  });
+  test("escape", () => {
+    const source = '"\\""';
+    expect(lex(source)).toEqual(tokens(["String", source]));
+  });
+  test("not closed", () => {
+    const source = '"';
+    expect(lex(source)).toEqual(tokens(["String", source]));
+  });
+  test("not closed + trailing escape", () => {
+    const source = '"\\';
+    expect(lex(source)).toEqual(tokens(["String", source]));
+  });
+});
+
 describe("Comment", () => {
   describe("single line", () => {
     test("with newline", () => {
