@@ -2,5 +2,18 @@
   "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "useGitignore": true,
   "ignorePaths": ["package-lock.json", ".git", "__snapshots__"],
-  "words": ["amane", "biomejs", "fuga", "hoge", "lefthook", "tsup", "uzmoi"]
+  "words": [
+    "amane",
+    "biomejs",
+    "emnorst",
+    "endregion",
+    "fuga",
+    "hoge",
+    "lefthook",
+    "parsea",
+    "tsup",
+    "typecheck",
+    "uzmoi",
+    "vitest"
+  ]
 }

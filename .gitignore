@@ -4,5 +4,6 @@ dist/
 coverage/
 
 *.tsbuildinfo
+*.vitest-temp.json
 
 /.vscode/settings.json
