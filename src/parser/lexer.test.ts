@@ -41,6 +41,7 @@ describe("Ident / Keyword", () => {
       ["trailing escape",        "a\\"],
       ["escape only",            "\\"],
       ["escaped keyword",        "\\if"],
+      ["string ident",           '\\"+"'],
     ],
   )("%s", (_, source) => {
     expect(lex(source)).toEqual(tokens(["Ident", source]));

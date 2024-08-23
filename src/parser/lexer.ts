@@ -71,6 +71,12 @@ export class Lexer implements IterableIterator<Token> {
   static #identStartRe = /[A-Za-z\\]/;
   static #identRe = /([\dA-Za-z_]|\\.)*\\?/uy;
   #readIdent() {
+    if (this.#isAhead('\\"')) {
+      this.#index += 2;
+      this.#readString();
+      return this.#token("Ident");
+    }
+
     const value = this.#readRe(Lexer.#identRe);
     const isKeyword = keywords.has(value as Keyword);
     return this.#token(isKeyword ? "Keyword" : "Ident");
