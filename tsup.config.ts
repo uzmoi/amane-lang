@@ -6,6 +6,6 @@ export default defineConfig({
   sourcemap: true,
   dts: true,
   define: {
-    "import.meta.vitest": "null",
+    "import.meta.env.DEV": "false",
   },
 });

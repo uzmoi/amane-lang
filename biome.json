@@ -14,6 +14,7 @@
   },
   "linter": {
     "enabled": true,
+    "ignore": ["*.d.ts"],
     "rules": {
       "all": true,
       "complexity": {

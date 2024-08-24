@@ -1,7 +1,7 @@
 {
   "include": ["src"],
   "compilerOptions": {
-    "module": "ES2015",
+    "module": "ES2020",
     "moduleResolution": "Bundler",
     "target": "ESNext",
     "verbatimModuleSyntax": true,
