@@ -29,6 +29,10 @@ test("Whitespace", () => {
   expect(lex(wsChars)).toEqual(tokens(["Whitespace", wsChars]));
 });
 
+test("Delimiter", () => {
+  expect(lex("()")).toEqual(tokens(["Delimiter", "("], ["Delimiter", ")"]));
+});
+
 describe("Ident / Keyword", () => {
   test.each(
     /* biome-ignore format: table */ [

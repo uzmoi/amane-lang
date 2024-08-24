@@ -16,12 +16,26 @@ export const keywords = new Set([
   "return",
 ] as const);
 
+export type Delimiter = typeof delimiters extends Set<infer T> ? T : never;
+
+export const delimiters = new Set([
+  "(",
+  ")",
+  "[",
+  "]",
+  "{",
+  "}",
+  ";",
+  ",",
+] as const);
+
 export type TokenType =
+  | "Whitespace"
+  | "Delimiter"
   | "Ident"
   | "Keyword"
   | "Number"
   | "String"
-  | "Whitespace"
   | "Comment";
 
 export interface Token {
@@ -130,6 +144,11 @@ export class Lexer implements IterableIterator<Token> {
       this.#index++;
       this.#readWhitespace();
       return this.#token("Whitespace");
+    }
+
+    if (delimiters.has(char as Delimiter)) {
+      this.#index++;
+      return this.#token("Delimiter");
     }
 
     if (this.#isAhead("//")) {
