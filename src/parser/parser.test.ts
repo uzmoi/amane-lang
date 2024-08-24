@@ -37,12 +37,29 @@ describe("Bool", () => {
   });
 });
 
-test("Number", () => {
-  expect(parse(Expression, "0")).toEqual(node("Number", { value: "0" }));
+describe("Number", () => {
+  test("number", () => {
+    expect(parse(Expression, "0")).toEqual(node("Number", { value: "0" }));
+  });
+  test("remove underscores", () => {
+    expect(parse(Expression, "1_000")).toEqual(
+      node("Number", { value: "1000" }),
+    );
+  });
 });
 
-test("String", () => {
-  expect(parse(Expression, '""')).toEqual(node("String", { value: '""' }));
+describe("String", () => {
+  test("empty", () => {
+    expect(parse(Expression, '""')).toEqual(node("String", { value: "" }));
+  });
+  test("unescape", () => {
+    expect(parse(Expression, '"\\\\"')).toEqual(
+      node("String", { value: "\\" }),
+    );
+  });
+  test("escape sequence", () => {
+    expect(parse(Expression, '"\\n"')).toEqual(node("String", { value: "\n" }));
+  });
 });
 
 describe("Tuple", () => {
@@ -72,8 +89,23 @@ describe("Tuple", () => {
   });
 });
 
-test("Ident", () => {
-  expect(parse(Expression, "hoge")).toEqual(node("Ident", { name: "hoge" }));
+describe("Ident", () => {
+  test("ident", () => {
+    expect(parse(Expression, "hoge")).toEqual(node("Ident", { name: "hoge" }));
+  });
+  test("unescape", () => {
+    expect(parse(Expression, "\\!")).toEqual(node("Ident", { name: "!" }));
+  });
+  describe("string ident", () => {
+    test("empty", () => {
+      expect(parse(Expression, '\\""')).toEqual(node("Ident", { name: "" }));
+    });
+    test("unescape", () => {
+      expect(parse(Expression, '\\"\\0"')).toEqual(
+        node("Ident", { name: "\0" }),
+      );
+    });
+  });
 });
 
 describe("Block", () => {
@@ -142,7 +174,7 @@ test("Let", () => {
   expect(parse(Statement, 'let hoge = ""')).toEqual(
     node("Let", {
       dest: node("Ident", { name: "hoge" }),
-      init: node("String", { value: '""' }),
+      init: node("String", { value: "" }),
     }),
   );
 });

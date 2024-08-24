@@ -3,6 +3,7 @@ import { error } from "parsea/internal";
 import type { Delimiter, Keyword, Operator, Token, TokenType } from "./lexer";
 import { type Loc, loc } from "./location";
 import type * as N from "./node";
+import { unescapeStringContent } from "./utils";
 
 const token = <T extends TokenType>(type: T) =>
   P.satisfy<Token & { type: T }, Token>((token) => token.type === type, {
@@ -50,10 +51,18 @@ const Bool = P.choice([keyword("true"), keyword("false")]).map(
 );
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
-const Number = token("Number");
+const Number = token("Number").map<N.NumberExpression<ParserExt>>((token) => ({
+  type: "Number",
+  value: token.value.replace(/_/g, ""),
+  loc: token.loc,
+}));
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
-const String = token("String");
+const String = token("String").map<N.StringExpression<ParserExt>>((token) => ({
+  type: "String",
+  value: unescapeStringContent(token.value.slice(1, -1)),
+  loc: token.loc,
+}));
 
 const Tuple = P.seq([
   delimiter("("),
@@ -67,7 +76,11 @@ const Tuple = P.seq([
 }));
 
 const Ident = token("Ident").map<N.IdentExpression<ParserExt>>((token) => {
-  const name = token.value.replace(/\\(.?)/g, "$1");
+  const { value } = token;
+  const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
+  const name = isStringIdent
+    ? unescapeStringContent(token.value.slice(2, -1))
+    : value.replace(/\\(.?)/g, "$1");
   return {
     type: "Ident",
     name,
