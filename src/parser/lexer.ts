@@ -19,6 +19,7 @@ export const keywords = new Set([
 export type TokenType =
   | "Ident"
   | "Keyword"
+  | "Number"
   | "String"
   | "Whitespace"
   | "Comment";
@@ -82,6 +83,10 @@ export class Lexer implements IterableIterator<Token> {
     return this.#token(isKeyword ? "Keyword" : "Ident");
   }
 
+  #readNumber() {
+    this.#readRe(/0[bo][\d_]*|0x[\da-f_]*|[\d_]+(\.[\d_]*)?/iy);
+  }
+
   #readString() {
     this.#readRe(/([^"\\]|\\.)*\\?/uy);
 
@@ -142,6 +147,11 @@ export class Lexer implements IterableIterator<Token> {
       this.#index += 2;
       this.#readMultiLineComment();
       return this.#token("Comment");
+    }
+
+    if (/\d/.test(char)) {
+      this.#readNumber();
+      return this.#token("Number");
     }
 
     if (Lexer.#identStartRe.test(char)) {
