@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { Lexer, type Token } from "./lexer";
 import type { Loc, SourceLocation } from "./location";
 import type * as N from "./node";
-import { Expression } from "./parser";
+import { Expression, Statement } from "./parser";
 
 const parse = (parser: Parser<unknown, Token>, source: string) => {
   const tokens = [...new Lexer(source)].filter(
@@ -104,4 +104,13 @@ test("Loop", () => {
 
 test("Break", () => {
   expect(parse(Expression, "break")).toEqual(node("Break"));
+});
+
+test("Let", () => {
+  expect(parse(Statement, 'let hoge = ""')).toEqual(
+    node("Let", {
+      dest: node("Ident", { name: "hoge" }),
+      init: node("String", { value: '""' }),
+    }),
+  );
 });

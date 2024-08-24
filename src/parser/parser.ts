@@ -1,6 +1,6 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
-import type { Delimiter, Keyword, Token, TokenType } from "./lexer";
+import type { Delimiter, Keyword, Operator, Token, TokenType } from "./lexer";
 import { type Loc, loc } from "./location";
 import type * as N from "./node";
 
@@ -18,6 +18,8 @@ const tokenWith = <T extends TokenType, U extends string>(type: T, value: U) =>
 const keyword = <T extends Keyword>(word: T) => tokenWith("Keyword", word);
 const delimiter = <T extends Delimiter>(delimiter: T) =>
   tokenWith("Delimiter", delimiter);
+const operator = <T extends string>(operator: Operator<T>) =>
+  tokenWith("Operator", operator);
 
 type ParserExt = Loc;
 
@@ -104,7 +106,16 @@ const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
 // #region Statement
 
 export const Statement: P.Parser<N.Statement<ParserExt>, Token> = P.lazy(() =>
-  P.choice([ExpressionStatement]),
+  P.choice([Let, ExpressionStatement]),
+);
+
+const Let = P.seq([keyword("let"), Ident, operator("="), Expression]).map(
+  ([letToken, dest, , init]): N.LetStatement<ParserExt> => ({
+    type: "Let",
+    dest,
+    init,
+    loc: loc(letToken, init),
+  }),
 );
 
 const ExpressionStatement = Expression.map(

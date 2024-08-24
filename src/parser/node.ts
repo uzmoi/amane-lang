@@ -60,11 +60,16 @@ export type Expression<T = never> =
 
 // #region Statement
 
+export type LetStatement<T = never> = NodeExtend<"Let", T> & {
+  dest: IdentExpression<T>;
+  init: Expression<T>;
+};
+
 export type ExpressionStatement<T = never> = NodeExtend<"Expression", T> & {
   expr: Expression<T>;
 };
 
-export type Statement<T = never> = ExpressionStatement<T>;
+export type Statement<T = never> = LetStatement<T> | ExpressionStatement<T>;
 
 // #endregion
 
