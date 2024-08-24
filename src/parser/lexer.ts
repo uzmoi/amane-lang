@@ -29,9 +29,42 @@ export const delimiters = new Set([
   ",",
 ] as const);
 
+export type OperatorChar = typeof operatorChars extends Set<infer T>
+  ? T
+  : never;
+
+export type Operator<T, U = T> = T extends `${infer S}${infer Rest}`
+  ? S extends OperatorChar
+    ? Operator<Rest, U>
+    : never
+  : U;
+
+export const operatorChars = new Set([
+  "!",
+  "#",
+  "$",
+  "%",
+  "&",
+  "*",
+  "+",
+  "-",
+  ".",
+  "/",
+  ":",
+  "<",
+  "=",
+  ">",
+  "?",
+  "@",
+  "^",
+  "|",
+  "~",
+] as const);
+
 export type TokenType =
   | "Whitespace"
   | "Delimiter"
+  | "Operator"
   | "Ident"
   | "Keyword"
   | "Number"
@@ -113,6 +146,18 @@ export class Lexer implements IterableIterator<Token> {
     // TODO: (char === "{") embed expression
   }
 
+  static operatorRe: RegExp;
+  static {
+    const chars = /* #__PURE__ */ [...operatorChars].join("");
+    Lexer.operatorRe = new RegExp(
+      `[${/* #__PURE__ */ chars.replace(/[\\\]]/g, "\\$&")}]*`,
+      "y",
+    );
+  }
+  #readOperator() {
+    this.#readRe(Lexer.operatorRe);
+  }
+
   #readLine() {
     this.#readRe(/.*/y);
   }
@@ -166,6 +211,12 @@ export class Lexer implements IterableIterator<Token> {
       this.#index += 2;
       this.#readMultiLineComment();
       return this.#token("Comment");
+    }
+
+    if (operatorChars.has(char as OperatorChar)) {
+      this.#index++;
+      this.#readOperator();
+      return this.#token("Operator");
     }
 
     if (/\d/.test(char)) {

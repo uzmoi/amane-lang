@@ -33,6 +33,10 @@ test("Delimiter", () => {
   expect(lex("()")).toEqual(tokens(["Delimiter", "("], ["Delimiter", ")"]));
 });
 
+test("Operator", () => {
+  expect(lex("==")).toEqual(tokens(["Operator", "=="]));
+});
+
 describe("Ident / Keyword", () => {
   test.each(
     /* biome-ignore format: table */ [
