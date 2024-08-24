@@ -45,8 +45,43 @@ test("String", () => {
   expect(parse(Expression, '""')).toEqual(node("String", { value: '""' }));
 });
 
+describe("Tuple", () => {
+  test("empty", () => {
+    expect(parse(Expression, "()")).toEqual(node("Tuple", { elements: [] }));
+  });
+  test("single element", () => {
+    expect(parse(Expression, "(0)")).toEqual(
+      node("Tuple", { elements: [node("Number", { value: "0" })] }),
+    );
+  });
+  test("elements", () => {
+    expect(parse(Expression, "(0, 1, 2)")).toEqual(
+      node("Tuple", {
+        elements: [
+          node("Number", { value: "0" }),
+          node("Number", { value: "1" }),
+          node("Number", { value: "2" }),
+        ],
+      }),
+    );
+  });
+  test("trailing comma", () => {
+    expect(parse(Expression, "(0, )")).toEqual(
+      node("Tuple", { elements: [node("Number", { value: "0" })] }),
+    );
+  });
+});
+
 test("Ident", () => {
   expect(parse(Expression, "hoge")).toEqual(node("Ident", { name: "hoge" }));
+});
+
+describe("Block", () => {
+  test("empty", () => {
+    expect(parse(Expression, "{}")).toEqual(
+      node("Block", { stmts: [], last: null }),
+    );
+  });
 });
 
 test("If", () => {

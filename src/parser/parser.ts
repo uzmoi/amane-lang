@@ -1,6 +1,6 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
-import type { Keyword, Token, TokenType } from "./lexer";
+import type { Delimiter, Keyword, Token, TokenType } from "./lexer";
 import { type Loc, loc } from "./location";
 import type * as N from "./node";
 
@@ -16,13 +16,15 @@ const tokenWith = <T extends TokenType, U extends string>(type: T, value: U) =>
   );
 
 const keyword = <T extends Keyword>(word: T) => tokenWith("Keyword", word);
+const delimiter = <T extends Delimiter>(delimiter: T) =>
+  tokenWith("Delimiter", delimiter);
 
 type ParserExt = Loc;
 
 // #region Expression
 
 export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
-  P.choice([Bool, Number, String, Ident, If, Loop, Break]),
+  P.choice([Bool, Number, String, Tuple, Ident, Block, If, Loop, Break]),
 );
 
 const Bool = P.choice([keyword("true"), keyword("false")]).map(
@@ -39,6 +41,17 @@ const Number = token("Number");
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
 const String = token("String");
 
+const Tuple = P.seq([
+  delimiter("("),
+  Expression.skip(delimiter(",")).apply(P.many),
+  Expression.option(),
+  delimiter(")"),
+]).map<N.TupleExpression<ParserExt>>(([start, elements, lastElement, end]) => ({
+  type: "Tuple",
+  elements: lastElement == null ? elements : [...elements, lastElement],
+  loc: loc(start, end),
+}));
+
 const Ident = token("Ident").map<N.IdentExpression<ParserExt>>((token) => {
   const name = token.value.replace(/\\(.?)/g, "$1");
   return {
@@ -47,6 +60,18 @@ const Ident = token("Ident").map<N.IdentExpression<ParserExt>>((token) => {
     loc: token.loc,
   };
 });
+
+const Block = P.seq([
+  delimiter("{"),
+  P.lazy(() => Statement).apply(P.many),
+  Expression.option(null),
+  delimiter("}"),
+]).map<N.BlockExpression<ParserExt>>(([start, stmts, last, end]) => ({
+  type: "Block",
+  stmts,
+  last,
+  loc: loc(start, end),
+}));
 
 const If = P.seq([
   keyword("if"),
@@ -78,7 +103,7 @@ const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
 
 // #region Statement
 
-export const Statement: P.Parser<N.Statement<ParserExt>> = P.lazy(() =>
+export const Statement: P.Parser<N.Statement<ParserExt>, Token> = P.lazy(() =>
   P.choice([ExpressionStatement]),
 );
 

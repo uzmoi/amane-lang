@@ -20,8 +20,17 @@ export type StringExpression<T = never> = NodeExtend<"String", T> & {
   value: string;
 };
 
+export type TupleExpression<T = never> = NodeExtend<"Tuple", T> & {
+  elements: Expression<T>[];
+};
+
 export type IdentExpression<T = never> = NodeExtend<"Ident", T> & {
   name: string;
+};
+
+export type BlockExpression<T = never> = NodeExtend<"Block", T> & {
+  stmts: Statement<T>[];
+  last: Expression<T> | null;
 };
 
 export type IfExpression<T = never> = NodeExtend<"If", T> & {
@@ -40,7 +49,9 @@ export type Expression<T = never> =
   | BoolExpression<T>
   | NumberExpression<T>
   | StringExpression<T>
+  | TupleExpression<T>
   | IdentExpression<T>
+  | BlockExpression<T>
   | IfExpression<T>
   | LoopExpression<T>
   | BreakExpression<T>;
