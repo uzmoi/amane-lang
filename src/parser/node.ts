@@ -12,6 +12,14 @@ export type BoolExpression<T = never> = NodeExtend<"Bool", T> & {
   value: boolean;
 };
 
+export type NumberExpression<T = never> = NodeExtend<"Number", T> & {
+  value: string;
+};
+
+export type StringExpression<T = never> = NodeExtend<"String", T> & {
+  value: string;
+};
+
 export type IdentExpression<T = never> = NodeExtend<"Ident", T> & {
   name: string;
 };
@@ -30,6 +38,8 @@ export type BreakExpression<T = never> = NodeExtend<"Break", T>;
 
 export type Expression<T = never> =
   | BoolExpression<T>
+  | NumberExpression<T>
+  | StringExpression<T>
   | IdentExpression<T>
   | IfExpression<T>
   | LoopExpression<T>

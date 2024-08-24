@@ -5,7 +5,7 @@ import { type Loc, loc } from "./location";
 import type * as N from "./node";
 
 const token = <T extends TokenType>(type: T) =>
-  P.satisfy<Token, Token>((token) => token.type === type, {
+  P.satisfy<Token & { type: T }, Token>((token) => token.type === type, {
     error: error.expected(type),
   });
 
@@ -22,7 +22,7 @@ type ParserExt = Loc;
 // #region Expression
 
 export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
-  P.choice([Bool, Ident, If, Loop, Break]),
+  P.choice([Bool, Number, String, Ident, If, Loop, Break]),
 );
 
 const Bool = P.choice([keyword("true"), keyword("false")]).map(
@@ -32,6 +32,12 @@ const Bool = P.choice([keyword("true"), keyword("false")]).map(
     loc: token.loc,
   }),
 );
+
+// biome-ignore lint/suspicious/noShadowRestrictedNames:
+const Number = token("Number");
+
+// biome-ignore lint/suspicious/noShadowRestrictedNames:
+const String = token("String");
 
 const Ident = token("Ident").map<N.IdentExpression<ParserExt>>((token) => {
   const name = token.value.replace(/\\(.?)/g, "$1");

@@ -37,6 +37,14 @@ describe("Bool", () => {
   });
 });
 
+test("Number", () => {
+  expect(parse(Expression, "0")).toEqual(node("Number", { value: "0" }));
+});
+
+test("String", () => {
+  expect(parse(Expression, '""')).toEqual(node("String", { value: '""' }));
+});
+
 test("Ident", () => {
   expect(parse(Expression, "hoge")).toEqual(node("Ident", { name: "hoge" }));
 });
