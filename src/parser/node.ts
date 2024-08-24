@@ -45,6 +45,15 @@ export type LoopExpression<T = never> = NodeExtend<"Loop", T> & {
 
 export type BreakExpression<T = never> = NodeExtend<"Break", T>;
 
+export type FnExpression<T = never> = NodeExtend<"Fn", T> & {
+  params: TupleExpression<T> | null;
+  body: Expression<T>;
+};
+
+export type ReturnExpression<T = never> = NodeExtend<"Return", T> & {
+  body: Expression<T> | null;
+};
+
 export type Expression<T = never> =
   | BoolExpression<T>
   | NumberExpression<T>
@@ -54,7 +63,9 @@ export type Expression<T = never> =
   | BlockExpression<T>
   | IfExpression<T>
   | LoopExpression<T>
-  | BreakExpression<T>;
+  | BreakExpression<T>
+  | FnExpression<T>
+  | ReturnExpression<T>;
 
 // #endregion
 

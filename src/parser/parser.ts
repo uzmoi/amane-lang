@@ -26,7 +26,19 @@ type ParserExt = Loc;
 // #region Expression
 
 export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
-  P.choice([Bool, Number, String, Tuple, Ident, Block, If, Loop, Break]),
+  P.choice([
+    Bool,
+    Number,
+    String,
+    Tuple,
+    Ident,
+    Block,
+    If,
+    Loop,
+    Break,
+    Fn,
+    Return,
+  ]),
 );
 
 const Bool = P.choice([keyword("true"), keyword("false")]).map(
@@ -100,6 +112,25 @@ const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
   type: "Break",
   loc: token.loc,
 }));
+
+const Fn = P.seq([
+  keyword("fn"),
+  Tuple.skip(operator("=>")).option(null),
+  Expression,
+]).map<N.FnExpression<ParserExt>>(([fnToken, params, body]) => ({
+  type: "Fn",
+  params,
+  body,
+  loc: loc(fnToken, body),
+}));
+
+const Return = keyword("return")
+  .and(Expression.option(null))
+  .map<N.ReturnExpression<ParserExt>>(([returnToken, body]) => ({
+    type: "Return",
+    body,
+    loc: loc(returnToken, body ?? returnToken),
+  }));
 
 // #endregion
 

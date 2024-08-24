@@ -106,6 +106,38 @@ test("Break", () => {
   expect(parse(Expression, "break")).toEqual(node("Break"));
 });
 
+describe("Fn", () => {
+  test("omit params", () => {
+    expect(parse(Expression, "fn body")).toEqual(
+      node("Fn", { params: null, body: node("Ident", { name: "body" }) }),
+    );
+  });
+  test("with params", () => {
+    expect(parse(Expression, "fn (param1, param2) => {}")).toEqual(
+      node("Fn", {
+        params: node("Tuple", {
+          elements: [
+            node("Ident", { name: "param1" }),
+            node("Ident", { name: "param2" }),
+          ],
+        }),
+        body: node("Block", { stmts: [], last: null }),
+      }),
+    );
+  });
+});
+
+describe("Return", () => {
+  test("without value", () => {
+    expect(parse(Expression, "return")).toEqual(node("Return", { body: null }));
+  });
+  test("with value", () => {
+    expect(parse(Expression, "return result")).toEqual(
+      node("Return", { body: node("Ident", { name: "result" }) }),
+    );
+  });
+});
+
 test("Let", () => {
   expect(parse(Statement, 'let hoge = ""')).toEqual(
     node("Let", {
