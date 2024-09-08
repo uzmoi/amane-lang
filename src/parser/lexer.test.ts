@@ -1,23 +1,17 @@
 import { describe, expect, test } from "vitest";
-import { Lexer, type Token, type TokenType } from "./lexer";
+import { Lexer, Token, type TokenType } from "./lexer";
 
-const MAX_LENGTH = 10000;
-
-const lex = (source: string): Token[] => {
-  const tokens = [];
-  for (const token of new Lexer(source)) {
-    if (tokens.push(token) > MAX_LENGTH) break;
-  }
-  return tokens;
-};
+const lex = (source: string): Token[] => [...new Lexer(source)];
 
 const tokens = (...tokens: [type: TokenType, value: string][]): Token[] => {
   let i = 0;
-  return tokens.map((token): Token => {
-    const [type, value] = token;
-    const loc = { start: i, end: (i += value.length) } as const;
-    return { type, value, loc };
-  });
+  return tokens.map(
+    ([type, value]): Token =>
+      new Token(type, value, {
+        start: i,
+        end: (i += value.length),
+      }),
+  );
 };
 
 test("empty", () => {

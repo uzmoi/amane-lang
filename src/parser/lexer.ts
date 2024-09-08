@@ -71,27 +71,18 @@ export type TokenType =
   | "String"
   | "Comment";
 
-export interface Token {
-  type: TokenType;
-  value: string;
-  loc: SourceLocation;
+export class Token {
+  constructor(
+    readonly type: TokenType,
+    readonly value: string,
+    readonly loc: SourceLocation,
+  ) {}
 }
 
 export class Lexer implements IterableIterator<Token> {
   constructor(readonly source: string) {}
 
   #index = 0;
-  #prevTokenEndIndex = 0;
-  #token(type: TokenType): Token {
-    const start = this.#prevTokenEndIndex;
-    const end = this.#index;
-    if (start === end) {
-      throw new Error("An empty token is invalid.");
-    }
-    this.#prevTokenEndIndex = end;
-    const value = this.source.slice(start, end);
-    return { type, value, loc: { start, end } };
-  }
 
   #peek(): string | undefined {
     return this.source[this.#index];
@@ -122,12 +113,12 @@ export class Lexer implements IterableIterator<Token> {
     if (this.#isAhead('\\"')) {
       this.#index += 2;
       this.#readString();
-      return this.#token("Ident");
+      return "Ident";
     }
 
     const value = this.#readRe(Lexer.#identRe);
     const isKeyword = keywords.has(value as Keyword);
-    return this.#token(isKeyword ? "Keyword" : "Ident");
+    return isKeyword ? "Keyword" : "Ident";
   }
 
   #readNumber() {
@@ -135,7 +126,7 @@ export class Lexer implements IterableIterator<Token> {
   }
 
   #readString() {
-    this.#readRe(/([^"\\]|\\.)*\\?/uy);
+    this.#readRe(/([^"\\]|\\.)*/uy);
 
     const char = this.#peek();
     if (char === undefined) return; // end of input
@@ -181,47 +172,46 @@ export class Lexer implements IterableIterator<Token> {
     this.#readRe(/\p{White_Space}*/uy);
   }
 
-  #readToken(): Token | undefined {
-    const char = this.#peek();
-    if (char === undefined) return;
+  #readToken(): TokenType {
+    const char = this.#peek()!;
 
     if (Lexer.isWhitespace(char)) {
       this.#index++;
       this.#readWhitespace();
-      return this.#token("Whitespace");
+      return "Whitespace";
     }
 
     if (delimiters.has(char as Delimiter)) {
       this.#index++;
-      return this.#token("Delimiter");
+      return "Delimiter";
     }
 
     if (this.#isAhead("//")) {
       this.#readLine();
-      return this.#token("Comment");
+      return "Comment";
     }
 
     if (char === '"') {
       this.#index++;
       this.#readString();
-      return this.#token("String");
+      return "String";
     }
 
     if (this.#isAhead("/*")) {
       this.#index += 2;
       this.#readMultiLineComment();
-      return this.#token("Comment");
+      return "Comment";
     }
 
     if (operatorChars.has(char as OperatorChar)) {
       this.#index++;
       this.#readOperator();
-      return this.#token("Operator");
+      return "Operator";
     }
 
     if (/\d/.test(char)) {
       this.#readNumber();
-      return this.#token("Number");
+      return "Number";
     }
 
     if (Lexer.#identStartRe.test(char)) {
@@ -232,11 +222,23 @@ export class Lexer implements IterableIterator<Token> {
   }
 
   next(): IteratorResult<Token, undefined> {
-    const token = this.#readToken();
-    return {
-      done: token === undefined,
-      value: token,
-    } as IteratorResult<Token, undefined>;
+    const start = this.#index;
+
+    if (start >= this.source.length) {
+      return { done: true, value: undefined };
+    }
+
+    const type = this.#readToken();
+
+    const end = this.#index;
+    if (start === end) {
+      throw new Error("An empty token is invalid.");
+    }
+
+    const value = this.source.slice(start, end);
+    const token = new Token(type, value, { start, end });
+
+    return { done: false, value: token };
   }
   [Symbol.iterator]() {
     return this;
