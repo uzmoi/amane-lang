@@ -43,26 +43,30 @@ export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
 );
 
 const Bool = P.choice([keyword("true"), keyword("false")]).map(
-  (token): N.BoolExpression<ParserExt> => ({
+  ({ value, loc }): N.BoolExpression<ParserExt> => ({
     type: "Bool",
-    value: token.value === "true",
-    loc: token.loc,
+    value: value === "true",
+    loc,
   }),
 );
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
-const Number = token("Number").map<N.NumberExpression<ParserExt>>((token) => ({
-  type: "Number",
-  value: token.value.replace(/_/g, ""),
-  loc: token.loc,
-}));
+const Number = token("Number").map(
+  ({ value, loc }): N.NumberExpression<ParserExt> => ({
+    type: "Number",
+    value: value.replace(/_/g, ""),
+    loc,
+  }),
+);
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
-const String = token("String").map<N.StringExpression<ParserExt>>((token) => ({
-  type: "String",
-  value: unescapeStringContent(token.value.slice(1, -1)),
-  loc: token.loc,
-}));
+const String = token("String").map(
+  ({ value, loc }): N.StringExpression<ParserExt> => ({
+    type: "String",
+    value: unescapeStringContent(value.slice(1, -1)),
+    loc,
+  }),
+);
 
 const Tuple = P.seq([
   delimiter("("),
@@ -75,18 +79,19 @@ const Tuple = P.seq([
   loc: loc(start, end),
 }));
 
-const Ident = token("Ident").map<N.IdentExpression<ParserExt>>((token) => {
-  const { value } = token;
-  const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
-  const name = isStringIdent
-    ? unescapeStringContent(token.value.slice(2, -1))
-    : value.replace(/\\(.?)/g, "$1");
-  return {
-    type: "Ident",
-    name,
-    loc: token.loc,
-  };
-});
+const Ident = token("Ident").map(
+  ({ value, loc }): N.IdentExpression<ParserExt> => {
+    const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
+    const name = isStringIdent
+      ? unescapeStringContent(value.slice(2, -1))
+      : value.replace(/\\(.?)/g, "$1");
+    return {
+      type: "Ident",
+      name,
+      loc,
+    };
+  },
+);
 
 const Block = P.seq([
   delimiter("{"),
