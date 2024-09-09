@@ -16,18 +16,17 @@ export const keywords = new Set([
   "return",
 ] as const);
 
-export type Delimiter = typeof delimiters extends Set<infer T> ? T : never;
+export type Delimiter = "(" | ")" | "[" | "]" | "{" | "}" | ";" | ",";
 
-export const delimiters = new Set([
-  "(",
-  ")",
-  "[",
-  "]",
-  "{",
-  "}",
-  ";",
-  ",",
-] as const);
+const isDelimiter: (char: string) => char is Delimiter = (char) =>
+  char === "(" ||
+  char === ")" ||
+  char === "[" ||
+  char === "]" ||
+  char === "{" ||
+  char === "}" ||
+  char === ";" ||
+  char === ",";
 
 export type OperatorChar = typeof operatorChars extends Set<infer T>
   ? T
@@ -181,7 +180,7 @@ export class Lexer implements IterableIterator<Token> {
       return "Whitespace";
     }
 
-    if (delimiters.has(char as Delimiter)) {
+    if (isDelimiter(char)) {
       this.#index++;
       return "Delimiter";
     }
