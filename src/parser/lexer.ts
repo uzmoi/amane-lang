@@ -1,4 +1,5 @@
 import type { SourceLocation } from "./location";
+import { isAlphabet, isDigit, isWhitespace } from "./utils";
 
 export type Keyword = typeof keywords extends Set<infer T> ? T : never;
 
@@ -106,8 +107,9 @@ export class Lexer implements IterableIterator<Token> {
     return result[0];
   }
 
-  static #identStartRe = /[A-Za-z\\]/;
-  static #identRe = /([\dA-Za-z_]|\\.)*\\?/uy;
+  static #isIdentChar(char: string) {
+    return isDigit(char) || isAlphabet(char) || char === "\\" || char === "_";
+  }
   #readIdent() {
     if (this.#isAhead('\\"')) {
       this.#index += 2;
@@ -115,47 +117,68 @@ export class Lexer implements IterableIterator<Token> {
       return "Ident";
     }
 
-    const value = this.#readRe(Lexer.#identRe);
+    const start = this.#index;
+
+    while (this.#index < this.source.length) {
+      const char = this.#peek()!;
+      if (!Lexer.#isIdentChar(char)) break;
+      this.#index++;
+      if (char === "\\" && this.#index < this.source.length) {
+        this.#index++;
+      }
+    }
+
+    const value = this.source.slice(start, this.#index);
     const isKeyword = keywords.has(value as Keyword);
     return isKeyword ? "Keyword" : "Ident";
   }
 
+  static #numberRe = /0[bo][\d_]*|0x[\da-f_]*|[\d_]+(\.[\d_]*)?/iy;
   #readNumber() {
-    this.#readRe(/0[bo][\d_]*|0x[\da-f_]*|[\d_]+(\.[\d_]*)?/iy);
+    this.#readRe(Lexer.#numberRe);
   }
 
   #readString() {
-    this.#readRe(/([^"\\]|\\.)*/uy);
-
-    const char = this.#peek();
-    if (char === undefined) return; // end of input
-
-    this.#index++;
-
-    // TODO: (char === "$") embed ident
-    // TODO: (char === "{") embed expression
+    while (this.#index < this.source.length) {
+      const char = this.#peek()!;
+      this.#index++;
+      switch (char) {
+        case "\\": {
+          if (this.#index < this.source.length) {
+            this.#index++;
+          }
+          break;
+        }
+        case '"': {
+          return;
+        }
+        // TODO: case "$": embed ident
+        // TODO: case "{": embed expression
+      }
+    }
   }
 
-  static operatorRe: RegExp;
-  static {
-    const chars = /* #__PURE__ */ [...operatorChars].join("");
-    Lexer.operatorRe = new RegExp(
-      `[${/* #__PURE__ */ chars.replace(/[\\\]]/g, "\\$&")}]*`,
-      "y",
-    );
+  static #isOperatorChar(char: string) {
+    return operatorChars.has(char as OperatorChar);
   }
   #readOperator() {
-    this.#readRe(Lexer.operatorRe);
+    while (this.#index < this.source.length) {
+      const char = this.#peek()!;
+      if (!Lexer.#isOperatorChar(char)) break;
+      this.#index++;
+    }
   }
 
   #readLine() {
-    this.#readRe(/.*/y);
+    const lineEndIndex = this.source.indexOf("\n", this.#index);
+    this.#index = lineEndIndex === -1 ? this.source.length : lineEndIndex;
   }
 
+  static #mlcRe = /\/\*|\*\/|$/g;
   #readMultiLineComment() {
     let depth = 1;
     do {
-      const value = this.#readRe(/\/\*|\*\/|$/g);
+      const value = this.#readRe(Lexer.#mlcRe);
 
       if (value === "") break; // EOF
 
@@ -164,20 +187,25 @@ export class Lexer implements IterableIterator<Token> {
     } while (depth > 0);
   }
 
-  static isWhitespace(char: string) {
-    return /\p{White_Space}/u.test(char);
-  }
   #readWhitespace() {
-    this.#readRe(/\p{White_Space}*/uy);
+    while (this.#index < this.source.length) {
+      const char = this.#peek()!;
+      if (!isWhitespace(char)) break;
+      this.#index++;
+    }
   }
 
   #readToken(): TokenType {
     const char = this.#peek()!;
 
-    if (Lexer.isWhitespace(char)) {
+    if (isWhitespace(char)) {
       this.#index++;
       this.#readWhitespace();
       return "Whitespace";
+    }
+
+    if (isAlphabet(char) || char === "\\" || char === "_") {
+      return this.#readIdent();
     }
 
     if (isDelimiter(char)) {
@@ -185,9 +213,21 @@ export class Lexer implements IterableIterator<Token> {
       return "Delimiter";
     }
 
-    if (this.#isAhead("//")) {
-      this.#readLine();
-      return "Comment";
+    if (Lexer.#isOperatorChar(char)) {
+      if (this.#isAhead("//")) {
+        this.#readLine();
+        return "Comment";
+      }
+
+      if (this.#isAhead("/*")) {
+        this.#index += 2;
+        this.#readMultiLineComment();
+        return "Comment";
+      }
+
+      this.#index++;
+      this.#readOperator();
+      return "Operator";
     }
 
     if (char === '"') {
@@ -196,25 +236,9 @@ export class Lexer implements IterableIterator<Token> {
       return "String";
     }
 
-    if (this.#isAhead("/*")) {
-      this.#index += 2;
-      this.#readMultiLineComment();
-      return "Comment";
-    }
-
-    if (operatorChars.has(char as OperatorChar)) {
-      this.#index++;
-      this.#readOperator();
-      return "Operator";
-    }
-
-    if (/\d/.test(char)) {
+    if (isDigit(char)) {
       this.#readNumber();
       return "Number";
-    }
-
-    if (Lexer.#identStartRe.test(char)) {
-      return this.#readIdent();
     }
 
     throw new Error("Unknown character.");
