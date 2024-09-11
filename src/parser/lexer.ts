@@ -87,9 +87,6 @@ export class Lexer implements IterableIterator<Token> {
   #peek(): string | undefined {
     return this.source[this.#index];
   }
-  #isAhead(string: string): boolean {
-    return this.source.startsWith(string, this.#index);
-  }
 
   #readRe(re: RegExp): string {
     if (!(re.sticky || re.global)) {
@@ -111,7 +108,7 @@ export class Lexer implements IterableIterator<Token> {
     return isDigit(char) || isAlphabet(char) || char === "\\" || char === "_";
   }
   #readIdent() {
-    if (this.#isAhead('\\"')) {
+    if (this.source.startsWith('\\"', this.#index)) {
       this.#index += 2;
       this.#readString();
       return "Ident";
@@ -214,12 +211,12 @@ export class Lexer implements IterableIterator<Token> {
     }
 
     if (Lexer.#isOperatorChar(char)) {
-      if (this.#isAhead("//")) {
+      if (this.source.startsWith("//", this.#index)) {
         this.#readLine();
         return "Comment";
       }
 
-      if (this.#isAhead("/*")) {
+      if (this.source.startsWith("/*", this.#index)) {
         this.#index += 2;
         this.#readMultiLineComment();
         return "Comment";
