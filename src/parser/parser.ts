@@ -5,6 +5,23 @@ import { type Loc, loc } from "./location";
 import type * as N from "./node";
 import { unescapeStringContent } from "./utils";
 
+const sepBy = <T, S>(
+  parser: P.Parser<T, S>,
+  separator: P.Parser<unknown, S>,
+): P.Parser<T[], S> => {
+  return parser
+    .skip(separator)
+    .apply(P.many)
+    .flatMap((xs) =>
+      parser
+        .map((last) => {
+          xs.push(last);
+          return xs;
+        })
+        .option(xs),
+    );
+};
+
 const token = <T extends TokenType>(type: T) =>
   P.satisfy<Token & { type: T }, Token>((token) => token.type === type, {
     error: error.expected(type),
@@ -70,12 +87,11 @@ const String = token("String").map(
 
 const Tuple = P.seq([
   delimiter("("),
-  Expression.skip(delimiter(",")).apply(P.many),
-  Expression.option(),
+  Expression.apply(sepBy, delimiter(",")),
   delimiter(")"),
-]).map<N.TupleExpression<ParserExt>>(([start, elements, lastElement, end]) => ({
+]).map<N.TupleExpression<ParserExt>>(([start, elements, end]) => ({
   type: "Tuple",
-  elements: lastElement == null ? elements : [...elements, lastElement],
+  elements,
   loc: loc(start, end),
 }));
 
