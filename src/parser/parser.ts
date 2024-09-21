@@ -5,23 +5,6 @@ import { type Loc, loc } from "./location";
 import type * as N from "./node";
 import { unescapeStringContent } from "./utils";
 
-const sepBy = <T, S>(
-  parser: P.Parser<T, S>,
-  separator: P.Parser<unknown, S>,
-): P.Parser<T[], S> => {
-  return parser
-    .skip(separator)
-    .apply(P.many)
-    .flatMap((xs) =>
-      parser
-        .map((last) => {
-          xs.push(last);
-          return xs;
-        })
-        .option(xs),
-    );
-};
-
 const token = <T extends TokenType>(type: T) =>
   P.satisfy<Token & { type: T }, Token>((token) => token.type === type, {
     error: error.expected(type),
@@ -87,7 +70,7 @@ const String = token("String").map(
 
 const Tuple = P.seq([
   delimiter("("),
-  Expression.apply(sepBy, delimiter(",")),
+  Expression.apply(P.sepBy, delimiter(","), { trailing: "allow" }),
   delimiter(")"),
 ]).map<N.TupleExpression<ParserExt>>(([start, elements, end]) => ({
   type: "Tuple",
@@ -134,13 +117,13 @@ const If = P.seq([
   loc: loc(ifToken, else_),
 }));
 
-const Loop = keyword("loop")
-  .and(Expression)
-  .map<N.LoopExpression<ParserExt>>(([loopToken, body]) => ({
+const Loop = P.seq([keyword("loop"), Expression]).map(
+  ([loopToken, body]): N.LoopExpression<ParserExt> => ({
     type: "Loop",
     body,
     loc: loc(loopToken, body),
-  }));
+  }),
+);
 
 const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
   type: "Break",
@@ -158,13 +141,13 @@ const Fn = P.seq([
   loc: loc(fnToken, body),
 }));
 
-const Return = keyword("return")
-  .and(Expression.option(null))
-  .map<N.ReturnExpression<ParserExt>>(([returnToken, body]) => ({
+const Return = P.seq([keyword("return"), Expression.option(null)]).map(
+  ([returnToken, body]): N.ReturnExpression<ParserExt> => ({
     type: "Return",
     body,
     loc: loc(returnToken, body ?? returnToken),
-  }));
+  }),
+);
 
 // #endregion
 

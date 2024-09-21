@@ -16,7 +16,7 @@
   "author": "uzmoi",
   "license": "MIT",
   "dependencies": {
-    "parsea": "^0.9.0"
+    "parsea": "^0.10.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",

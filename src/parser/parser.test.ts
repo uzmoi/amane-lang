@@ -1,4 +1,4 @@
-import { EOI, type Parser } from "parsea";
+import { type Parser, parseA } from "parsea";
 import { describe, expect, test } from "vitest";
 import { Lexer, type Token } from "./lexer";
 import type { Loc, SourceLocation } from "./location";
@@ -9,9 +9,7 @@ const parse = (parser: Parser<unknown, Token>, source: string) => {
   const tokens = [...new Lexer(source)].filter(
     (token) => token.type !== "Whitespace",
   );
-  const result = parser.skip(EOI).parse(tokens);
-  if (result.success) return result.value;
-  throw result;
+  return parseA(parser, tokens);
 };
 
 const loc: SourceLocation = {
