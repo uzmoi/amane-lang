@@ -6,6 +6,8 @@ export type Keyword = typeof keywords extends Set<infer T> ? T : never;
 export const keywords = new Set([
   "true",
   "false",
+  "inf",
+  "nan",
   "if",
   "then",
   "else",

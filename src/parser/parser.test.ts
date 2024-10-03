@@ -49,6 +49,12 @@ describe("Number", () => {
       node("Number", { value: "0.0" }),
     );
   });
+  test("nan", () => {
+    expect(parse(Expression, "nan")).toEqual(node("Number", { value: "nan" }));
+  });
+  test("inf", () => {
+    expect(parse(Expression, "inf")).toEqual(node("Number", { value: "inf" }));
+  });
 });
 
 describe("String", () => {
