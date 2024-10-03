@@ -44,6 +44,11 @@ describe("Number", () => {
       node("Number", { value: "1000" }),
     );
   });
+  test("remove leading zeros", () => {
+    expect(parse(Expression, "0_000.0")).toEqual(
+      node("Number", { value: "0.0" }),
+    );
+  });
 });
 
 describe("String", () => {
