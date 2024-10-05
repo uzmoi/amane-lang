@@ -1,5 +1,6 @@
 /** 0-9 */
-export const isDigit = (char: string) => "\x2f" < char && char < "\x3a";
+// biome-ignore format: ()で囲わないとlintのyodaの警告が出る
+export const isDigit = (char: string) => ("\x2f" < char && char < "\x3a");
 
 /** A-Z | a-z */
 export const isAlphabet = (char: string) =>

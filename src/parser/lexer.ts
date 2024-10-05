@@ -153,6 +153,9 @@ export class Lexer implements IterableIterator<Token> {
         }
         // TODO: case "$": embed ident
         // TODO: case "{": embed expression
+        default: {
+          // noop
+        }
       }
     }
   }

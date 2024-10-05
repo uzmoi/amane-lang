@@ -54,6 +54,7 @@ const Bool = P.choice([keyword("true"), keyword("false")]).map(
 const Number = P.choice([keyword("inf"), keyword("nan"), token("Number")]).map(
   ({ value, loc }): N.NumberExpression<ParserExt> => ({
     type: "Number",
+    // biome-ignore lint/performance/useTopLevelRegex: for readability
     value: value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1"),
     loc,
   }),
