@@ -109,7 +109,7 @@ export class Lexer implements IterableIterator<Token> {
   static #isIdentChar(char: string) {
     return isDigit(char) || isAlphabet(char) || char === "\\" || char === "_";
   }
-  #readIdent() {
+  #readIdentOrKeyword() {
     if (this.source.startsWith('\\"', this.#index)) {
       this.#index += 2;
       this.#readString();
@@ -207,7 +207,7 @@ export class Lexer implements IterableIterator<Token> {
     }
 
     if (isAlphabet(char) || char === "\\" || char === "_") {
-      return this.#readIdent();
+      return this.#readIdentOrKeyword();
     }
 
     if (isDelimiter(char)) {
