@@ -43,29 +43,29 @@ export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
 );
 
 const Bool = P.choice([keyword("true"), keyword("false")]).map(
-  ({ value, loc }): N.BoolExpression<ParserExt> => ({
+  (token): N.BoolExpression<ParserExt> => ({
     type: "Bool",
-    value: value === "true",
-    loc,
+    value: token.value === "true",
+    loc: token,
   }),
 );
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
 const Number = P.choice([keyword("inf"), keyword("nan"), token("Number")]).map(
-  ({ value, loc }): N.NumberExpression<ParserExt> => ({
+  (token): N.NumberExpression<ParserExt> => ({
     type: "Number",
     // biome-ignore lint/performance/useTopLevelRegex: for readability
-    value: value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1"),
-    loc,
+    value: token.value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1"),
+    loc: token,
   }),
 );
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames:
 const String = token("String").map(
-  ({ value, loc }): N.StringExpression<ParserExt> => ({
+  (token): N.StringExpression<ParserExt> => ({
     type: "String",
-    value: unescapeStringContent(value.slice(1, -1)),
-    loc,
+    value: unescapeStringContent(token.value.slice(1, -1)),
+    loc: token,
   }),
 );
 
@@ -79,19 +79,18 @@ const Tuple = P.seq([
   loc: loc(start, end),
 }));
 
-const Ident = token("Ident").map(
-  ({ value, loc }): N.IdentExpression<ParserExt> => {
-    const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
-    const name = isStringIdent
-      ? unescapeStringContent(value.slice(2, -1))
-      : value.replace(/\\(.?)/g, "$1");
-    return {
-      type: "Ident",
-      name,
-      loc,
-    };
-  },
-);
+const Ident = token("Ident").map((token): N.IdentExpression<ParserExt> => {
+  const { value } = token;
+  const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
+  const name = isStringIdent
+    ? unescapeStringContent(value.slice(2, -1))
+    : value.replace(/\\(.?)/g, "$1");
+  return {
+    type: "Ident",
+    name,
+    loc: token,
+  };
+});
 
 const Block = P.seq([
   delimiter("{"),
@@ -115,20 +114,20 @@ const If = P.seq([
   cond,
   then: then_,
   else: else_,
-  loc: loc(ifToken, else_),
+  loc: loc(ifToken, else_.loc),
 }));
 
 const Loop = P.seq([keyword("loop"), Expression]).map(
   ([loopToken, body]): N.LoopExpression<ParserExt> => ({
     type: "Loop",
     body,
-    loc: loc(loopToken, body),
+    loc: loc(loopToken, body.loc),
   }),
 );
 
 const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
   type: "Break",
-  loc: token.loc,
+  loc: token,
 }));
 
 const Fn = P.seq([
@@ -139,14 +138,14 @@ const Fn = P.seq([
   type: "Fn",
   params,
   body,
-  loc: loc(fnToken, body),
+  loc: loc(fnToken, body.loc),
 }));
 
 const Return = P.seq([keyword("return"), Expression.option(null)]).map(
   ([returnToken, body]): N.ReturnExpression<ParserExt> => ({
     type: "Return",
     body,
-    loc: loc(returnToken, body ?? returnToken),
+    loc: loc(returnToken, body?.loc ?? returnToken),
   }),
 );
 
@@ -163,7 +162,7 @@ const Let = P.seq([keyword("let"), Ident, operator("="), Expression]).map(
     type: "Let",
     dest,
     init,
-    loc: loc(letToken, init),
+    loc: loc(letToken, init.loc),
   }),
 );
 

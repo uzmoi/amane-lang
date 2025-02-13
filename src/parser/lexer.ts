@@ -73,11 +73,12 @@ export type TokenType =
   | "String"
   | "Comment";
 
-export class Token {
+export class Token implements SourceLocation {
   constructor(
     readonly type: TokenType,
     readonly value: string,
-    readonly loc: SourceLocation,
+    readonly start: number,
+    readonly end: number,
   ) {}
 }
 
@@ -261,7 +262,7 @@ export class Lexer implements IterableIterator<Token> {
     }
 
     const value = this.source.slice(start, end);
-    const token = new Token(type, value, { start, end });
+    const token = new Token(type, value, start, end);
 
     return { done: false, value: token };
   }

@@ -6,11 +6,7 @@ const lex = (source: string): Token[] => [...new Lexer(source)];
 const tokens = (...tokens: [type: TokenType, value: string][]): Token[] => {
   let i = 0;
   return tokens.map(
-    ([type, value]): Token =>
-      new Token(type, value, {
-        start: i,
-        end: (i += value.length),
-      }),
+    ([type, value]) => new Token(type, value, i, (i += value.length)),
   );
 };
 

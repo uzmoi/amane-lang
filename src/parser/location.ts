@@ -13,7 +13,10 @@ export interface Loc {
   loc: SourceLocation;
 }
 
-export const loc = (start: Loc, end: Loc): SourceLocation => ({
-  start: start.loc.start,
-  end: end.loc.end,
+export const loc = (
+  start: SourceLocation,
+  end: SourceLocation,
+): SourceLocation => ({
+  start: start.start,
+  end: end.end,
 });
