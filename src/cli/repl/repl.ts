@@ -1,12 +1,11 @@
-import type { Interface as ReadlineInterface } from "node:readline/promises";
-import { type ReplCommand, commands, parseReplCommand } from "./commands";
+import { type ReplCommand, parseReplCommand } from "./commands";
 import { ReplExecuter } from "./executer";
 
 export class Repl {
   private commands = new Map<string, ReplCommand>();
   private executer = new ReplExecuter();
 
-  constructor() {
+  registerCommands(commands: ReplCommand[]) {
     for (const command of commands) {
       this.commands.set(command.name, command);
     }
@@ -36,7 +35,7 @@ export class Repl {
 
     return await this.executer.complete(input);
   }
-  async run(input: string, rli: ReadlineInterface): Promise<void> {
+  async run(input: string): Promise<void> {
     if (input.startsWith(":")) {
       const { commandName, argument } = parseReplCommand(input);
       const command = this.commands.get(commandName);
@@ -48,7 +47,7 @@ export class Repl {
           `Unknown repl command :${commandName}, type :help to show help.`,
         );
       } else {
-        await command.run({ repl: this, rli, argument });
+        await command.run(this, argument);
       }
     } else {
       await this.executer.execute(input);

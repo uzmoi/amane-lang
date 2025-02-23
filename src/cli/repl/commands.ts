@@ -4,11 +4,7 @@ import type { Repl } from "./repl";
 export interface ReplCommand {
   name: string;
   description: string;
-  run(arg: {
-    repl: Repl;
-    rli: ReadlineInterface;
-    argument: string | undefined;
-  }): void | Promise<void>;
+  run(repl: Repl, argument: string | undefined): void | Promise<void>;
   complete?(arg: string): Promise<readonly string[]>;
 }
 
@@ -24,11 +20,11 @@ export const parseReplCommand = (line: string): ReplCommandParseResult => {
     : { commandName: line.slice(1, i), argument: line.slice(i + 1) };
 };
 
-export const commands: ReplCommand[] = [
+export const commands = (rli: ReadlineInterface): ReplCommand[] => [
   {
     name: "help",
     description: "Print this help.",
-    run({ repl: _ }) {
+    run(_repl) {
       // TODO: impl
       // repl.println(repl.help().join("\n"));
     },
@@ -36,7 +32,7 @@ export const commands: ReplCommand[] = [
   {
     name: "quit",
     description: "Quit REPL.",
-    run({ rli }) {
+    run() {
       rli.close();
     },
   },

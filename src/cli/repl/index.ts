@@ -2,6 +2,7 @@ import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import pc from "picocolors";
 import { version } from "../..";
+import { commands } from "./commands";
 import { Repl } from "./repl";
 
 export const startRepl = async () => {
@@ -19,6 +20,8 @@ export const startRepl = async () => {
     },
     tabSize: 2,
   });
+
+  repl.registerCommands(commands(rli));
 
   let shouldExit = false;
 
@@ -45,7 +48,7 @@ export const startRepl = async () => {
 
     rli.pause();
 
-    await repl.run(line, rli);
+    await repl.run(line);
 
     rli.prompt();
   }
