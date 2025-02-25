@@ -6,6 +6,12 @@ export const isDigit = (char: string) => ("\x2f" < char && char < "\x3a");
 export const isAlphabet = (char: string) =>
   ("\x40" < char && char < "\x5b") || ("\x60" < char && char < "\x7b");
 
+export const isIdentStart = (char: string) =>
+  isAlphabet(char) || char === "\\" || char === "_";
+
+export const isIdentContinue = (char: string) =>
+  isDigit(char) || isAlphabet(char) || char === "\\" || char === "_";
+
 const wsRe = /\p{White_Space}/u;
 export const isWhitespace = (char: string) =>
   ("\x08" < char && char < "\x0e") || // "\t" | "\n" | "\v" | "\f" | "\r"

@@ -1,5 +1,5 @@
 import type { SourceLocation } from "./location";
-import { isAlphabet, isDigit, isWhitespace } from "./utils";
+import { isDigit, isIdentContinue, isIdentStart, isWhitespace } from "./utils";
 
 export type Keyword = typeof keywords extends Set<infer T> ? T : never;
 
@@ -107,9 +107,6 @@ export class Lexer implements IterableIterator<Token> {
     return result[0];
   }
 
-  static #isIdentChar(char: string) {
-    return isDigit(char) || isAlphabet(char) || char === "\\" || char === "_";
-  }
   #readIdentOrKeyword() {
     if (this.source.startsWith('\\"', this.#index)) {
       this.#index += 2;
@@ -121,7 +118,7 @@ export class Lexer implements IterableIterator<Token> {
 
     while (this.#index < this.source.length) {
       const char = this.#peek()!;
-      if (!Lexer.#isIdentChar(char)) break;
+      if (!isIdentContinue(char)) break;
       this.#index++;
       if (char === "\\" && this.#index < this.source.length) {
         this.#index++;
@@ -207,7 +204,7 @@ export class Lexer implements IterableIterator<Token> {
       return "Whitespace";
     }
 
-    if (isAlphabet(char) || char === "\\" || char === "_") {
+    if (isIdentStart(char)) {
       return this.#readIdentOrKeyword();
     }
 
