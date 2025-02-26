@@ -50,39 +50,15 @@ describe("Ident / Keyword", () => {
 });
 
 describe("Number", () => {
-  test("zero", () => {
-    expect(lex("0")).toEqual(tokens(["Number", "0"]));
-  });
-  test("integer", () => {
-    expect(lex("42")).toEqual(tokens(["Number", "42"]));
-  });
-  test("float", () => {
-    expect(lex("6.28")).toEqual(tokens(["Number", "6.28"]));
-  });
   describe.each`
-    name             | prefix  | max
-    ${"Binary"}      | ${"0b"} | ${"1"}
-    ${"Decimal"}     | ${""}   | ${"9"}
-    ${"Hexadecimal"} | ${"0x"} | ${"f"}
-  `("$name", ({ prefix, max }: { prefix: string; max: string }) => {
-    test.skipIf(prefix === "")("prefix only", () => {
-      expect(lex(prefix)).toEqual(tokens(["Number", prefix]));
-    });
-    test.skipIf(prefix === "")("uppercase prefix", () => {
-      const source = `${prefix.toUpperCase()}0`;
+    name             | cases
+    ${"Decimal"}     | ${["0", "0123456789", "1_000", "0__", "6.28", "1."]}
+    ${"Binary"}      | ${["0b", "0b0", "0B0", "0b01", "0b1_000", "0b__"]}
+    ${"Hexadecimal"} | ${["0x", "0x0", "0X0", "0x0123456789abcdefABCDEF", "0x1_000", "0x__"]}
+  `("$name", ({ cases }: { cases: string[] }) => {
+    test.each(cases)("%s", (source) => {
       expect(lex(source)).toEqual(tokens(["Number", source]));
     });
-    test("max", () => {
-      const source = `${prefix}0${max}`;
-      expect(lex(source)).toEqual(tokens(["Number", source]));
-    });
-    test("Separate with underscores", () => {
-      const source = `${prefix}1_000`;
-      expect(lex(source)).toEqual(tokens(["Number", source]));
-    });
-  });
-  test("uppercase hexadecimal", () => {
-    expect(lex("0xF")).toEqual(tokens(["Number", "0xF"]));
   });
 });
 
