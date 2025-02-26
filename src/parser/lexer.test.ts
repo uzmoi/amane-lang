@@ -100,8 +100,8 @@ describe("Comment", () => {
     });
   });
 
-  describe("multi line", () => {
-    test("multiline comment", () => {
+  describe("block", () => {
+    test("block comment", () => {
       const comment = "/*\n  comment\n*/";
       expect(lex(`${comment} `)).toEqual(
         tokens(["Comment", comment], ["Whitespace", " "]),

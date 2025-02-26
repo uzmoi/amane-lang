@@ -228,11 +228,11 @@ export class Lexer implements IterableIterator<Token> {
     this.#index = lineEndIndex === -1 ? this.source.length : lineEndIndex;
   }
 
-  static #mlcRe = /\/\*|\*\/|$/g;
-  #readMultiLineComment() {
+  static #blockCommentRe = /\/\*|\*\/|$/g;
+  #readBlockComment() {
     let depth = 1;
     do {
-      const value = this.#readRe(Lexer.#mlcRe);
+      const value = this.#readRe(Lexer.#blockCommentRe);
 
       if (value === "") break; // EOF
 
@@ -275,7 +275,7 @@ export class Lexer implements IterableIterator<Token> {
 
       if (this.source.startsWith("/*", this.#index)) {
         this.#index += 2;
-        this.#readMultiLineComment();
+        this.#readBlockComment();
         return "Comment";
       }
 
