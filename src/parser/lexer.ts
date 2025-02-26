@@ -177,7 +177,7 @@ export class Lexer implements IterableIterator<Token> {
           break;
         }
         default:
-          if (char == null || !isDigit(char)) return;
+          if (char == null || !(isDigit(char) || char === "_")) return;
       }
     }
 
@@ -308,7 +308,7 @@ export class Lexer implements IterableIterator<Token> {
     const type = this.#readToken();
 
     const end = this.#index;
-    if (start === end) {
+    if (start >= end) {
       throw new Error("An empty token is invalid.");
     }
 
