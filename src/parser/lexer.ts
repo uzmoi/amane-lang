@@ -1,5 +1,12 @@
 import type { SourceLocation } from "./location";
-import { isDigit, isIdentContinue, isIdentStart, isWhitespace } from "./utils";
+import {
+  isBinDigit,
+  isDigit,
+  isHexDigit,
+  isIdentContinue,
+  isIdentStart,
+  isWhitespace,
+} from "./utils";
 
 export type Keyword = typeof keywords extends Set<infer T> ? T : never;
 
@@ -130,9 +137,62 @@ export class Lexer implements IterableIterator<Token> {
     return isKeyword ? "Keyword" : "Ident";
   }
 
-  static #numberRe = /0[bo][\d_]*|0x[\da-f_]*|[\d_]+(\.[\d_]*)?/iy;
+  #readBinDigits() {
+    while (this.#index < this.source.length) {
+      const char = this.#peek()!;
+      if (char !== "_" && !isBinDigit(char)) break;
+      this.#index++;
+    }
+  }
+  #readDigits() {
+    while (this.#index < this.source.length) {
+      const char = this.#peek()!;
+      if (char !== "_" && !isDigit(char)) break;
+      this.#index++;
+    }
+  }
+  #readHexDigits() {
+    while (this.#index < this.source.length) {
+      const char = this.#peek()!;
+      if (char !== "_" && !isHexDigit(char)) break;
+      this.#index++;
+    }
+  }
+
   #readNumber() {
-    this.#readRe(Lexer.#numberRe);
+    if (this.#peek() === "0") {
+      this.#index++;
+      const char = this.#peek();
+      switch (char) {
+        case "b": // 2進リテラル
+        case "B": {
+          this.#index++;
+          this.#readBinDigits();
+          break;
+        }
+        case "o": // 8進リテラル
+        case "O": {
+          this.#index++;
+          this.#readDigits();
+          break;
+        }
+        case "x": // 16進リテラル
+        case "X": {
+          this.#index++;
+          this.#readHexDigits();
+          break;
+        }
+        default:
+          if (char == null || !isDigit(char)) return;
+      }
+    }
+
+    // 10進リテラル
+    this.#readDigits();
+    if (this.#peek() === ".") {
+      this.#index++;
+      this.#readDigits();
+    }
   }
 
   #readString() {

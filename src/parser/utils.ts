@@ -1,6 +1,15 @@
+/** 0 | 1 */
+export const isBinDigit = (char: string) => char === "0" || char === "1";
+
 /** 0-9 */
 // biome-ignore format: ()で囲わないとlintのyodaの警告が出る
 export const isDigit = (char: string) => ("\x2f" < char && char < "\x3a");
+
+/** 0-9 | A-F | a-f */
+export const isHexDigit = (char: string) =>
+  ("\x40" < char && char < "\x47") || // A-F
+  ("\x60" < char && char < "\x67") || // a-f
+  isDigit(char);
 
 /** A-Z | a-z */
 export const isAlphabet = (char: string) =>
