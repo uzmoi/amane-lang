@@ -170,12 +170,6 @@ export class Lexer implements IterableIterator<Token> {
           this.#readBinDigits();
           break;
         }
-        case "o": // 8進リテラル
-        case "O": {
-          this.#index++;
-          this.#readDigits();
-          break;
-        }
         case "x": // 16進リテラル
         case "X": {
           this.#index++;

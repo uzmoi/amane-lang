@@ -62,7 +62,6 @@ describe("Number", () => {
   describe.each`
     name             | prefix  | max
     ${"Binary"}      | ${"0b"} | ${"1"}
-    ${"Octal"}       | ${"0o"} | ${"7"}
     ${"Decimal"}     | ${""}   | ${"9"}
     ${"Hexadecimal"} | ${"0x"} | ${"f"}
   `("$name", ({ prefix, max }: { prefix: string; max: string }) => {
