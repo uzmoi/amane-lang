@@ -124,8 +124,8 @@ export class Lexer implements IterableIterator<Token> {
     const start = this.#index;
 
     while (this.#index < this.source.length) {
+      if (!isIdentContinue(this.source, this.#index)) break;
       const char = this.#peek()!;
-      if (!isIdentContinue(char)) break;
       this.#index++;
       if (char === "\\" && this.#index < this.source.length) {
         this.#index++;
@@ -258,7 +258,7 @@ export class Lexer implements IterableIterator<Token> {
       return "Whitespace";
     }
 
-    if (isIdentStart(char)) {
+    if (isIdentStart(this.source, this.#index)) {
       return this.#readIdentOrKeyword();
     }
 

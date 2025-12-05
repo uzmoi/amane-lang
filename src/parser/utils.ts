@@ -16,31 +16,43 @@ export const isAlphabet = (char: string) =>
   ("\x40" < char && char < "\x5b") || ("\x60" < char && char < "\x7b");
 
 // https://www.unicode.org/reports/tr31/#Default_Identifier_Syntax
-// REVIEW: フラグvにする？stringに添え字でアクセスして文字取ってきてるから意味ない？
-const idStartRe = /\p{ID_Start}/u;
-const idContinueRe = /\p{ID_Continue}/u;
+const idStartRe = /\p{ID_Start}/vy;
+const idContinueRe = /\p{ID_Continue}/vy;
+
+// 全ての文字ごとに正規表現で判定するのは重いので、ascii文字はそのまま判定する。
 
 /** `ID_Start` + `\` */
-export const isIdentStart = (char: string) =>
-  // NOTE: 全ての文字ごとに正規表現で判定するのは重いので、ascii文字はそのまま判定する。
-  // https://util.unicode.org/UnicodeJsps/list-unicodeset.jsp?a=[[:ASCII:]%26[:ID_Start:]]
-  isAlphabet(char) || char === "\\" || (char > "\x7f" && idStartRe.test(char));
+export const isIdentStart = (source: string, index: number) => {
+  const char = source[index]!;
+
+  // is ascii
+  if (char < "\x80") {
+    // https://util.unicode.org/UnicodeJsps/list-unicodeset.jsp?a=[[:ASCII:]%26[:ID_Start:]]
+    return isAlphabet(char) || char === "\\";
+  }
+
+  idStartRe.lastIndex = index;
+  return idStartRe.test(source);
+};
 
 /** `ID_Continue` + `\` */
-export const isIdentContinue = (char: string) =>
-  // 上のNOTE:と同じく。
-  // https://util.unicode.org/UnicodeJsps/list-unicodeset.jsp?a=[[:ASCII:]%26[:ID_Continue:]]
-  isDigit(char) ||
-  isAlphabet(char) ||
-  char === "\\" ||
-  char === "_" ||
-  (char > "\x7f" && idContinueRe.test(char));
+export const isIdentContinue = (source: string, index: number) => {
+  const char = source[index]!;
+
+  // is ascii
+  if (char < "\x80") {
+    // https://util.unicode.org/UnicodeJsps/list-unicodeset.jsp?a=[[:ASCII:]%26[:ID_Continue:]]
+    return isDigit(char) || isAlphabet(char) || char === "\\" || char === "_";
+  }
+
+  idContinueRe.lastIndex = index;
+  return idContinueRe.test(source);
+};
 
 // REVIEW: Pattern_White_Spaceにする？
 // REVIEW: フラグvにする？
 const wsRe = /\p{White_Space}/u;
 export const isWhitespace = (char: string) =>
-  // 上のNOTE:と同じく。
   // https://util.unicode.org/UnicodeJsps/list-unicodeset.jsp?a=[[:ASCII:]%26[:White_Space:]]
   ("\x08" < char && char < "\x0e") || // "\t" | "\n" | "\v" | "\f" | "\r"
   char === " " ||
