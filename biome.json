@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
   "files": { "ignoreUnknown": true },
   "vcs": {
     "enabled": true,
@@ -9,14 +9,18 @@
   "formatter": {
     "indentStyle": "space"
   },
-  "organizeImports": {
-    "enabled": true
+  "assist": {
+    "actions": { "recommended": true }
   },
   "linter": {
     "enabled": true,
-    "ignore": ["*.d.ts"],
+    "includes": ["**", "!**/*.d.ts"],
+    "domains": {
+      "project": "recommended",
+      "test": "recommended"
+    },
     "rules": {
-      "all": true,
+      "recommended": true,
       "complexity": {
         "noExcessiveCognitiveComplexity": "off"
       },
@@ -27,10 +31,10 @@
       },
       "performance": {
         "noBarrelFile": "off",
-        "noReExportAll": "off"
+        "noReExportAll": "off",
+        "noNamespaceImport": "off"
       },
       "style": {
-        "noNamespaceImport": "off",
         "noNonNullAssertion": "off",
         "noParameterProperties": "off",
         "useBlockStatements": "off",
@@ -44,10 +48,9 @@
   },
   "overrides": [
     {
-      "include": ["*.test.ts", "*.config.ts"],
+      "includes": ["**/*.test.ts", "**/*.config.ts"],
       "linter": {
         "rules": {
-          "style": { "all": false },
           "suspicious": {
             "noAssignInExpressions": "off"
           }
