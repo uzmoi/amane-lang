@@ -1,0 +1,6 @@
+ignoredBuiltDependencies:
+  - '@biomejs/biome'
+  - esbuild
+  - lefthook
+
+minimumReleaseAge: 10080 # 1 week
