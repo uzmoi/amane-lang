@@ -1,4 +1,4 @@
-import { type ReplCommand, parseReplCommand } from "./commands";
+import { parseReplCommand, type ReplCommand } from "./commands";
 import { ReplExecuter } from "./executer";
 
 export class Repl {
@@ -41,8 +41,6 @@ export class Repl {
       const command = this.commands.get(commandName);
 
       if (command == null) {
-        // biome-ignore lint/suspicious/noConsoleLog:
-        // biome-ignore lint/suspicious/noConsole:
         console.log(
           `Unknown repl command :${commandName}, type :help to show help.`,
         );

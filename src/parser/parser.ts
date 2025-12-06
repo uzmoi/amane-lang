@@ -50,17 +50,16 @@ const Bool = P.choice([keyword("true"), keyword("false")]).map(
   }),
 );
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames:
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Node name
 const Number = P.choice([keyword("inf"), keyword("nan"), token("Number")]).map(
   (token): N.NumberExpression<ParserExt> => ({
     type: "Number",
-    // biome-ignore lint/performance/useTopLevelRegex: for readability
     value: token.value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1"),
     loc: token,
   }),
 );
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames:
+// biome-ignore lint/suspicious/noShadowRestrictedNames: Node name
 const String = token("String").map(
   (token): N.StringExpression<ParserExt> => ({
     type: "String",

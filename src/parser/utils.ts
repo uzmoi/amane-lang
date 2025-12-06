@@ -2,8 +2,7 @@
 export const isBinDigit = (char: string) => char === "0" || char === "1";
 
 /** 0-9 */
-// biome-ignore format: ()で囲わないとlintのyodaの警告が出る
-export const isDigit = (char: string) => ("\x2f" < char && char < "\x3a");
+export const isDigit = (char: string) => "\x2f" < char && char < "\x3a";
 
 /** 0-9 | A-F | a-f */
 export const isHexDigit = (char: string) =>
@@ -68,4 +67,7 @@ const escapeCharMap = new Map([
 
 // REVIEW: uかvフラグ付ける？
 export const unescapeStringContent = (string: string): string =>
-  string.replace(/\\(.)/g, (_, mat: string) => escapeCharMap.get(mat) ?? mat);
+  string.replace(
+    /\\(.)/g,
+    (_, mat) => escapeCharMap.get(mat as string) ?? (mat as string),
+  );
