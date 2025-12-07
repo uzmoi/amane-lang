@@ -1,12 +1,15 @@
 import { describe, expect, test } from "vitest";
-import { Lexer, Token, type TokenType } from "./lexer";
+import { Lexer, TOKEN_TYPE_NAMES, Token } from "./lexer";
 
 const lex = (source: string): Token[] => [...new Lexer(source)];
 
-const tokens = (...tokens: [type: TokenType, value: string][]): Token[] => {
+type TokenTypeName = (typeof TOKEN_TYPE_NAMES)[number];
+
+const tokens = (...tokens: [type: TokenTypeName, value: string][]): Token[] => {
   let i = 0;
   return tokens.map(
-    ([type, value]) => new Token(type, value, i, (i += value.length)),
+    ([type, value]) =>
+      new Token(TOKEN_TYPE_NAMES.indexOf(type), value, i, (i += value.length)),
   );
 };
 

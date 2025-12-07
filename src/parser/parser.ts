@@ -1,26 +1,36 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
-import type { Delimiter, Keyword, Operator, Token, TokenType } from "./lexer";
+import {
+  type Delimiter,
+  type Keyword,
+  type Operator,
+  TOKEN_TYPE_NAMES,
+  type Token,
+  TokenType,
+} from "./lexer";
 import { type Loc, loc } from "./location";
 import type * as N from "./node";
 import { unescapeStringContent } from "./utils";
 
 const token = <T extends TokenType>(type: T) =>
   P.satisfy<Token & { type: T }, Token>((token) => token.type === type, {
-    error: error.expected(type),
+    error: error.expected(TOKEN_TYPE_NAMES[type]),
   });
 
 const tokenWith = <T extends TokenType, U extends string>(type: T, value: U) =>
   P.satisfy<Token & { type: T; value: U }, Token>(
     (token) => token.type === type && token.value === value,
-    { error: error.expected(`${type}("${value}")`) },
+    { error: error.expected(`${TOKEN_TYPE_NAMES[type]}("${value}")`) },
   );
 
-const keyword = <T extends Keyword>(word: T) => tokenWith("Keyword", word);
+const keyword = <T extends Keyword>(word: T) =>
+  tokenWith(TokenType.Keyword, word);
+
 const delimiter = <T extends Delimiter>(delimiter: T) =>
-  tokenWith("Delimiter", delimiter);
+  tokenWith(TokenType.Delimiter, delimiter);
+
 const operator = <T extends string>(operator: Operator<T>) =>
-  tokenWith("Operator", operator);
+  tokenWith(TokenType.Operator, operator);
 
 type ParserExt = Loc;
 
@@ -51,7 +61,11 @@ const Bool = P.choice([keyword("true"), keyword("false")]).map(
 );
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames: Node name
-const Number = P.choice([keyword("inf"), keyword("nan"), token("Number")]).map(
+const Number = P.choice([
+  keyword("inf"),
+  keyword("nan"),
+  token(TokenType.Number),
+]).map(
   (token): N.NumberExpression<ParserExt> => ({
     type: "Number",
     value: token.value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1"),
@@ -60,7 +74,7 @@ const Number = P.choice([keyword("inf"), keyword("nan"), token("Number")]).map(
 );
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames: Node name
-const String = token("String").map(
+const String = token(TokenType.String).map(
   (token): N.StringExpression<ParserExt> => ({
     type: "String",
     value: unescapeStringContent(token.value.slice(1, -1)),
@@ -78,18 +92,20 @@ const Tuple = P.seq([
   loc: loc(start, end),
 }));
 
-const Ident = token("Ident").map((token): N.IdentExpression<ParserExt> => {
-  const { value } = token;
-  const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
-  const name = isStringIdent
-    ? unescapeStringContent(value.slice(2, -1))
-    : value.replace(/\\(.?)/g, "$1");
-  return {
-    type: "Ident",
-    name,
-    loc: token,
-  };
-});
+const Ident = token(TokenType.Ident).map(
+  (token): N.IdentExpression<ParserExt> => {
+    const { value } = token;
+    const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
+    const name = isStringIdent
+      ? unescapeStringContent(value.slice(2, -1))
+      : value.replace(/\\(.?)/g, "$1");
+    return {
+      type: "Ident",
+      name,
+      loc: token,
+    };
+  },
+);
 
 const Block = P.seq([
   delimiter("{"),

@@ -38,9 +38,8 @@ const isDelimiter: (char: string) => char is Delimiter = (char) =>
   char === ";" ||
   char === ",";
 
-export type OperatorChar = typeof operatorChars extends Set<infer T>
-  ? T
-  : never;
+export type OperatorChar =
+  typeof operatorChars extends Set<infer T> ? T : never;
 
 export type Operator<T, U = T> = T extends `${infer S}${infer Rest}`
   ? S extends OperatorChar
@@ -70,15 +69,27 @@ export const operatorChars = new Set([
   "~",
 ] as const);
 
-export type TokenType =
-  | "Whitespace"
-  | "Delimiter"
-  | "Operator"
-  | "Ident"
-  | "Keyword"
-  | "Number"
-  | "String"
-  | "Comment";
+export const enum TokenType {
+  Whitespace,
+  Delimiter,
+  Operator,
+  Ident,
+  Keyword,
+  Number,
+  String,
+  Comment,
+}
+
+export const TOKEN_TYPE_NAMES = [
+  "Whitespace",
+  "Delimiter",
+  "Operator",
+  "Ident",
+  "Keyword",
+  "Number",
+  "String",
+  "Comment",
+] as const;
 
 export class Token implements SourceLocation {
   constructor(
@@ -118,7 +129,7 @@ export class Lexer implements IterableIterator<Token> {
     if (this.source.startsWith('\\"', this.#index)) {
       this.#index += 2;
       this.#readString();
-      return "Ident";
+      return TokenType.Ident;
     }
 
     const start = this.#index;
@@ -134,7 +145,7 @@ export class Lexer implements IterableIterator<Token> {
 
     const value = this.source.slice(start, this.#index);
     const isKeyword = keywords.has(value as Keyword);
-    return isKeyword ? "Keyword" : "Ident";
+    return isKeyword ? TokenType.Keyword : TokenType.Ident;
   }
 
   #readBinDigits() {
@@ -255,7 +266,7 @@ export class Lexer implements IterableIterator<Token> {
     if (isWhitespace(char)) {
       this.#index++;
       this.#readWhitespace();
-      return "Whitespace";
+      return TokenType.Whitespace;
     }
 
     if (isIdentStart(this.source, this.#index)) {
@@ -264,35 +275,35 @@ export class Lexer implements IterableIterator<Token> {
 
     if (isDelimiter(char)) {
       this.#index++;
-      return "Delimiter";
+      return TokenType.Delimiter;
     }
 
     if (Lexer.#isOperatorChar(char)) {
       if (this.source.startsWith("//", this.#index)) {
         this.#readLine();
-        return "Comment";
+        return TokenType.Comment;
       }
 
       if (this.source.startsWith("/*", this.#index)) {
         this.#index += 2;
         this.#readBlockComment();
-        return "Comment";
+        return TokenType.Comment;
       }
 
       this.#index++;
       this.#readOperator();
-      return "Operator";
+      return TokenType.Operator;
     }
 
     if (char === '"') {
       this.#index++;
       this.#readString();
-      return "String";
+      return TokenType.String;
     }
 
     if (isDigit(char)) {
       this.#readNumber();
-      return "Number";
+      return TokenType.Number;
     }
 
     throw new Error("Unknown character.");
