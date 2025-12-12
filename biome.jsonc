@@ -16,29 +16,18 @@
     "enabled": true,
     "includes": ["**", "!**/*.d.ts"],
     "domains": {
-      "project": "recommended",
-      "test": "recommended"
+      "project": "all",
+      "test": "all"
     },
     "rules": {
       "recommended": true,
-      "complexity": {
-        "noExcessiveCognitiveComplexity": "off"
-      },
       "correctness": {
         "noEmptyCharacterClassInRegex": "off",
-        "noNodejsModules": "off",
         "useImportExtensions": "off"
-      },
-      "performance": {
-        "noBarrelFile": "off",
-        "noReExportAll": "off",
-        "noNamespaceImport": "off"
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noParameterProperties": "off",
-        "useBlockStatements": "off",
-        "useEnumInitializers": "off"
+        "noUnusedTemplateLiteral": "warn"
       },
       "suspicious": {
         "noConstEnum": "off",
@@ -48,12 +37,10 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.test.ts", "**/*.config.ts"],
+      "includes": ["src/**", "!src/cli/**"],
       "linter": {
         "rules": {
-          "suspicious": {
-            "noAssignInExpressions": "off"
-          }
+          "correctness": { "noNodejsModules": "error" }
         }
       }
     }

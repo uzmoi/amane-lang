@@ -9,6 +9,7 @@ const tokens = (...tokens: [type: TokenTypeName, value: string][]): Token[] => {
   let i = 0;
   return tokens.map(
     ([type, value]) =>
+      // biome-ignore lint/suspicious/noAssignInExpressions: test
       new Token(TOKEN_TYPE_NAMES.indexOf(type), value, i, (i += value.length)),
   );
 };
