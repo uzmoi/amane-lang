@@ -1,13 +1,12 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: {
     index: "src/index.ts",
     cli: "src/cli/main.ts",
   },
-  format: "esm",
+  platform: "neutral",
   sourcemap: true,
-  dts: true,
   define: {
     "import.meta.env.DEV": "false",
   },

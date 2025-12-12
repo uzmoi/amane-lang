@@ -6,12 +6,13 @@
   "type": "module",
   "sideEffects": false,
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist",
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "check": "biome check",
     "test": "vitest --typecheck",
     "spell": "cspell --no-progress ."
@@ -33,7 +34,7 @@
     "better-typescript-lib": "^2.12.0",
     "cspell": "^9.3.2",
     "lefthook": "^2.0.4",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.17.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.14"
   }
