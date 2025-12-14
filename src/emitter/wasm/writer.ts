@@ -1,9 +1,22 @@
-import { Opcode } from "./opcode";
 import type { u8 } from "./types";
 
 export class Writer {
-  u8(_value: u8) {
-    // TODO: impl
+  #buffer = new ArrayBuffer(0, { maxByteLength: 64 * 1024 }); // 64 KiB
+  binary = new Uint8Array(this.#buffer);
+  #ptr = 0;
+
+  consume(n: number) {
+    const ptr = this.#ptr;
+    this.#ptr += n;
+    if (this.#ptr > this.binary.length) {
+      this.#buffer.resize(this.#ptr);
+      // this.binary = new Uint8Array(this.buffer);
+    }
+    return ptr;
+  }
+
+  u8(value: u8) {
+    this.binary[this.consume(1)] = value;
   }
 
   u32leb128(n: number) {
