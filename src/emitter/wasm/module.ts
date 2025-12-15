@@ -34,30 +34,36 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u8(h);
   }
 
-  writer.u8(SectionId.type);
-  writer.u32leb128(4); // section size
-  writer.u32leb128(1); // types count
-  writer.u32leb128(0x60); // func type
-  writer.u32leb128(0); // params count
-  writer.u32leb128(0); // results count
+  {
+    writer.u8(SectionId.type);
+    const ptr = writer.consume(1); // section size
+    writer.u32leb128(1); // types count
+    writer.u32leb128(0x60); // func type
+    writer.u32leb128(0); // params count
+    writer.u32leb128(0); // results count
+    writer.fixupSize(ptr);
+  }
 
   if (module.funcs.length > 0) {
     writer.u8(SectionId.func);
-    writer.u32leb128(1 + module.funcs.length); // section size
+    const ptr = writer.consume(1); // section size
     writer.u32leb128(module.funcs.length); // functions count
     for (const _ of module.funcs) {
       writer.u32leb128(0); // function signature index
     }
+    writer.fixupSize(ptr);
   }
 
   if (module.funcs.length > 0) {
     writer.u8(SectionId.code);
-    writer.u32leb128(1 + module.funcs.length * 3); // section size
+    const ptr = writer.consume(1); // section size
     writer.u32leb128(module.funcs.length); // functions count
     for (const _ of module.funcs) {
-      writer.u32leb128(2); // body size
+      const ptr = writer.consume(1); // body size
       writer.u32leb128(0); // local decl count
       writer.u8(Opcode.end);
+      writer.fixupSize(ptr);
     }
+    writer.fixupSize(ptr);
   }
 };

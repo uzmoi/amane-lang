@@ -1,4 +1,5 @@
 import type { u8 } from "./types";
+import { leb128size } from "./utils";
 
 export class Writer {
   #buffer = new ArrayBuffer(0, { maxByteLength: 64 * 1024 }); // 64 KiB
@@ -29,5 +30,20 @@ export class Writer {
 
       this.u8(byte);
     } while (n !== 0);
+  }
+
+  fixupSize(ptr: number, hint = 1) {
+    const size = this.#ptr - ptr - hint;
+    const sizeSize = leb128size(size);
+    if (sizeSize === 1) {
+      this.binary[ptr] = size;
+    } else {
+      this.binary.copyWithin(
+        ptr + sizeSize,
+        ptr + hint,
+        this.consume(sizeSize),
+      );
+      this.u32leb128(size);
+    }
   }
 }
