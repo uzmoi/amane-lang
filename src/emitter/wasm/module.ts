@@ -36,11 +36,13 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u8(h);
   }
 
-  if (module.types.length > 0) {
+  const { types, funcs } = module;
+
+  if (types.length > 0) {
     writer.u8(SectionId.type);
     const ptr = writer.consume(1); // section size
-    writer.u32leb128(module.types.length);
-    for (const type of module.types) {
+    writer.u32leb128(types.length);
+    for (const type of types) {
       writer.u32leb128(0x60); // func type
       writer.u32leb128(type.params.length);
       for (const _ of type.params) {
@@ -54,21 +56,21 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.fixupSize(ptr);
   }
 
-  if (module.funcs.length > 0) {
+  if (funcs.length > 0) {
     writer.u8(SectionId.func);
     const ptr = writer.consume(1); // section size
-    writer.u32leb128(module.funcs.length); // functions count
-    for (const func of module.funcs) {
+    writer.u32leb128(funcs.length);
+    for (const func of funcs) {
       writer.u32leb128(func.signature); // function signature index
     }
     writer.fixupSize(ptr);
   }
 
-  if (module.funcs.length > 0) {
+  if (funcs.length > 0) {
     writer.u8(SectionId.code);
     const ptr = writer.consume(1); // section size
-    writer.u32leb128(module.funcs.length); // functions count
-    for (const _ of module.funcs) {
+    writer.u32leb128(funcs.length);
+    for (const _ of funcs) {
       const ptr = writer.consume(1); // body size
       writer.u32leb128(0); // local decl count
       writer.u8(Opcode.end);
