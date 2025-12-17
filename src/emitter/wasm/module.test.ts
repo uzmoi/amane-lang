@@ -1,37 +1,51 @@
 import { describe, expect, test } from "vitest";
-import { write_module } from "./module";
+import { ImportExportDesc, type Module, write_module } from "./module";
 import { Writer } from "./writer";
 
 describe("write_module", () => {
-  test("validate empty module", () => {
+  test.each(
+    Object.entries<string, Module>({
+      empty: { types: [], imports: [], funcs: [], exports: [] },
+      export_func: {
+        types: [{ kind: "func", params: [], return: [] }],
+        imports: [],
+        funcs: [{ signature: 0, body: null }],
+        exports: [{ name: "noop", desc: ImportExportDesc.func, idx: 0 }],
+      },
+    }),
+  )("validate %s module %#", (_, module) => {
     const writer = new Writer();
     expect(writer.binary.length).toBe(0);
-    write_module(writer, { types: [], funcs: [] });
+    write_module(writer, module);
 
     expect(WebAssembly.validate(writer.binary)).toBeTruthy();
-    expect(writer.binary.length).toBe(14);
   });
 
-  test("validate simple module", () => {
+  test("exports", async () => {
     const writer = new Writer();
     write_module(writer, {
       types: [{ kind: "func", params: [], return: [] }],
+      imports: [],
       funcs: [{ signature: 0, body: null }],
+      exports: [{ name: "hoge", desc: ImportExportDesc.func, idx: 0 }],
     });
 
-    expect(WebAssembly.validate(writer.binary)).toBeTruthy();
+    const { instance } = await WebAssembly.instantiate(writer.binary);
+    expect(instance.exports).toEqual({ hoge: expect.any(Function) });
   });
 
-  test("validate simple module 2", () => {
+  test("empty module snapshot", () => {
     const writer = new Writer();
+    expect(writer.binary.length).toBe(0);
     write_module(writer, {
-      types: [{ kind: "func", params: [], return: [] }],
-      funcs: [
-        { signature: 0, body: null },
-        { signature: 0, body: null },
-      ],
+      types: [],
+      imports: [],
+      funcs: [],
+      exports: [],
     });
 
-    expect(WebAssembly.validate(writer.binary)).toBeTruthy();
+    expect(writer.binary).toEqual(
+      new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]),
+    );
   });
 });
