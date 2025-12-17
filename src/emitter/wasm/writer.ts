@@ -46,4 +46,15 @@ export class Writer {
       this.u32leb128(size);
     }
   }
+
+  vec_u8(u8array: Uint8Array<ArrayBuffer>) {
+    this.u32leb128(u8array.length);
+    this.binary.set(u8array, this.consume(u8array.length));
+  }
+
+  #encoder = new TextEncoder();
+  str(utf16string: string) {
+    const utf8string = this.#encoder.encode(utf16string);
+    this.vec_u8(utf8string);
+  }
 }

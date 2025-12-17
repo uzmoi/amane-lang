@@ -20,14 +20,36 @@ const enum SectionId {
 
 export type Type = { kind: "func"; params: []; return: [] };
 
+export const enum ImportExportDesc {
+  func = 0x00,
+  table = 0x01,
+  mem = 0x02,
+  global = 0x03,
+}
+
+export interface Import {
+  mod: string;
+  name: string;
+  desc: ImportExportDesc;
+  type: number;
+}
+
 export interface Func {
   signature: number;
   body: null;
 }
 
+export interface Export {
+  name: string;
+  desc: ImportExportDesc;
+  idx: number;
+}
+
 export interface Module {
   types: readonly Type[];
+  imports: readonly Import[];
   funcs: readonly Func[];
+  exports: readonly Export[];
 }
 
 export const write_module = (writer: Writer, module: Module) => {
@@ -36,7 +58,7 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u8(h);
   }
 
-  const { types, funcs } = module;
+  const { types, imports, funcs, exports } = module;
 
   if (types.length > 0) {
     writer.u8(SectionId.type);
@@ -56,12 +78,36 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.fixupSize(ptr);
   }
 
+  if (imports.length > 0) {
+    writer.u8(SectionId.import);
+    const ptr = writer.consume(1); // section size
+    for (const import_ of imports) {
+      writer.str(import_.mod);
+      writer.str(import_.name);
+      writer.u8(import_.desc);
+      writer.u32leb128(import_.type);
+    }
+    writer.fixupSize(ptr);
+  }
+
   if (funcs.length > 0) {
     writer.u8(SectionId.func);
     const ptr = writer.consume(1); // section size
     writer.u32leb128(funcs.length);
     for (const func of funcs) {
       writer.u32leb128(func.signature); // function signature index
+    }
+    writer.fixupSize(ptr);
+  }
+
+  if (exports.length > 0) {
+    writer.u8(SectionId.export);
+    const ptr = writer.consume(1); // section size
+    writer.u32leb128(exports.length);
+    for (const export_ of exports) {
+      writer.str(export_.name);
+      writer.u8(export_.desc);
+      writer.u32leb128(export_.idx);
     }
     writer.fixupSize(ptr);
   }
