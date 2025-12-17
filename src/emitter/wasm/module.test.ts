@@ -5,12 +5,20 @@ import { Writer } from "./writer";
 describe("write_module", () => {
   test.each(
     Object.entries<string, Module>({
-      empty: { types: [], imports: [], funcs: [], exports: [] },
+      empty: { types: [], imports: [], funcs: [], exports: [], start: null },
       export_func: {
         types: [{ kind: "func", params: [], return: [] }],
         imports: [],
         funcs: [{ signature: 0, body: null }],
         exports: [{ name: "noop", desc: ImportExportDesc.func, idx: 0 }],
+        start: null,
+      },
+      start: {
+        types: [{ kind: "func", params: [], return: [] }],
+        imports: [],
+        funcs: [{ signature: 0, body: null }],
+        exports: [],
+        start: { idx: 0 },
       },
     }),
   )("validate %s module %#", (_, module) => {
@@ -28,6 +36,7 @@ describe("write_module", () => {
       imports: [],
       funcs: [{ signature: 0, body: null }],
       exports: [{ name: "hoge", desc: ImportExportDesc.func, idx: 0 }],
+      start: null,
     });
 
     const { instance } = await WebAssembly.instantiate(writer.binary);
@@ -42,6 +51,7 @@ describe("write_module", () => {
       imports: [],
       funcs: [],
       exports: [],
+      start: null,
     });
 
     expect(writer.binary).toEqual(

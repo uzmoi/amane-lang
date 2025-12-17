@@ -1,4 +1,6 @@
 import { Opcode } from "./opcode";
+import type { u8 } from "./types";
+import { leb128size } from "./utils";
 import type { Writer } from "./writer";
 
 // https://www.w3.org/TR/wasm-core-2/#sections①
@@ -45,11 +47,16 @@ export interface Export {
   idx: number;
 }
 
+export interface Start {
+  idx: number;
+}
+
 export interface Module {
   types: readonly Type[];
   imports: readonly Import[];
   funcs: readonly Func[];
   exports: readonly Export[];
+  start: Start | null;
 }
 
 export const write_module = (writer: Writer, module: Module) => {
@@ -58,7 +65,7 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u8(h);
   }
 
-  const { types, imports, funcs, exports } = module;
+  const { types, imports, funcs, exports, start } = module;
 
   if (types.length > 0) {
     writer.u8(SectionId.type);
@@ -110,6 +117,12 @@ export const write_module = (writer: Writer, module: Module) => {
       writer.u32leb128(export_.idx);
     }
     writer.fixupSize(ptr);
+  }
+
+  if (start != null) {
+    writer.u8(SectionId.start);
+    writer.u8(leb128size(start.idx) as u8); // section size
+    writer.u32leb128(start.idx);
   }
 
   if (funcs.length > 0) {
