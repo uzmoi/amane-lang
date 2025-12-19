@@ -41,9 +41,11 @@ export class Writer {
       this.binary.copyWithin(
         ptr + sizeSize,
         ptr + hint,
-        this.consume(sizeSize),
+        this.consume(sizeSize - hint),
       );
+      this.#ptr -= size + sizeSize;
       this.u32leb128(size);
+      this.#ptr += size;
     }
   }
 
