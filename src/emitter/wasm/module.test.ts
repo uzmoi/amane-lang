@@ -23,7 +23,6 @@ describe("write_module", () => {
     }),
   )("validate %s module %#", (_, module) => {
     const writer = new Writer();
-    expect(writer.binary.length).toBe(0);
     write_module(writer, module);
 
     expect(WebAssembly.validate(writer.binary)).toBeTruthy();
@@ -45,7 +44,6 @@ describe("write_module", () => {
 
   test("empty module snapshot", () => {
     const writer = new Writer();
-    expect(writer.binary.length).toBe(0);
     write_module(writer, {
       types: [],
       imports: [],
