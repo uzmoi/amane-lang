@@ -1,3 +1,5 @@
+import type { Air } from "../../air";
+import { write_air } from "./air";
 import { Opcode } from "./opcode";
 import type { u8 } from "./types";
 import { leb128size } from "./utils";
@@ -38,7 +40,7 @@ export interface Import {
 
 export interface Func {
   signature: number;
-  body: null;
+  body: Air | null;
 }
 
 export interface Export {
@@ -129,9 +131,12 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u8(SectionId.code);
     const ptr = writer.consume(1); // section size
     writer.u32leb128(funcs.length);
-    for (const _ of funcs) {
+    for (const func of funcs) {
       const ptr = writer.consume(1); // body size
       writer.u32leb128(0); // local decl count
+      if (func.body) {
+        write_air(writer, func.body);
+      }
       writer.u8(Opcode.end);
       writer.fixupSize(ptr);
     }
