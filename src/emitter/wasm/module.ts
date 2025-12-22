@@ -22,7 +22,30 @@ const enum SectionId {
   data_count = 12,
 }
 
-export type Type = { kind: "func"; params: []; return: [] };
+// https://www.w3.org/TR/wasm-core-2/#types⑦
+export const enum NumType {
+  i32 = 0x7f,
+  i64 = 0x7e,
+  f32 = 0x7d,
+  f64 = 0x7c,
+}
+
+export const enum VecType {
+  v128 = 0x7b,
+}
+
+export const enum RefType {
+  func_ref = 0x70,
+  extern_ref = 0x6f,
+}
+
+export type ValType = NumType | VecType | RefType;
+
+export interface FuncType {
+  kind: "func";
+  params: readonly ValType[];
+  return: readonly ValType[];
+}
 
 export const enum ImportExportDesc {
   func = 0x00,
@@ -54,7 +77,7 @@ export interface Start {
 }
 
 export interface Module {
-  types: readonly Type[];
+  types: readonly FuncType[];
   imports: readonly Import[];
   funcs: readonly Func[];
   exports: readonly Export[];
@@ -75,14 +98,8 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u32leb128(types.length);
     for (const type of types) {
       writer.u32leb128(0x60); // func type
-      writer.u32leb128(type.params.length);
-      for (const _ of type.params) {
-        // writer.u32leb128(NumberType.i32);
-      }
-      writer.u32leb128(type.return.length);
-      for (const _ of type.return) {
-        // writer.u32leb128(NumberType.i32);
-      }
+      writer.vec_u8(type.params);
+      writer.vec_u8(type.return);
     }
     writer.fixupSize(ptr);
   }

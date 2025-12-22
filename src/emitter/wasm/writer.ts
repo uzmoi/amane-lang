@@ -49,7 +49,7 @@ export class Writer {
     }
   }
 
-  vec_u8(u8array: Uint8Array<ArrayBuffer>) {
+  vec_u8(u8array: Uint8Array<ArrayBuffer> | readonly u8[]) {
     this.u32leb128(u8array.length);
     this.binary.set(u8array, this.consume(u8array.length));
   }
