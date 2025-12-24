@@ -63,6 +63,7 @@ export interface Import {
 
 export interface Func {
   signature: number;
+  decl_count: number;
   body: Air | null;
 }
 
@@ -150,8 +151,8 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u32leb128(funcs.length);
     for (const func of funcs) {
       const ptr = writer.consume(1); // body size
-      writer.u32leb128(0); // local decl count
-      if (func.body) {
+      writer.u32leb128(func.decl_count);
+      if (func.body != null) {
         write_air(writer, func.body);
       }
       writer.u8(Opcode.end);
