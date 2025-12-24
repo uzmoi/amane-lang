@@ -1,5 +1,9 @@
 import { Writer } from "./writer";
 
-export const emitWasm = () => {
-  const _writer = new Writer();
+export const emit_wasm = (): Uint8Array<ArrayBuffer> => {
+  const writer = new Writer();
+
+  // write_module(writer, { ... });
+
+  return writer.binary;
 };
