@@ -1,21 +1,21 @@
 import { type Parser, parseA } from "parsea";
 import { describe, expect, test } from "vitest";
-import { Lexer, type Token } from "./lexer";
+import { Lexer, type Token, TokenType } from "./lexer";
 import type { Loc, SourceLocation } from "./location";
 import type * as N from "./node";
 import { Expression, Statement } from "./parser";
 
 const parse = (parser: Parser<unknown, Token>, source: string) => {
   const tokens = [...new Lexer(source)].filter(
-    (token) => token.type !== "Whitespace",
+    (token) => token.type !== TokenType.Whitespace,
   );
   return parseA(parser, tokens);
 };
 
-const loc: SourceLocation = {
+const loc: SourceLocation = expect.objectContaining({
   start: expect.any(Number),
   end: expect.any(Number),
-};
+});
 
 type SelectNode<T, U = never> = Extract<N.Node<U>, { type: T }>;
 
