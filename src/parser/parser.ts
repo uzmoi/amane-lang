@@ -1,36 +1,37 @@
+/** biome-ignore-all lint/style/useNamingConvention: Node */
 import * as P from "parsea";
 import { error } from "parsea/internal";
 import {
   type Delimiter,
   type Keyword,
   type Operator,
-  TOKEN_TYPE_NAMES,
   type Token,
   TokenType,
+  token_type_names,
 } from "./lexer";
 import { type Loc, loc } from "./location";
 import type * as N from "./node";
-import { unescapeStringContent } from "./utils";
+import { unescape_string_content } from "./utils";
 
 const token = <T extends TokenType>(type: T) =>
   P.satisfy<Token & { type: T }, Token>((token) => token.type === type, {
-    error: error.expected(TOKEN_TYPE_NAMES[type]),
+    error: error.expected(token_type_names[type]),
   });
 
-const tokenWith = <T extends TokenType, U extends string>(type: T, value: U) =>
+const token_with = <T extends TokenType, U extends string>(type: T, value: U) =>
   P.satisfy<Token & { type: T; value: U }, Token>(
     (token) => token.type === type && token.value === value,
-    { error: error.expected(`${TOKEN_TYPE_NAMES[type]}("${value}")`) },
+    { error: error.expected(`${token_type_names[type]}("${value}")`) },
   );
 
 const keyword = <T extends Keyword>(word: T) =>
-  tokenWith(TokenType.Keyword, word);
+  token_with(TokenType.Keyword, word);
 
 const delimiter = <T extends Delimiter>(delimiter: T) =>
-  tokenWith(TokenType.Delimiter, delimiter);
+  token_with(TokenType.Delimiter, delimiter);
 
 const operator = <T extends string>(operator: Operator<T>) =>
-  tokenWith(TokenType.Operator, operator);
+  token_with(TokenType.Operator, operator);
 
 type ParserExt = Loc;
 
@@ -77,7 +78,7 @@ const Number = P.choice([
 const String = token(TokenType.String).map(
   (token): N.StringExpression<ParserExt> => ({
     type: "String",
-    value: unescapeStringContent(token.value.slice(1, -1)),
+    value: unescape_string_content(token.value.slice(1, -1)),
     loc: token,
   }),
 );
@@ -97,7 +98,7 @@ const Ident = token(TokenType.Ident).map(
     const { value } = token;
     const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
     const name = isStringIdent
-      ? unescapeStringContent(value.slice(2, -1))
+      ? unescape_string_content(value.slice(2, -1))
       : value.replace(/\\(.?)/g, "$1");
     return {
       type: "Ident",

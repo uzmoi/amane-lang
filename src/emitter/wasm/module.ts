@@ -102,19 +102,20 @@ export const write_module = (writer: Writer, module: Module) => {
       writer.vec_u8(type.params);
       writer.vec_u8(type.return);
     }
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
   }
 
   if (imports.length > 0) {
     writer.u8(SectionId.import);
     const ptr = writer.consume(1); // section size
+    // biome-ignore lint/style/useNamingConvention: 予約語
     for (const import_ of imports) {
       writer.str(import_.mod);
       writer.str(import_.name);
       writer.u8(import_.desc);
       writer.u32leb128(import_.type);
     }
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
   }
 
   if (funcs.length > 0) {
@@ -124,19 +125,20 @@ export const write_module = (writer: Writer, module: Module) => {
     for (const func of funcs) {
       writer.u32leb128(func.signature); // function signature index
     }
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
   }
 
   if (exports.length > 0) {
     writer.u8(SectionId.export);
     const ptr = writer.consume(1); // section size
     writer.u32leb128(exports.length);
+    // biome-ignore lint/style/useNamingConvention: 予約語
     for (const export_ of exports) {
       writer.str(export_.name);
       writer.u8(export_.desc);
       writer.u32leb128(export_.idx);
     }
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
   }
 
   if (start != null) {
@@ -156,8 +158,8 @@ export const write_module = (writer: Writer, module: Module) => {
         write_air(writer, func.body);
       }
       writer.u8(Opcode.end);
-      writer.fixupSize(ptr);
+      writer.fixup_size(ptr);
     }
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
   }
 };

@@ -17,8 +17,8 @@ export const enum Opcode {
   call_indirect       = 0x11,
 
   drop                = 0x1a,
-  select_             = 0x1b,
-  select              = 0x1c,
+  select              = 0x1b,
+  select_t            = 0x1c,
 
   local_get           = 0x20,
   local_set           = 0x21,

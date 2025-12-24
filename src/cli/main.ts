@@ -1,12 +1,12 @@
 import { cac } from "cac";
 import { version } from "..";
-import { startRepl } from "./repl";
+import { start_repl } from "./repl";
 
 export const main = () => {
   const cli = cac("amane");
 
   cli.command("repl").action(async () => {
-    await startRepl();
+    await start_repl();
   });
 
   cli.help();

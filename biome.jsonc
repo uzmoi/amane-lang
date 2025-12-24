@@ -27,7 +27,29 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noUnusedTemplateLiteral": "warn"
+        "noUnusedTemplateLiteral": "warn",
+        "useNamingConvention": {
+          "level": "warn",
+          "options": {
+            "conventions": [
+              // 外部ライブラリとの互換のため
+              {
+                "selector": { "kind": "objectLiteralMember" },
+                "formats": ["snake_case", "camelCase"]
+              },
+              {
+                "selector": { "kind": "enumMember" },
+                "formats": ["snake_case", "PascalCase"]
+              },
+              { "selector": { "kind": "typeLike" }, "formats": ["PascalCase"] },
+              {
+                "selector": { "kind": "namespaceLike" },
+                "formats": ["PascalCase"]
+              },
+              { "formats": ["snake_case"] }
+            ]
+          }
+        }
       },
       "suspicious": {
         "noConstEnum": "off",

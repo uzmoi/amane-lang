@@ -29,7 +29,7 @@ describe("Writer", () => {
     writer.u8(10);
     writer.u8(11);
     writer.u8(12);
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
 
     expect(writer.binary).toEqual(new Uint8Array([3, 10, 11, 12]));
   });
@@ -42,7 +42,7 @@ describe("Writer", () => {
     for (const byte of bytes) {
       writer.u8(byte as u8);
     }
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
 
     expect(writer.binary).toEqual(new Uint8Array([0x80, 0x01, ...bytes]));
   });
@@ -53,7 +53,7 @@ describe("Writer", () => {
 
     const ptr = writer.consume(1);
     writer.vec_u8(bytes);
-    writer.fixupSize(ptr);
+    writer.fixup_size(ptr);
 
     expect(writer.binary).toEqual(
       new Uint8Array([0x81, 0x80, 0x01, 0xff, 0x7f, ...bytes]),

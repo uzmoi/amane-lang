@@ -1,16 +1,16 @@
 import { describe, expect, test } from "vitest";
-import { Lexer, TOKEN_TYPE_NAMES, Token } from "./lexer";
+import { Lexer, Token, token_type_names } from "./lexer";
 
 const lex = (source: string): Token[] => [...new Lexer(source)];
 
-type TokenTypeName = (typeof TOKEN_TYPE_NAMES)[number];
+type TokenTypeName = (typeof token_type_names)[number];
 
 const tokens = (...tokens: [type: TokenTypeName, value: string][]): Token[] => {
   let i = 0;
   return tokens.map(
     ([type, value]) =>
       // biome-ignore lint/suspicious/noAssignInExpressions: test
-      new Token(TOKEN_TYPE_NAMES.indexOf(type), value, i, (i += value.length)),
+      new Token(token_type_names.indexOf(type), value, i, (i += value.length)),
   );
 };
 
@@ -19,8 +19,8 @@ test("empty", () => {
 });
 
 test("Whitespace", () => {
-  const wsChars = " \t\r\n\v\f";
-  expect(lex(wsChars)).toEqual(tokens(["Whitespace", wsChars]));
+  const ws_chars = " \t\r\n\v\f";
+  expect(lex(ws_chars)).toEqual(tokens(["Whitespace", ws_chars]));
 });
 
 test("Delimiter", () => {

@@ -32,18 +32,18 @@ export class Writer {
     } while (n !== 0);
   }
 
-  fixupSize(ptr: number, hint = 1) {
+  fixup_size(ptr: number, hint = 1) {
     const size = this.#ptr - ptr - hint;
-    const sizeSize = leb128size(size);
-    if (sizeSize === 1) {
+    const size_size = leb128size(size);
+    if (size_size === 1) {
       this.binary[ptr] = size;
     } else {
       this.binary.copyWithin(
-        ptr + sizeSize,
+        ptr + size_size,
         ptr + hint,
-        this.consume(sizeSize - hint),
+        this.consume(size_size - hint),
       );
-      this.#ptr -= size + sizeSize;
+      this.#ptr -= size + size_size;
       this.u32leb128(size);
       this.#ptr += size;
     }

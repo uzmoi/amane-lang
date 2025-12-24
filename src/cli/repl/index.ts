@@ -5,7 +5,7 @@ import { version } from "../..";
 import { commands } from "./commands";
 import { Repl } from "./repl";
 
-export const startRepl = async () => {
+export const start_repl = async () => {
   stdout.write(`Welcome to amane v${version}. For help, enter :help.\n`);
 
   const repl = new Repl();
@@ -21,16 +21,16 @@ export const startRepl = async () => {
     tabSize: 2,
   });
 
-  repl.registerCommands(commands(rli));
+  repl.register_commands(commands(rli));
 
-  let shouldExit = false;
+  let should_exit = false;
 
   rli.on("SIGINT", () => {
-    if (shouldExit) {
+    if (should_exit) {
       stdout.write("\n");
       rli.close();
     } else {
-      shouldExit = true;
+      should_exit = true;
       stdout.write("\nTo exit, press ctrl-c again or enter :quit.\n");
       rli.prompt();
     }
@@ -39,7 +39,7 @@ export const startRepl = async () => {
   rli.prompt();
 
   for await (const line of rli) {
-    shouldExit = false;
+    should_exit = false;
 
     if (line === "") {
       rli.prompt();

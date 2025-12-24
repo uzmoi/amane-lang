@@ -1,11 +1,11 @@
 import type { SourceLocation } from "./location";
 import {
-  isBinDigit,
-  isDigit,
-  isHexDigit,
-  isIdentContinue,
-  isIdentStart,
-  isWhitespace,
+  is_bin_digit,
+  is_digit,
+  is_hex_digit,
+  is_ident_continue,
+  is_ident_start,
+  is_whitespace,
 } from "./utils";
 
 export type Keyword = typeof keywords extends Set<infer T> ? T : never;
@@ -28,7 +28,7 @@ export const keywords = new Set([
 
 export type Delimiter = "(" | ")" | "[" | "]" | "{" | "}" | ";" | ",";
 
-const isDelimiter: (char: string) => char is Delimiter = (char) =>
+const is_delimiter: (char: string) => char is Delimiter = (char) =>
   char === "(" ||
   char === ")" ||
   char === "[" ||
@@ -39,7 +39,7 @@ const isDelimiter: (char: string) => char is Delimiter = (char) =>
   char === ",";
 
 export type OperatorChar =
-  typeof operatorChars extends Set<infer T> ? T : never;
+  typeof operator_chars extends Set<infer T> ? T : never;
 
 export type Operator<T, U = T> = T extends `${infer S}${infer Rest}`
   ? S extends OperatorChar
@@ -47,7 +47,7 @@ export type Operator<T, U = T> = T extends `${infer S}${infer Rest}`
     : never
   : U;
 
-export const operatorChars = new Set([
+export const operator_chars = new Set([
   "!",
   "#",
   "$",
@@ -80,7 +80,7 @@ export const enum TokenType {
   Comment,
 }
 
-export const TOKEN_TYPE_NAMES = [
+export const token_type_names = [
   "Whitespace",
   "Delimiter",
   "Operator",
@@ -109,7 +109,7 @@ export class Lexer implements IterableIterator<Token> {
     return this.source[this.#index];
   }
 
-  #readRe(re: RegExp): string {
+  #read_re(re: RegExp): string {
     if (!(re.sticky || re.global)) {
       throw new Error("Requires sticky or global flag.");
     }
@@ -125,17 +125,17 @@ export class Lexer implements IterableIterator<Token> {
     return result[0];
   }
 
-  #readIdentOrKeyword() {
+  #read_ident_or_keyword() {
     if (this.source.startsWith('\\"', this.#index)) {
       this.#index += 2;
-      this.#readString();
+      this.#read_string();
       return TokenType.Ident;
     }
 
     const start = this.#index;
 
     while (this.#index < this.source.length) {
-      if (!isIdentContinue(this.source, this.#index)) break;
+      if (!is_ident_continue(this.source, this.#index)) break;
       const char = this.#peek()!;
       this.#index++;
       if (char === "\\" && this.#index < this.source.length) {
@@ -144,33 +144,33 @@ export class Lexer implements IterableIterator<Token> {
     }
 
     const value = this.source.slice(start, this.#index);
-    const isKeyword = keywords.has(value as Keyword);
-    return isKeyword ? TokenType.Keyword : TokenType.Ident;
+    const is_keyword = keywords.has(value as Keyword);
+    return is_keyword ? TokenType.Keyword : TokenType.Ident;
   }
 
-  #readBinDigits() {
+  #read_bin_digits() {
     while (this.#index < this.source.length) {
       const char = this.#peek()!;
-      if (char !== "_" && !isBinDigit(char)) break;
+      if (char !== "_" && !is_bin_digit(char)) break;
       this.#index++;
     }
   }
-  #readDigits() {
+  #read_digits() {
     while (this.#index < this.source.length) {
       const char = this.#peek()!;
-      if (char !== "_" && !isDigit(char)) break;
+      if (char !== "_" && !is_digit(char)) break;
       this.#index++;
     }
   }
-  #readHexDigits() {
+  #read_hex_digits() {
     while (this.#index < this.source.length) {
       const char = this.#peek()!;
-      if (char !== "_" && !isHexDigit(char)) break;
+      if (char !== "_" && !is_hex_digit(char)) break;
       this.#index++;
     }
   }
 
-  #readNumber() {
+  #read_number() {
     if (this.#peek() === "0") {
       this.#index++;
       const char = this.#peek();
@@ -178,29 +178,29 @@ export class Lexer implements IterableIterator<Token> {
         case "b": // 2進リテラル
         case "B": {
           this.#index++;
-          this.#readBinDigits();
+          this.#read_bin_digits();
           break;
         }
         case "x": // 16進リテラル
         case "X": {
           this.#index++;
-          this.#readHexDigits();
+          this.#read_hex_digits();
           break;
         }
         default:
-          if (char == null || !(isDigit(char) || char === "_")) return;
+          if (char == null || !(is_digit(char) || char === "_")) return;
       }
     }
 
     // 10進リテラル
-    this.#readDigits();
+    this.#read_digits();
     if (this.#peek() === ".") {
       this.#index++;
-      this.#readDigits();
+      this.#read_digits();
     }
   }
 
-  #readString() {
+  #read_string() {
     while (this.#index < this.source.length) {
       const char = this.#peek()!;
       this.#index++;
@@ -223,27 +223,27 @@ export class Lexer implements IterableIterator<Token> {
     }
   }
 
-  static #isOperatorChar(char: string) {
-    return operatorChars.has(char as OperatorChar);
+  static #is_operator_char(char: string) {
+    return operator_chars.has(char as OperatorChar);
   }
-  #readOperator() {
+  #read_operator() {
     while (this.#index < this.source.length) {
       const char = this.#peek()!;
-      if (!Lexer.#isOperatorChar(char)) break;
+      if (!Lexer.#is_operator_char(char)) break;
       this.#index++;
     }
   }
 
-  #readLine() {
-    const lineEndIndex = this.source.indexOf("\n", this.#index);
-    this.#index = lineEndIndex === -1 ? this.source.length : lineEndIndex;
+  #read_line() {
+    const line_end_index = this.source.indexOf("\n", this.#index);
+    this.#index = line_end_index === -1 ? this.source.length : line_end_index;
   }
 
-  static #blockCommentRe = /\/\*|\*\/|$/g;
-  #readBlockComment() {
+  static #block_comment_re = /\/\*|\*\/|$/g;
+  #read_block_comment() {
     let depth = 1;
     do {
-      const value = this.#readRe(Lexer.#blockCommentRe);
+      const value = this.#read_re(Lexer.#block_comment_re);
 
       if (value === "") break; // EOF
 
@@ -252,57 +252,57 @@ export class Lexer implements IterableIterator<Token> {
     } while (depth > 0);
   }
 
-  #readWhitespace() {
+  #read_whitespace() {
     while (this.#index < this.source.length) {
       const char = this.#peek()!;
-      if (!isWhitespace(char)) break;
+      if (!is_whitespace(char)) break;
       this.#index++;
     }
   }
 
-  #readToken(): TokenType {
+  #read_token(): TokenType {
     const char = this.#peek()!;
 
-    if (isWhitespace(char)) {
+    if (is_whitespace(char)) {
       this.#index++;
-      this.#readWhitespace();
+      this.#read_whitespace();
       return TokenType.Whitespace;
     }
 
-    if (isIdentStart(this.source, this.#index)) {
-      return this.#readIdentOrKeyword();
+    if (is_ident_start(this.source, this.#index)) {
+      return this.#read_ident_or_keyword();
     }
 
-    if (isDelimiter(char)) {
+    if (is_delimiter(char)) {
       this.#index++;
       return TokenType.Delimiter;
     }
 
-    if (Lexer.#isOperatorChar(char)) {
+    if (Lexer.#is_operator_char(char)) {
       if (this.source.startsWith("//", this.#index)) {
-        this.#readLine();
+        this.#read_line();
         return TokenType.Comment;
       }
 
       if (this.source.startsWith("/*", this.#index)) {
         this.#index += 2;
-        this.#readBlockComment();
+        this.#read_block_comment();
         return TokenType.Comment;
       }
 
       this.#index++;
-      this.#readOperator();
+      this.#read_operator();
       return TokenType.Operator;
     }
 
     if (char === '"') {
       this.#index++;
-      this.#readString();
+      this.#read_string();
       return TokenType.String;
     }
 
-    if (isDigit(char)) {
-      this.#readNumber();
+    if (is_digit(char)) {
+      this.#read_number();
       return TokenType.Number;
     }
 
@@ -316,7 +316,7 @@ export class Lexer implements IterableIterator<Token> {
       return { done: true, value: undefined };
     }
 
-    const type = this.#readToken();
+    const type = this.#read_token();
 
     const end = this.#index;
     if (start >= end) {
