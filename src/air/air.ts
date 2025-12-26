@@ -1,3 +1,7 @@
+export interface AirModule {
+  items: readonly Air[];
+}
+
 /**
  * Amane Intermediate Representation
  */

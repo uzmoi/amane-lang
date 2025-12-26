@@ -23,7 +23,9 @@ export class ReplExecuter {
       // TODO: ASTをlowingしてAirに変換
       // REPL用にstartを設定するなどの変形を行いemit_wasmに渡す。
 
-      const wasm_binary = emit_wasm();
+      const module = { items: [] };
+
+      const wasm_binary = emit_wasm(module);
 
       const { instance } = await WebAssembly.instantiate(wasm_binary, {
         // TODO: これまでに定義した変数や依存モジュールの値を渡す。
