@@ -1,11 +1,27 @@
 import type { AirModule } from "../../air";
-import type { Module } from "./module";
+import { type Func, type FuncType, type Module, NumType } from "./module";
 
-export const convert = (_air_module: AirModule): Module => {
+export const convert = (air_module: AirModule): Module => {
+  const types: FuncType[] = [];
+  const funcs: Func[] = [];
+
+  if (air_module.items.length > 0) {
+    const signature = types.length;
+    types.push({ kind: "func", params: [], return: [NumType.i32] });
+
+    for (const item of air_module.items) {
+      funcs.push({
+        signature,
+        decl_count: 0,
+        body: item,
+      });
+    }
+  }
+
   return {
-    types: [],
+    types,
     imports: [],
-    funcs: [],
+    funcs,
     exports: [],
     start: null,
   };
