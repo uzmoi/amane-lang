@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { Air, AirModule } from "../../air";
 import { convert } from "./convert";
-import type { Module } from "./module";
+import { type Module, NumType } from "./module";
 
 describe("convert", () => {
   test("empty", () => {
@@ -21,11 +21,11 @@ describe("convert", () => {
   test("func", () => {
     const func_body: Air = { type: "lit.num.int", value: 0 };
     const air_module: AirModule = {
-      items: [func_body],
+      items: [{ type: "fn", body: func_body }],
     };
 
     expect(convert(air_module)).toEqual({
-      types: [{ kind: "func", params: [], return: [] }],
+      types: [{ kind: "func", params: [], return: [NumType.i32] }],
       imports: [],
       funcs: [
         {

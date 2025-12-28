@@ -10,10 +10,14 @@ export const convert = (air_module: AirModule): Module => {
     types.push({ kind: "func", params: [], return: [NumType.i32] });
 
     for (const item of air_module.items) {
+      if (item.type !== "fn") {
+        throw new Error("");
+      }
+
       funcs.push({
         signature,
         decl_count: 0,
-        body: item,
+        body: item.body,
       });
     }
   }

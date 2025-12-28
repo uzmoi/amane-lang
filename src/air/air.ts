@@ -5,4 +5,6 @@ export interface AirModule {
 /**
  * Amane Intermediate Representation
  */
-export type Air = { type: "lit.num.int"; value: number };
+export type Air =
+  | { type: "fn"; body: Air }
+  | { type: "lit.num.int"; value: number };
