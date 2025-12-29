@@ -8,5 +8,5 @@ export const emit_wasm = (module: AirModule): Uint8Array<ArrayBuffer> => {
 
   write_module(writer, convert(module));
 
-  return writer.binary;
+  return writer.emit_binary();
 };

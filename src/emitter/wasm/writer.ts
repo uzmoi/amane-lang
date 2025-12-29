@@ -2,22 +2,26 @@ import type { u8 } from "./types";
 import { leb128size } from "./utils";
 
 export class Writer {
-  #buffer = new ArrayBuffer(0, { maxByteLength: 64 * 1024 }); // 64 KiB
-  binary = new Uint8Array(this.#buffer);
+  #buffer = new ArrayBuffer(1024, { maxByteLength: 64 * 1024 }); // 64 KiB
+  #bytes = new Uint8Array(this.#buffer);
   #ptr = 0;
+
+  emit_binary() {
+    return new Uint8Array(this.#buffer, 0, this.#ptr);
+  }
 
   consume(n: number) {
     const ptr = this.#ptr;
     this.#ptr += n;
-    if (this.#ptr > this.binary.length) {
-      this.#buffer.resize(this.#ptr);
-      // this.binary = new Uint8Array(this.buffer);
+    if (this.#ptr > this.#bytes.length) {
+      // 0x3ff === 1024 - 1
+      this.#buffer.resize((this.#ptr ^ (this.#ptr & 0x3ff)) + 1024);
     }
     return ptr;
   }
 
   u8(value: u8) {
-    this.binary[this.consume(1)] = value;
+    this.#bytes[this.consume(1)] = value;
   }
 
   u32leb128(n: number) {
@@ -36,9 +40,9 @@ export class Writer {
     const size = this.#ptr - ptr - hint;
     const size_size = leb128size(size);
     if (size_size === 1) {
-      this.binary[ptr] = size;
+      this.#bytes[ptr] = size;
     } else {
-      this.binary.copyWithin(
+      this.#bytes.copyWithin(
         ptr + size_size,
         ptr + hint,
         this.consume(size_size - hint),
@@ -51,7 +55,7 @@ export class Writer {
 
   vec_u8(u8array: Uint8Array<ArrayBuffer> | readonly u8[]) {
     this.u32leb128(u8array.length);
-    this.binary.set(u8array, this.consume(u8array.length));
+    this.#bytes.set(u8array, this.consume(u8array.length));
   }
 
   #encoder = new TextEncoder();

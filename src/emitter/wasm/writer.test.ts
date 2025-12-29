@@ -5,21 +5,23 @@ import { Writer } from "./writer";
 describe("Writer", () => {
   test("consume", () => {
     const writer = new Writer();
-    expect(writer.binary.length).toBe(0);
+    expect(writer.emit_binary().length).toBe(0);
     expect(writer.consume(4)).toBe(0);
-    expect(writer.binary).toEqual(new Uint8Array(4));
+    expect(writer.emit_binary()).toEqual(new Uint8Array(4));
   });
 
   test("str", () => {
     const writer = new Writer();
     writer.str("あ");
-    expect(writer.binary).toEqual(new Uint8Array([3, 227, 129, 130]));
+    expect(writer.emit_binary()).toEqual(new Uint8Array([3, 227, 129, 130]));
   });
 
   test("leb128", () => {
     const writer = new Writer();
     writer.u32leb128(12345678);
-    expect(writer.binary).toEqual(new Uint8Array([0xce, 0xc2, 0xf1, 0x05]));
+    expect(writer.emit_binary()).toEqual(
+      new Uint8Array([0xce, 0xc2, 0xf1, 0x05]),
+    );
   });
 
   test("fixup without expansion", () => {
@@ -31,7 +33,7 @@ describe("Writer", () => {
     writer.u8(12);
     writer.fixup_size(ptr);
 
-    expect(writer.binary).toEqual(new Uint8Array([3, 10, 11, 12]));
+    expect(writer.emit_binary()).toEqual(new Uint8Array([3, 10, 11, 12]));
   });
 
   test("fixup with expansion (+1)", () => {
@@ -44,7 +46,9 @@ describe("Writer", () => {
     }
     writer.fixup_size(ptr);
 
-    expect(writer.binary).toEqual(new Uint8Array([0x80, 0x01, ...bytes]));
+    expect(writer.emit_binary()).toEqual(
+      new Uint8Array([0x80, 0x01, ...bytes]),
+    );
   });
 
   test("fixup with expansion (+2)", () => {
@@ -55,7 +59,7 @@ describe("Writer", () => {
     writer.vec_u8(bytes);
     writer.fixup_size(ptr);
 
-    expect(writer.binary).toEqual(
+    expect(writer.emit_binary()).toEqual(
       new Uint8Array([0x81, 0x80, 0x01, 0xff, 0x7f, ...bytes]),
     );
   });

@@ -25,7 +25,7 @@ describe("write_module", () => {
     const writer = new Writer();
     write_module(writer, module);
 
-    expect(WebAssembly.validate(writer.binary)).toBeTruthy();
+    expect(WebAssembly.validate(writer.emit_binary())).toBeTruthy();
   });
 
   test("exports", async () => {
@@ -38,7 +38,7 @@ describe("write_module", () => {
       start: null,
     });
 
-    const { instance } = await WebAssembly.instantiate(writer.binary);
+    const { instance } = await WebAssembly.instantiate(writer.emit_binary());
     expect(instance.exports).toEqual({ hoge: expect.any(Function) });
   });
 
@@ -52,7 +52,7 @@ describe("write_module", () => {
       start: null,
     });
 
-    expect(writer.binary).toEqual(
+    expect(writer.emit_binary()).toEqual(
       new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]),
     );
   });
