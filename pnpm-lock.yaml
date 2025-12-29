@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@uzmoi/ut':
+        specifier: ^0.1.4
+        version: 0.1.4
       cac:
         specifier: ^6.7.14
         version: 6.7.14
@@ -859,6 +862,9 @@ packages:
 
   '@types/node@24.10.1':
     resolution: {integrity: sha512-GNWcUTRBgIRJD5zj+Tq0fKOJ5XZajIiBroOF0yvj2bSU1WvNdYS/dn9UxwsujGW4JX06dnHyjV2y9rRaybH0iQ==}
+
+  '@uzmoi/ut@0.1.4':
+    resolution: {integrity: sha512-tEydBU+yQfWkc2mMxbTOf43yKp8h0VhG8WaL9X0R9jork/pC8R+Vgh+xR+ew4rP7ynP1pV+BC7QnBqDxq397RA==}
 
   '@vitest/coverage-v8@4.0.14':
     resolution: {integrity: sha512-EYHLqN/BY6b47qHH7gtMxAg++saoGmsjWmAq9MlXxAz4M0NcHh9iOyKhBZyU4yxZqOd8Xnqp80/5saeitz4Cng==}
@@ -2080,6 +2086,8 @@ snapshots:
   '@types/node@24.10.1':
     dependencies:
       undici-types: 7.16.0
+
+  '@uzmoi/ut@0.1.4': {}
 
   '@vitest/coverage-v8@4.0.14(vitest@4.0.14)':
     dependencies:

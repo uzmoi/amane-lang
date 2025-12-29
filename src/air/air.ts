@@ -1,3 +1,7 @@
+import type { Brand } from "@uzmoi/ut/types";
+
+export type Id = number & Brand<"Id">;
+
 export interface AirModule {
   items: readonly Air[];
 }
@@ -6,5 +10,5 @@ export interface AirModule {
  * Amane Intermediate Representation
  */
 export type Air =
-  | { type: "fn"; body: Air }
+  | { type: "fn"; params: readonly Id[]; body: Air }
   | { type: "lit.num.int"; value: number };

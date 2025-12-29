@@ -5,21 +5,29 @@ export const convert = (air_module: AirModule): Module => {
   const types: FuncType[] = [];
   const funcs: Func[] = [];
 
-  if (air_module.items.length > 0) {
-    const signature = types.length;
-    types.push({ kind: "func", params: [], return: [NumType.i32] });
+  for (const item of air_module.items) {
+    if (item.type !== "fn") {
+      throw new Error("");
+    }
 
-    for (const item of air_module.items) {
-      if (item.type !== "fn") {
-        throw new Error("");
-      }
+    let signature = types.findIndex(
+      (type) => type.params.length === item.params.length,
+    );
 
-      funcs.push({
-        signature,
-        decl_count: 0,
-        body: item.body,
+    if (signature === -1) {
+      signature = types.length;
+      types.push({
+        kind: "func",
+        params: item.params.map(() => NumType.i32),
+        return: [NumType.i32],
       });
     }
+
+    funcs.push({
+      signature,
+      decl_count: 0,
+      body: item.body,
+    });
   }
 
   return {

@@ -21,7 +21,7 @@ describe("convert", () => {
   test("func", () => {
     const func_body: Air = { type: "lit.num.int", value: 0 };
     const air_module: AirModule = {
-      items: [{ type: "fn", body: func_body }],
+      items: [{ type: "fn", params: [], body: func_body }],
     };
 
     expect(convert(air_module)).toEqual({
