@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`write_module > empty module snapshot 1`] = `(module)`;
+
+exports[`write_module > export_func module snapshot 1`] = `
+(module
+  (type (;0;) (func))
+  (func (;0;) (type 0))
+  (export "noop" (func 0)))
+`;
+
+exports[`write_module > start module snapshot 1`] = `
+(module
+  (type (;0;) (func))
+  (func (;0;) (type 0))
+  (start 0))
+`;

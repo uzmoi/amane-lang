@@ -21,11 +21,11 @@ describe("write_module", () => {
         start: { idx: 0 },
       },
     }),
-  )("validate %s module %#", (_, module) => {
+  )("%s module snapshot", (_, module) => {
     const writer = new Writer();
     write_module(writer, module);
 
-    expect(WebAssembly.validate(writer.emit_binary())).toBeTruthy();
+    expect(writer.emit_binary()).toMatchSnapshot();
   });
 
   test("exports", async () => {
@@ -40,20 +40,5 @@ describe("write_module", () => {
 
     const { instance } = await WebAssembly.instantiate(writer.emit_binary());
     expect(instance.exports).toEqual({ hoge: expect.any(Function) });
-  });
-
-  test("empty module snapshot", () => {
-    const writer = new Writer();
-    write_module(writer, {
-      types: [],
-      imports: [],
-      funcs: [],
-      exports: [],
-      start: null,
-    });
-
-    expect(writer.emit_binary()).toEqual(
-      new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]),
-    );
   });
 });
