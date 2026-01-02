@@ -12,4 +12,5 @@ export interface AirModule {
 export type Air =
   | { type: "ref"; id: Id }
   | { type: "fn"; params: readonly Id[]; body: Air }
+  | { type: "block"; body: readonly Air[]; last: Air | null }
   | { type: "lit.num.int"; value: number };

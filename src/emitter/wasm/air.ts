@@ -16,6 +16,21 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
     case "fn": {
       throw new Error("");
     }
+    case "block": {
+      for (const body of air.body) {
+        write_air(writer, body, ctx);
+        writer.u8(Opcode.drop);
+      }
+
+      if (air.last == null) {
+        // TODO: 型を増やすときにUnit的な型にする。
+        writer.u8(Opcode.i32_const);
+        writer.u32leb128(0);
+      } else {
+        write_air(writer, air.last, ctx);
+      }
+      break;
+    }
     case "lit.num.int": {
       writer.u8(Opcode.i32_const);
       writer.u32leb128(air.value);

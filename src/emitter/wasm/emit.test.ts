@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { Id } from "../../air";
+import type { Air, Id } from "../../air";
 import { emit_wasm } from "./emit";
 
 describe("emit_wasm", () => {
@@ -33,5 +33,34 @@ describe("emit_wasm", () => {
       ],
     });
     expect(wasm).toMatchSnapshot();
+  });
+
+  describe("block", () => {
+    test("empty block", async () => {
+      const wasm = emit_wasm({
+        items: [
+          {
+            type: "fn",
+            params: [],
+            body: { type: "block", body: [], last: null },
+          },
+        ],
+      });
+      expect(wasm).toMatchSnapshot();
+    });
+
+    test("block with last", async () => {
+      const air: Air = { type: "lit.num.int", value: 0 };
+      const wasm = emit_wasm({
+        items: [
+          {
+            type: "fn",
+            params: [],
+            body: { type: "block", body: [air, air], last: air },
+          },
+        ],
+      });
+      expect(wasm).toMatchSnapshot();
+    });
   });
 });
