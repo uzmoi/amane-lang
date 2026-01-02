@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`emit_wasm > constant func 1`] = `
+(module
+  (type (;0;) (func (result i32)))
+  (func (;0;) (type 0) (result i32)
+    i32.const 0))
+`;
+
+exports[`emit_wasm > empty module 1`] = `(module)`;
+
+exports[`emit_wasm > identity func 1`] = `
+(module
+  (type (;0;) (func (param i32) (result i32)))
+  (func (;0;) (type 0) (param i32) (result i32)
+    local.get 0))
+`;
