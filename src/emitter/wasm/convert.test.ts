@@ -30,6 +30,7 @@ describe("convert", () => {
       funcs: [
         {
           signature: 0,
+          locals: new Map(),
           decl_count: 0,
           body: func_body,
         },

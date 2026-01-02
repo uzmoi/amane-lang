@@ -23,8 +23,11 @@ export const convert = (air_module: AirModule): Module => {
       });
     }
 
+    const locals = new Map(item.params.map((param, index) => [param, index]));
+
     funcs.push({
       signature,
+      locals,
       decl_count: 0,
       body: item.body,
     });

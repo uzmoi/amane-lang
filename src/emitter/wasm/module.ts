@@ -1,4 +1,4 @@
-import type { Air } from "../../air";
+import type { Air, Id } from "../../air";
 import { write_air } from "./air";
 import { Opcode } from "./opcode";
 import type { u8 } from "./types";
@@ -63,6 +63,7 @@ export interface Import {
 
 export interface Func {
   signature: number;
+  locals: Map<Id, number>;
   decl_count: number;
   body: Air | null;
 }
@@ -155,7 +156,11 @@ export const write_module = (writer: Writer, module: Module) => {
       const ptr = writer.consume(1); // body size
       writer.u32leb128(func.decl_count);
       if (func.body != null) {
-        write_air(writer, func.body);
+        write_air(writer, func.body, {
+          get_index(id) {
+            return func.locals.get(id)!;
+          },
+        });
       }
       writer.u8(Opcode.end);
       writer.fixup_size(ptr);

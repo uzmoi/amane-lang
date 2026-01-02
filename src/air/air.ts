@@ -10,5 +10,6 @@ export interface AirModule {
  * Amane Intermediate Representation
  */
 export type Air =
+  | { type: "ref"; id: Id }
   | { type: "fn"; params: readonly Id[]; body: Air }
   | { type: "lit.num.int"; value: number };

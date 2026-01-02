@@ -9,14 +9,14 @@ describe("write_module", () => {
       export_func: {
         types: [{ kind: "func", params: [], return: [] }],
         imports: [],
-        funcs: [{ signature: 0, decl_count: 0, body: null }],
+        funcs: [{ signature: 0, locals: new Map(), decl_count: 0, body: null }],
         exports: [{ name: "noop", desc: ImportExportDesc.func, idx: 0 }],
         start: null,
       },
       start: {
         types: [{ kind: "func", params: [], return: [] }],
         imports: [],
-        funcs: [{ signature: 0, decl_count: 0, body: null }],
+        funcs: [{ signature: 0, locals: new Map(), decl_count: 0, body: null }],
         exports: [],
         start: { idx: 0 },
       },
@@ -33,7 +33,7 @@ describe("write_module", () => {
     write_module(writer, {
       types: [{ kind: "func", params: [], return: [] }],
       imports: [],
-      funcs: [{ signature: 0, decl_count: 0, body: null }],
+      funcs: [{ signature: 0, locals: new Map(), decl_count: 0, body: null }],
       exports: [{ name: "hoge", desc: ImportExportDesc.func, idx: 0 }],
       start: null,
     });
