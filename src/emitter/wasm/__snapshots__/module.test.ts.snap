@@ -9,9 +9,30 @@ exports[`write_module > export_func module snapshot 1`] = `
   (export "noop" (func 0)))
 `;
 
+exports[`write_module > global module snapshot 1`] = `
+(module
+  (global (;0;) i32 (i32.const 0))
+  (global (;1;) (mut i32) (i32.const 0)))
+`;
+
+exports[`write_module > memory32 module snapshot 1`] = `
+(module
+  (memory (;0;) 1))
+`;
+
+exports[`write_module > memory32_with_max module snapshot 1`] = `
+(module
+  (memory (;0;) 1 1))
+`;
+
 exports[`write_module > start module snapshot 1`] = `
 (module
   (type (;0;) (func))
   (func (;0;) (type 0))
   (start 0))
+`;
+
+exports[`write_module > table module snapshot 1`] = `
+(module
+  (table (;0;) 1 funcref))
 `;

@@ -68,6 +68,17 @@ export interface Func {
   body: Air | null;
 }
 
+export interface Table {
+  ref_type: RefType;
+  limits: Limits;
+}
+
+export interface Global {
+  type: ValType;
+  mut: boolean;
+  expr: Air;
+}
+
 export interface Export {
   name: string;
   desc: ImportExportDesc;
@@ -78,10 +89,27 @@ export interface Start {
   idx: number;
 }
 
+export interface Limits {
+  flags: 0x00 | 0x01;
+  initial: number;
+  max: number | undefined;
+}
+
+const write_limits = (writer: Writer, limits: Limits) => {
+  writer.u8(limits.flags);
+  writer.u32leb128(limits.initial);
+  if (limits.max != null) {
+    writer.u32leb128(limits.max);
+  }
+};
+
 export interface Module {
   types: readonly FuncType[];
   imports: readonly Import[];
   funcs: readonly Func[];
+  tables: readonly Table[];
+  memories: readonly Limits[];
+  globals: readonly Global[];
   exports: readonly Export[];
   start: Start | null;
 }
@@ -92,7 +120,8 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u8(h);
   }
 
-  const { types, imports, funcs, exports, start } = module;
+  const { types, imports, funcs, tables, memories, globals, exports, start } =
+    module;
 
   if (types.length > 0) {
     writer.u8(SectionId.type);
@@ -125,6 +154,44 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u32leb128(funcs.length);
     for (const func of funcs) {
       writer.u32leb128(func.signature); // function signature index
+    }
+    writer.fixup_size(ptr);
+  }
+
+  if (tables.length > 0) {
+    writer.u8(SectionId.table);
+    const ptr = writer.consume(1); // section size
+    writer.u32leb128(tables.length);
+    for (const table of tables) {
+      writer.u8(table.ref_type);
+      write_limits(writer, table.limits);
+    }
+    writer.fixup_size(ptr);
+  }
+
+  if (memories.length > 0) {
+    writer.u8(SectionId.memory);
+    const ptr = writer.consume(1); // section size
+    writer.u32leb128(memories.length);
+    for (const memory of memories) {
+      write_limits(writer, memory);
+    }
+    writer.fixup_size(ptr);
+  }
+
+  if (globals.length > 0) {
+    writer.u8(SectionId.global);
+    const ptr = writer.consume(1); // section size
+    writer.u32leb128(globals.length);
+    for (const global of globals) {
+      writer.u8(global.type);
+      writer.u8(global.mut ? 1 : 0);
+      write_air(writer, global.expr, {
+        get_index() {
+          throw new Error();
+        },
+      });
+      writer.u8(Opcode.end);
     }
     writer.fixup_size(ptr);
   }

@@ -37,6 +37,9 @@ export const convert = (air_module: AirModule): Module => {
     types,
     imports: [],
     funcs,
+    tables: [],
+    memories: [],
+    globals: [],
     exports: [],
     start: null,
   };

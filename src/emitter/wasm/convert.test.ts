@@ -13,6 +13,9 @@ describe("convert", () => {
       types: [],
       imports: [],
       funcs: [],
+      tables: [],
+      memories: [],
+      globals: [],
       exports: [],
       start: null,
     } satisfies Module);
@@ -35,6 +38,9 @@ describe("convert", () => {
           body: func_body,
         },
       ],
+      tables: [],
+      memories: [],
+      globals: [],
       exports: [],
       start: null,
     } satisfies Module);
