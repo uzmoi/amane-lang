@@ -138,6 +138,7 @@ export const write_module = (writer: Writer, module: Module) => {
   if (imports.length > 0) {
     writer.u8(SectionId.import);
     const ptr = writer.consume(1); // section size
+    writer.u32leb128(imports.length);
     // biome-ignore lint/style/useNamingConvention: 予約語
     for (const import_ of imports) {
       writer.str(import_.mod);

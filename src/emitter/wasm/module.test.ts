@@ -12,6 +12,12 @@ describe("write_module", () => {
   test.each(
     Object.entries<string, Partial<Module>>({
       empty: {},
+      import: {
+        types: [{ kind: "func", params: [], return: [] }],
+        imports: [
+          { mod: "hoge", name: "fuga", desc: ImportExportDesc.func, type: 0 },
+        ],
+      },
       export_func: {
         types: [{ kind: "func", params: [], return: [] }],
         funcs: [{ signature: 0, locals: new Map(), decl_count: 0, body: null }],
@@ -68,7 +74,7 @@ describe("write_module", () => {
     expect(writer.emit_binary()).toMatchSnapshot();
   });
 
-  test("exports", async () => {
+  test("exports", async ({ expect }) => {
     const writer = new Writer();
     write_module(writer, {
       types: [{ kind: "func", params: [], return: [] }],

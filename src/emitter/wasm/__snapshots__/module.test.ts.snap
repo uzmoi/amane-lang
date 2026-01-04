@@ -15,6 +15,12 @@ exports[`write_module > global module snapshot 1`] = `
   (global (;1;) (mut i32) (i32.const 0)))
 `;
 
+exports[`write_module > import module snapshot 1`] = `
+(module
+  (type (;0;) (func))
+  (import "hoge" "fuga" (func (;0;) (type 0))))
+`;
+
 exports[`write_module > memory32 module snapshot 1`] = `
 (module
   (memory (;0;) 1))
