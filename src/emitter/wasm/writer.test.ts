@@ -10,6 +10,20 @@ describe("Writer", () => {
     expect(writer.emit_binary()).toEqual(new Uint8Array(4));
   });
 
+  test("u8", () => {
+    const writer = new Writer();
+    writer.u8(0xfe);
+    expect(writer.emit_binary()).toEqual(new Uint8Array([0xfe]));
+  });
+
+  test("u32be", () => {
+    const writer = new Writer();
+    writer.u32be(0x11223344);
+    expect(writer.emit_binary()).toEqual(
+      new Uint8Array([0x11, 0x22, 0x33, 0x44]),
+    );
+  });
+
   test("str", () => {
     const writer = new Writer();
     writer.str("あ");

@@ -24,6 +24,14 @@ export class Writer {
     this.#bytes[this.consume(1)] = value;
   }
 
+  u32be(number: number) {
+    const i = this.consume(4);
+    this.#bytes[i] = (number >> 24) & 0xff;
+    this.#bytes[i + 1] = (number >> 16) & 0xff;
+    this.#bytes[i + 2] = (number >> 8) & 0xff;
+    this.#bytes[i + 3] = number & 0xff;
+  }
+
   u32leb128(n: number) {
     do {
       let byte = (n & 0x7f) as u8;

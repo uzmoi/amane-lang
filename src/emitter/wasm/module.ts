@@ -115,10 +115,8 @@ export interface Module {
 }
 
 export const write_module = (writer: Writer, module: Module) => {
-  // magic number and version
-  for (const h of [0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00] as const) {
-    writer.u8(h);
-  }
+  writer.u32be(0x0061736d); // magic (\0asm)
+  writer.u32be(0x01000000); // version
 
   const { types, imports, funcs, tables, memories, globals, exports, start } =
     module;
