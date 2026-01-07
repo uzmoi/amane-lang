@@ -23,12 +23,14 @@ export const convert = (air_module: AirModule): Module => {
       });
     }
 
-    const locals = new Map(item.params.map((param, index) => [param, index]));
+    const local_refs = new Map(
+      item.params.map((param, index) => [param, index]),
+    );
 
     funcs.push({
       signature,
-      locals,
-      decl_count: 0,
+      local_refs,
+      locals: [],
       body: item.body,
     });
   }

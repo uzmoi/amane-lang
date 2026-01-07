@@ -2,7 +2,7 @@ import type { Air, Id } from "../../air";
 import { write_air } from "./air";
 import { Opcode } from "./opcode";
 import type { u8 } from "./types";
-import { leb128size } from "./utils";
+import { leb128size, run_length_encoding } from "./utils";
 import type { Writer } from "./writer";
 
 // https://www.w3.org/TR/wasm-core-2/#sections①
@@ -63,8 +63,8 @@ export interface Import {
 
 export interface Func {
   signature: number;
-  locals: Map<Id, number>;
-  decl_count: number;
+  local_refs: Map<Id, number>;
+  locals: readonly ValType[];
   body: Air | null;
 }
 
@@ -220,11 +220,18 @@ export const write_module = (writer: Writer, module: Module) => {
     writer.u32leb128(funcs.length);
     for (const func of funcs) {
       const ptr = writer.consume(1); // body size
-      writer.u32leb128(func.decl_count);
+
+      const locals = run_length_encoding(func.locals);
+      writer.u32leb128(locals.length);
+      for (const [count, type] of locals) {
+        writer.u32leb128(count);
+        writer.u8(type);
+      }
+
       if (func.body != null) {
         write_air(writer, func.body, {
           get_index(id) {
-            return func.locals.get(id)!;
+            return func.local_refs.get(id)!;
           },
         });
       }
