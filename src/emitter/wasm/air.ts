@@ -13,6 +13,12 @@ export const write_air_statements = (
 ) => {
   for (const statement of statements) {
     switch (statement.type) {
+      case "def": {
+        write_air(writer, statement.init, ctx);
+        writer.u8(Opcode.local_set);
+        writer.u32leb128(ctx.get_index(statement.id));
+        break;
+      }
       case "assign": {
         write_air(writer, statement.val, ctx);
         writer.u8(Opcode.local_set);

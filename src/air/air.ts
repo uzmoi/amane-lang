@@ -6,7 +6,10 @@ export interface AirModule {
   items: readonly AirStatement[];
 }
 
-export type AirStatement = { type: "assign"; id: Id; val: Air } | Air;
+export type AirStatement =
+  | { type: "def"; id: Id; init: Air }
+  | { type: "assign"; id: Id; val: Air }
+  | Air;
 
 /**
  * Amane Intermediate Representation

@@ -87,4 +87,28 @@ describe("emit_wasm", () => {
     });
     expect(wasm).toMatchSnapshot();
   });
+
+  test("define", () => {
+    const id0 = 0 as Id;
+    const wasm = emit_wasm({
+      items: [
+        {
+          type: "fn",
+          params: [],
+          body: {
+            type: "block",
+            body: [
+              {
+                type: "def",
+                id: id0,
+                init: { type: "lit.num.int", value: 0 },
+              },
+            ],
+            last: { type: "ref", id: id0 },
+          },
+        },
+      ],
+    });
+    expect(wasm).toMatchSnapshot();
+  });
 });

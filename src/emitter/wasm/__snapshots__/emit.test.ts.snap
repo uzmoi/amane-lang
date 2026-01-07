@@ -34,6 +34,16 @@ exports[`emit_wasm > constant func 1`] = `
     i32.const 0))
 `;
 
+exports[`emit_wasm > define 1`] = `
+(module
+  (type (;0;) (func (result i32)))
+  (func (;0;) (type 0) (result i32)
+    (local i32)
+    i32.const 0
+    local.set 0
+    local.get 0))
+`;
+
 exports[`emit_wasm > empty module 1`] = `(module)`;
 
 exports[`emit_wasm > identity func 1`] = `
