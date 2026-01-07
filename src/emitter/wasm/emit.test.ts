@@ -3,12 +3,12 @@ import type { Air, Id } from "../../air";
 import { emit_wasm } from "./emit";
 
 describe("emit_wasm", () => {
-  test("empty module", async () => {
+  test("empty module", () => {
     const wasm = emit_wasm({ items: [] });
     expect(wasm).toMatchSnapshot();
   });
 
-  test("constant func", async () => {
+  test("constant func", () => {
     const wasm = emit_wasm({
       items: [
         {
@@ -21,7 +21,7 @@ describe("emit_wasm", () => {
     expect(wasm).toMatchSnapshot();
   });
 
-  test("identity func", async () => {
+  test("identity func", () => {
     const id0 = 0 as Id;
     const wasm = emit_wasm({
       items: [
@@ -36,7 +36,7 @@ describe("emit_wasm", () => {
   });
 
   describe("block", () => {
-    test("empty block", async () => {
+    test("empty block", () => {
       const wasm = emit_wasm({
         items: [
           {
@@ -49,7 +49,7 @@ describe("emit_wasm", () => {
       expect(wasm).toMatchSnapshot();
     });
 
-    test("block with last", async () => {
+    test("block with last", () => {
       const air: Air = { type: "lit.num.int", value: 0 };
       const wasm = emit_wasm({
         items: [
@@ -64,7 +64,7 @@ describe("emit_wasm", () => {
     });
   });
 
-  test("assign to param", async () => {
+  test("assign to param", () => {
     const id0 = 0 as Id;
     const wasm = emit_wasm({
       items: [
