@@ -1,10 +1,32 @@
-import type { Air, Id } from "../../air";
+import type { Air, AirStatement, Id } from "../../air";
 import { Opcode } from "./opcode";
 import type { Writer } from "./writer";
 
 export interface FuncContext {
   get_index(id: Id): number;
 }
+
+export const write_air_statements = (
+  writer: Writer,
+  statements: readonly AirStatement[],
+  ctx: FuncContext,
+) => {
+  for (const statement of statements) {
+    switch (statement.type) {
+      case "assign": {
+        write_air(writer, statement.val, ctx);
+        writer.u8(Opcode.local_set);
+        writer.u32leb128(ctx.get_index(statement.id));
+        break;
+      }
+      default: {
+        write_air(writer, statement, ctx);
+        writer.u8(Opcode.drop);
+        break;
+      }
+    }
+  }
+};
 
 export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
   switch (air.type) {
@@ -17,10 +39,7 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       throw new Error("");
     }
     case "block": {
-      for (const body of air.body) {
-        write_air(writer, body, ctx);
-        writer.u8(Opcode.drop);
-      }
+      write_air_statements(writer, air.body, ctx);
 
       if (air.last == null) {
         // TODO: 型を増やすときにUnit的な型にする。

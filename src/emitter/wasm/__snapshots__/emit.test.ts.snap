@@ -1,5 +1,14 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`emit_wasm > assign to param 1`] = `
+(module
+  (type (;0;) (func (param i32) (result i32)))
+  (func (;0;) (type 0) (param i32) (result i32)
+    i32.const 0
+    local.set 0
+    local.get 0))
+`;
+
 exports[`emit_wasm > block > block with last 1`] = `
 (module
   (type (;0;) (func (result i32)))

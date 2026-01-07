@@ -63,4 +63,28 @@ describe("emit_wasm", () => {
       expect(wasm).toMatchSnapshot();
     });
   });
+
+  test("assign to param", async () => {
+    const id0 = 0 as Id;
+    const wasm = emit_wasm({
+      items: [
+        {
+          type: "fn",
+          params: [id0],
+          body: {
+            type: "block",
+            body: [
+              {
+                type: "assign",
+                id: id0,
+                val: { type: "lit.num.int", value: 0 },
+              },
+            ],
+            last: { type: "ref", id: id0 },
+          },
+        },
+      ],
+    });
+    expect(wasm).toMatchSnapshot();
+  });
 });
