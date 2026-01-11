@@ -63,6 +63,10 @@ const collect_locals_in_func = (
   locals: ValType[],
 ) => {
   switch (air.type) {
+    case "return": {
+      collect_locals_in_func(air.value, local_refs, locals);
+      break;
+    }
     case "block": {
       for (const stmt of air.body) {
         switch (stmt.type) {

@@ -35,6 +35,19 @@ describe("emit_wasm", () => {
     expect(wasm).toMatchSnapshot();
   });
 
+  test("return", () => {
+    const wasm = emit_wasm({
+      items: [
+        {
+          type: "fn",
+          params: [],
+          body: { type: "return", value: { type: "lit.num.int", value: 0 } },
+        },
+      ],
+    });
+    expect(wasm).toMatchSnapshot();
+  });
+
   describe("block", () => {
     test("empty block", () => {
       const wasm = emit_wasm({

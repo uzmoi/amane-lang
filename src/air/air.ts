@@ -17,6 +17,7 @@ export type AirStatement =
 export type Air =
   | { type: "ref"; id: Id }
   | { type: "fn"; params: readonly Id[]; body: Air }
+  | { type: "return"; value: Air }
   | { type: "block"; body: readonly AirStatement[]; last: Air | null }
   | { type: "if"; cond: Air; then: Air; else: Air }
   | { type: "lit.num.int"; value: number };

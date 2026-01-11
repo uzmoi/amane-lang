@@ -45,6 +45,11 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
     case "fn": {
       throw new Error("");
     }
+    case "return": {
+      write_air(writer, air.value, ctx);
+      writer.u8(Opcode.return);
+      break;
+    }
     case "block": {
       write_air_statements(writer, air.body, ctx);
 
