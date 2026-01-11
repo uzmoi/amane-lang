@@ -1,4 +1,5 @@
 import type { Air, AirStatement, Id } from "../../air";
+import { NumType } from "./module";
 import { Opcode } from "./opcode";
 import type { Writer } from "./writer";
 
@@ -54,6 +55,16 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       } else {
         write_air(writer, air.last, ctx);
       }
+      break;
+    }
+    case "if": {
+      write_air(writer, air.cond, ctx);
+      writer.u8(Opcode.if);
+      writer.u8(NumType.i32);
+      write_air(writer, air.then, ctx);
+      writer.u8(Opcode.else);
+      write_air(writer, air.else, ctx);
+      writer.u8(Opcode.end);
       break;
     }
     case "lit.num.int": {

@@ -52,3 +52,15 @@ exports[`emit_wasm > identity func 1`] = `
   (func (;0;) (type 0) (param i32) (result i32)
     local.get 0))
 `;
+
+exports[`emit_wasm > if 1`] = `
+(module
+  (type (;0;) (func (result i32)))
+  (func (;0;) (type 0) (result i32)
+    i32.const 0
+    if (result i32)  ;; label = @1
+      i32.const 0
+    else
+      i32.const 0
+    end))
+`;

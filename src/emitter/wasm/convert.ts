@@ -84,6 +84,13 @@ const collect_locals_in_func = (
       if (air.last != null) {
         collect_locals_in_func(air.last, local_refs, locals);
       }
+      break;
+    }
+    case "if": {
+      collect_locals_in_func(air.cond, local_refs, locals);
+      collect_locals_in_func(air.then, local_refs, locals);
+      collect_locals_in_func(air.else, local_refs, locals);
+      break;
     }
   }
 };

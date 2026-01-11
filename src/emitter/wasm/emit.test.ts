@@ -64,6 +64,20 @@ describe("emit_wasm", () => {
     });
   });
 
+  test("if", () => {
+    const air: Air = { type: "lit.num.int", value: 0 };
+    const wasm = emit_wasm({
+      items: [
+        {
+          type: "fn",
+          params: [],
+          body: { type: "if", cond: air, then: air, else: air },
+        },
+      ],
+    });
+    expect(wasm).toMatchSnapshot();
+  });
+
   test("assign to param", () => {
     const id0 = 0 as Id;
     const wasm = emit_wasm({
