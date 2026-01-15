@@ -62,6 +62,18 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       }
       break;
     }
+    case "loop": {
+      writer.u8(Opcode.loop);
+      writer.u8(NumType.i32);
+      write_air(writer, air.body, ctx);
+      writer.u8(Opcode.end);
+      break;
+    }
+    case "break": {
+      writer.u8(Opcode.br);
+      writer.u32leb128(0);
+      break;
+    }
     case "if": {
       write_air(writer, air.cond, ctx);
       writer.u8(Opcode.if);

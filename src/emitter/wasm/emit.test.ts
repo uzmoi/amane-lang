@@ -45,6 +45,22 @@ describe("emit_wasm", () => {
     });
   });
 
+  describe("loop", () => {
+    test("empty block", () => {
+      const wasm = emit_wasm({
+        items: [art("fn loop {}")],
+      });
+      expect(wasm).toMatchSnapshot();
+    });
+
+    test("break", () => {
+      const wasm = emit_wasm({
+        items: [art("fn loop break")],
+      });
+      expect(wasm).toMatchSnapshot();
+    });
+  });
+
   test("if", () => {
     const wasm = emit_wasm({
       items: [art("fn if 0 then 0 else 0")],

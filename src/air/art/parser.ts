@@ -51,6 +51,12 @@ const air = P.lazy((): P.Parser<Air, Token> => {
       .between(delimiter("{"), delimiter("}"))
       .map(([body, last]): Air => ({ type: "block", body, last })),
 
+    keyword("loop")
+      .then(air)
+      .map((body): Air => ({ type: "loop", body })),
+
+    keyword("break").return<Air>({ type: "break" }),
+
     P.seq([
       keyword("if").then(air),
       keyword("then").then(air),

@@ -90,6 +90,10 @@ const collect_locals_in_func = (
       }
       break;
     }
+    case "loop": {
+      collect_locals_in_func(air.body, local_refs, locals);
+      break;
+    }
     case "if": {
       collect_locals_in_func(air.cond, local_refs, locals);
       collect_locals_in_func(air.then, local_refs, locals);

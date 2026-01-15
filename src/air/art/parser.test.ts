@@ -68,6 +68,17 @@ describe("block", () => {
   });
 });
 
+test("loop", () => {
+  expect(art("loop {}")).toEqual({
+    type: "loop",
+    body: art("{}"),
+  });
+});
+
+test("break", () => {
+  expect(art("break")).toEqual({ type: "break" });
+});
+
 test("if", () => {
   expect(art("if %0 then %1 else %2")).toEqual({
     type: "if",

@@ -19,5 +19,7 @@ export type Air =
   | { type: "fn"; params: readonly Id[]; body: Air }
   | { type: "return"; value: Air }
   | { type: "block"; body: readonly AirStatement[]; last: Air | null }
+  | { type: "loop"; body: Air }
+  | { type: "break" }
   | { type: "if"; cond: Air; then: Air; else: Air }
   | { type: "lit.num.int"; value: number };
