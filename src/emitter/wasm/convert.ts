@@ -1,4 +1,5 @@
-import type { Air, AirModule, Id } from "../../air";
+import type { Air, AirModule, AirStatement } from "../../air";
+import { type W, walk_air, walk_air_statement } from "../../air/walk";
 import {
   type Func,
   type FuncType,
@@ -11,37 +12,67 @@ export const convert = (air_module: AirModule): Module => {
   const types: FuncType[] = [];
   const funcs: Func[] = [];
 
-  for (const item of air_module.items) {
-    if (item.type !== "fn") {
-      throw new Error("");
+  const fns: Extract<Air, { type: "fn" }>[] = [];
+
+  const walk_toplevel_air = (air: Air, v: W): void => {
+    if (air.type === "fn") {
+      fns.push(air);
+    } else {
+      walk_air(air, v);
     }
+  };
+
+  for (const item of air_module.items) {
+    if (item.type === "fn") {
+      fns.push(item);
+    } else {
+      walk_air_statement(item, {
+        air: walk_toplevel_air,
+        air_statement: walk_air_statement,
+      });
+    }
+  }
+
+  while (fns.length) {
+    const fn_air = fns.shift()!;
 
     let signature = types.findIndex(
-      (type) => type.params.length === item.params.length,
+      (type) => type.params.length === fn_air.params.length,
     );
 
     if (signature === -1) {
       signature = types.length;
       types.push({
         kind: "func",
-        params: item.params.map(() => NumType.i32),
+        params: fn_air.params.map(() => NumType.i32),
         return: [NumType.i32],
       });
     }
 
     const local_refs = new Map(
-      item.params.map((param, index) => [param, index]),
+      fn_air.params.map((param, index) => [param, index]),
     );
 
     const locals: ValType[] = [];
 
-    collect_locals_in_func(item.body, local_refs, locals);
+    const walk_fn_air_statement = (air: AirStatement, w: W): void => {
+      walk_air_statement(air, w);
+      if (air.type === "def") {
+        local_refs.set(air.id, local_refs.size);
+        locals.push(NumType.i32);
+      }
+    };
+
+    walk_fn_air_statement(fn_air, {
+      air: walk_toplevel_air,
+      air_statement: walk_fn_air_statement,
+    });
 
     funcs.push({
       signature,
       local_refs,
       locals,
-      body: item.body,
+      body: fn_air.body,
     });
   }
 
@@ -55,50 +86,4 @@ export const convert = (air_module: AirModule): Module => {
     exports: [],
     start: null,
   };
-};
-
-const collect_locals_in_func = (
-  air: Air,
-  local_refs: Map<Id, number>,
-  locals: ValType[],
-) => {
-  switch (air.type) {
-    case "return": {
-      collect_locals_in_func(air.value, local_refs, locals);
-      break;
-    }
-    case "block": {
-      for (const stmt of air.body) {
-        switch (stmt.type) {
-          case "def": {
-            collect_locals_in_func(stmt.init, local_refs, locals);
-            local_refs.set(stmt.id, local_refs.size);
-            locals.push(NumType.i32);
-            break;
-          }
-          case "assign": {
-            collect_locals_in_func(stmt.val, local_refs, locals);
-            break;
-          }
-          default: {
-            collect_locals_in_func(stmt, local_refs, locals);
-          }
-        }
-      }
-      if (air.last != null) {
-        collect_locals_in_func(air.last, local_refs, locals);
-      }
-      break;
-    }
-    case "loop": {
-      collect_locals_in_func(air.body, local_refs, locals);
-      break;
-    }
-    case "if": {
-      collect_locals_in_func(air.cond, local_refs, locals);
-      collect_locals_in_func(air.then, local_refs, locals);
-      collect_locals_in_func(air.else, local_refs, locals);
-      break;
-    }
-  }
 };
