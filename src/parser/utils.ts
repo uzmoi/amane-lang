@@ -53,9 +53,9 @@ export const is_ident_continue = (source: string, index: number) => {
 const ws_re = /\p{White_Space}/u;
 export const is_whitespace = (char: string) =>
   // https://util.unicode.org/UnicodeJsps/list-unicodeset.jsp?a=[[:ASCII:]%26[:White_Space:]]
-  ("\x08" < char && char < "\x0e") || // "\t" | "\n" | "\v" | "\f" | "\r"
-  char === " " ||
-  (char > "\x7f" && ws_re.test(char));
+  char < "\x80" // is ascii
+    ? char === " " || ("\x08" < char && char < "\x0e") // "\t" | "\n" | "\v" | "\f" | "\r"
+    : ws_re.test(char);
 
 const escape_char_map = new Map([
   ["0", "\0"],
