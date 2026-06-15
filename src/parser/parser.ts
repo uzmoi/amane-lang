@@ -43,9 +43,9 @@ type ParserExt = Loc;
 
 export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
   P.choice([
-    Bool,
-    Number,
-    String,
+    BoolLiteral,
+    NumberLiteral,
+    StringLiteral,
     Tuple,
     Ident,
     Block,
@@ -57,7 +57,7 @@ export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
   ]),
 );
 
-const Bool = P.choice([keyword("true"), keyword("false")]).map(
+const BoolLiteral = P.choice([keyword("true"), keyword("false")]).map(
   (token): N.BoolExpression<ParserExt> => ({
     type: "Bool",
     value: token.value === "true",
@@ -65,8 +65,7 @@ const Bool = P.choice([keyword("true"), keyword("false")]).map(
   }),
 );
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames: Node name
-const Number = P.choice([
+const NumberLiteral = P.choice([
   keyword("inf"),
   keyword("nan"),
   token(TokenType.Number),
@@ -78,8 +77,7 @@ const Number = P.choice([
   }),
 );
 
-// biome-ignore lint/suspicious/noShadowRestrictedNames: Node name
-const String = token(TokenType.String).map(
+const StringLiteral = token(TokenType.String).map(
   (token): N.StringExpression<ParserExt> => ({
     type: "String",
     value: unescape_string_content(token.value.slice(1, -1)),
