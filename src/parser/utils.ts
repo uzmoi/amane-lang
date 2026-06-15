@@ -79,6 +79,16 @@ export const unescape_ident = (value: string): string => {
     : value.replace(/\\(.?)/g, "$1");
 };
 
+/**
+ * 有効な数値リテラル構文の文字列を受け取り、正規化して返す関数。
+ */
 export const normalize_number = (value: string): string => {
-  return value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1");
+  // - アンダースコアの除去
+  // - アルファベット（0B, 0X, 16進のA-F）の小文字化
+  // - 先行ゼロ/小数部の末尾ゼロの削除
+  return value
+    .replaceAll("_", "")
+    .toLowerCase()
+    .replace(/^(0[a-z])0+\B|^0+(?=\d)/, "$1")
+    .replace(/(\.\d+?)0+$/, "$1");
 };
