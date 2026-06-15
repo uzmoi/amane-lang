@@ -11,7 +11,11 @@ import {
 } from "./lexer";
 import { type Loc, loc } from "./location";
 import type * as N from "./node";
-import { unescape_string_content } from "./utils";
+import {
+  normalize_number,
+  unescape_ident,
+  unescape_string_content,
+} from "./utils";
 
 const token = <T extends TokenType>(type: T) =>
   P.satisfy<Token & { type: T }, Token>((token) => token.type === type, {
@@ -69,7 +73,7 @@ const Number = P.choice([
 ]).map(
   (token): N.NumberExpression<ParserExt> => ({
     type: "Number",
-    value: token.value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1"),
+    value: normalize_number(token.value),
     loc: token,
   }),
 );
@@ -94,18 +98,11 @@ const Tuple = P.seq([
 }));
 
 const Ident = token(TokenType.Ident).map(
-  (token): N.IdentExpression<ParserExt> => {
-    const { value } = token;
-    const isStringIdent = value.startsWith('\\"') && value.endsWith('"');
-    const name = isStringIdent
-      ? unescape_string_content(value.slice(2, -1))
-      : value.replace(/\\(.?)/g, "$1");
-    return {
-      type: "Ident",
-      name,
-      loc: token,
-    };
-  },
+  (token): N.IdentExpression<ParserExt> => ({
+    type: "Ident",
+    name: unescape_ident(token.value),
+    loc: token,
+  }),
 );
 
 const Block = P.seq([

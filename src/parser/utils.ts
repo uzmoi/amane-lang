@@ -71,3 +71,14 @@ export const unescape_string_content = (string: string): string =>
     /\\(.)/g,
     (_, mat) => escape_char_map.get(mat as string) ?? (mat as string),
   );
+
+export const unescape_ident = (value: string): string => {
+  const is_string_ident = value.startsWith('\\"') && value.endsWith('"');
+  return is_string_ident
+    ? unescape_string_content(value.slice(2, -1))
+    : value.replace(/\\(.?)/g, "$1");
+};
+
+export const normalize_number = (value: string): string => {
+  return value.replace(/_/g, "").replace(/^(0[box])?0+\B/, "$1");
+};
