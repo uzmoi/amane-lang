@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { Air, AirModule } from "../../air";
+import { parse_art as art } from "../../air/art";
 import { convert } from "./convert";
 import { type Module, NumType } from "./module";
 
@@ -22,9 +23,8 @@ describe("convert", () => {
   });
 
   test("func", () => {
-    const func_body: Air = { type: "lit.num.int", value: 0 };
     const air_module: AirModule = {
-      items: [{ type: "fn", params: [], body: func_body }],
+      items: [art("let %0 = fn 0")],
     };
 
     expect(convert(air_module)).toEqual({
@@ -35,7 +35,7 @@ describe("convert", () => {
           signature: 0,
           local_refs: new Map(),
           locals: [],
-          body: func_body,
+          body: art("0") as Air,
         },
       ],
       tables: [],
