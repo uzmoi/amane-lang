@@ -1,5 +1,5 @@
 {
-  "packageManager": "pnpm@10.24.0+sha512.01ff8ae71b4419903b65c60fb2dc9d34cf8bb6e06d03bde112ef38f7a34d6904c424ba66bea5cdcf12890230bf39f9580473140ed9c946fef328b6e5238a345a",
+  "packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b",
   "name": "amane",
   "version": "0.0.1",
   "description": "",
@@ -21,8 +21,8 @@
   "author": "uzmoi",
   "license": "MIT",
   "dependencies": {
-    "@uzmoi/ut": "^0.1.4",
-    "cac": "^6.7.14",
+    "@uzmoi/ut": "^0.1.6",
+    "cac": "^7.0.0",
     "emnorst": "^1.0.0-next.2",
     "parsea": "^0.10.2",
     "picocolors": "^1.1.1"
@@ -30,14 +30,14 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.8",
     "@types/node": "^24.10.1",
-    "@vitest/coverage-v8": "^4.0.14",
-    "@vitest/ui": "^4.0.14",
+    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/ui": "^4.1.9",
     "better-typescript-lib": "^2.12.0",
     "cspell": "^9.3.2",
-    "lefthook": "^2.0.4",
-    "tsdown": "^0.17.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.14",
+    "lefthook": "^2.1.9",
+    "tsdown": "^0.22.3",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9",
     "wabt": "^1.0.39"
   }
 }
