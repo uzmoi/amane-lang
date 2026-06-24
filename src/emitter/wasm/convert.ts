@@ -1,14 +1,18 @@
 import type { Air, AirModule, AirStatement } from "../../air";
 import { type W, walk_air, walk_air_statement } from "../../air/walk";
 import {
+  type Export,
   type Func,
   type FuncType,
+  type Import,
   type Module,
   NumType,
   type ValType,
 } from "./module";
 
 export const convert = (air_module: AirModule): Module => {
+  const imports: Import[] = [];
+  const exports: Export[] = [];
   const types: FuncType[] = [];
   const funcs: Func[] = [];
 
@@ -78,12 +82,12 @@ export const convert = (air_module: AirModule): Module => {
 
   return {
     types,
-    imports: [],
+    imports,
     funcs,
     tables: [],
     memories: [],
     globals: [],
-    exports: [],
+    exports,
     start: null,
   };
 };
