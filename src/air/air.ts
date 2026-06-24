@@ -1,4 +1,5 @@
 import type { Brand } from "@uzmoi/ut/types";
+import type { Ty } from "./ty";
 
 export type Id = number & Brand<"Id">;
 
@@ -14,12 +15,13 @@ export type AirStatement =
 /**
  * Amane Intermediate Representation
  */
-export type Air =
+export type Air = { ty?: Ty } & (
   | { type: "ref"; id: Id }
-  | { type: "fn"; params: readonly Id[]; body: Air }
+  | { type: "fn"; params: readonly { id: Id; ty: Ty }[]; body: Air }
   | { type: "return"; value: Air }
   | { type: "block"; body: readonly AirStatement[]; last: Air | null }
   | { type: "loop"; body: Air }
   | { type: "break" }
   | { type: "if"; cond: Air; then: Air; else: Air }
-  | { type: "lit.num.int"; value: number };
+  | { type: "lit.num.int"; value: number }
+);

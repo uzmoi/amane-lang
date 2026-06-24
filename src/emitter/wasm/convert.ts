@@ -1,14 +1,8 @@
 import type { Air, AirModule, AirStatement } from "#air";
 import { type W, walk_air, walk_air_statement } from "../../air/walk";
-import {
-  type Export,
-  type Func,
-  type FuncType,
-  type Import,
-  type Module,
-  NumType,
-  type ValType,
-} from "./module";
+import type { Export, Func, FuncType, Import, Module, ValType } from "./module";
+import { ty } from "./type";
+import { zip } from "./utils";
 
 export const convert = (air_module: AirModule): Module => {
   const imports: Import[] = [];
@@ -40,21 +34,36 @@ export const convert = (air_module: AirModule): Module => {
   while (fns.length) {
     const fn_air = fns.shift()!;
 
+    const param_types = fn_air.params.map((param) => {
+      const type = ty(param.ty);
+      if (type == null) {
+        throw new Error("paramの型がvoidなのマジイミフじゃねw ウケるw");
+      }
+      return type;
+    });
+
+    const return_type = ty(fn_air.body.ty);
+
     let signature = types.findIndex(
-      (type) => type.params.length === fn_air.params.length,
+      (type) =>
+        type.params.length === fn_air.params.length &&
+        zip(type.params, param_types).every(([a, b]) => a === b) &&
+        (return_type == null
+          ? type.return.length === 0
+          : type.return.length === 1 && type.return[0] === return_type),
     );
 
     if (signature === -1) {
       signature = types.length;
       types.push({
         kind: "func",
-        params: fn_air.params.map(() => NumType.i32),
-        return: [NumType.i32],
+        params: param_types,
+        return: return_type ? [return_type] : [],
       });
     }
 
     const local_refs = new Map(
-      fn_air.params.map((param, index) => [param, index]),
+      fn_air.params.map((param, index) => [param.id, index]),
     );
 
     const locals: ValType[] = [];
@@ -63,7 +72,11 @@ export const convert = (air_module: AirModule): Module => {
       walk_air_statement(air, w);
       if (air.type === "def") {
         local_refs.set(air.id, local_refs.size);
-        locals.push(NumType.i32);
+        const type = ty(air.init.ty);
+        if (type == null) {
+          throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");
+        }
+        locals.push(type);
       }
     };
 

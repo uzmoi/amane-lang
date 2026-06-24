@@ -1,6 +1,7 @@
+import { todo, unreachable } from "@uzmoi/ut/ils";
 import type { Air, AirStatement, Id } from "#air";
-import { NumType } from "./module";
 import { Opcode } from "./opcode";
+import { empty_type, ty } from "./type";
 import type { Writer } from "./writer";
 
 export interface FuncContext {
@@ -43,7 +44,7 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       break;
     }
     case "fn": {
-      throw new Error("");
+      throw todo();
     }
     case "return": {
       write_air(writer, air.value, ctx);
@@ -53,18 +54,14 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
     case "block": {
       write_air_statements(writer, air.body, ctx);
 
-      if (air.last == null) {
-        // TODO: 型を増やすときにUnit的な型にする。
-        writer.u8(Opcode.i32_const);
-        writer.u32leb128(0);
-      } else {
+      if (air.last != null) {
         write_air(writer, air.last, ctx);
       }
       break;
     }
     case "loop": {
       writer.u8(Opcode.loop);
-      writer.u8(NumType.i32);
+      writer.u8(ty(air.ty) ?? empty_type); // block type
       write_air(writer, air.body, ctx);
       writer.u8(Opcode.end);
       break;
@@ -77,7 +74,7 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
     case "if": {
       write_air(writer, air.cond, ctx);
       writer.u8(Opcode.if);
-      writer.u8(NumType.i32);
+      writer.u8(ty(air.ty) ?? empty_type); // block type
       write_air(writer, air.then, ctx);
       writer.u8(Opcode.else);
       write_air(writer, air.else, ctx);
@@ -85,7 +82,12 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       break;
     }
     case "lit.num.int": {
-      writer.u8(Opcode.i32_const);
+      writer.u8(
+        // biome-ignore format: match式
+        air.ty === "i32" ? Opcode.i32_const :
+        air.ty === "i64" ? Opcode.i64_const :
+        unreachable(),
+      );
       writer.u32leb128(air.value);
       break;
     }
