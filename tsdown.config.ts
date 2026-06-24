@@ -6,6 +6,9 @@ export default defineConfig({
     cli: "src/cli/main.ts",
   },
   platform: "neutral",
+  deps: {
+    neverBundle: /^node:/,
+  },
   sourcemap: true,
   define: {
     "import.meta.env.DEV": "false",
