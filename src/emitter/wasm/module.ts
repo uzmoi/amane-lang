@@ -1,4 +1,4 @@
-import type { Air, Id } from "../../air";
+import type { Air, Id } from "#air";
 import { write_air } from "./air";
 import { Opcode } from "./opcode";
 import type { u8 } from "./types";

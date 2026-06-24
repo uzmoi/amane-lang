@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import type { Air, AirModule } from "../../air";
-import { parse_art as art } from "../../air/art";
+import type { Air, AirModule } from "#air";
+import { parse_art as art } from "#art";
 import { convert } from "./convert";
 import { type Module, NumType } from "./module";
 

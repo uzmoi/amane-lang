@@ -1,4 +1,4 @@
-import type { AirModule } from "../../air";
+import type { AirModule } from "#air";
 import { convert } from "./convert";
 import { write_module } from "./module";
 import { Writer } from "./writer";

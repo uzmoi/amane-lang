@@ -1,4 +1,4 @@
-import type { Air, AirStatement, Id } from "../../air";
+import type { Air, AirStatement, Id } from "#air";
 import { NumType } from "./module";
 import { Opcode } from "./opcode";
 import type { Writer } from "./writer";

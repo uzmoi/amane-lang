@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { parse_art as art } from "../../air/art";
+import { parse_art as art } from "#art";
 import { emit_wasm } from "./emit";
 
 describe("emit_wasm", () => {

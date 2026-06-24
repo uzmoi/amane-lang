@@ -20,6 +20,11 @@
   "keywords": [],
   "author": "uzmoi",
   "license": "MIT",
+  "imports": {
+    "#amane": "./src/index.ts",
+    "#air": "./src/air/index.ts",
+    "#art": "./src/air/art/index.ts"
+  },
   "dependencies": {
     "@uzmoi/ut": "^0.1.6",
     "cac": "^7.0.0",

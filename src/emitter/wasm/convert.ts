@@ -1,4 +1,4 @@
-import type { Air, AirModule, AirStatement } from "../../air";
+import type { Air, AirModule, AirStatement } from "#air";
 import { type W, walk_air, walk_air_statement } from "../../air/walk";
 import {
   type Export,
