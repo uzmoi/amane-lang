@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { normalize_number } from "./utils";
+import { normalize_number, skip_shebang } from "./utils";
 
 describe("normalize_number", () => {
   test.each([
@@ -26,5 +26,27 @@ describe("normalize_number", () => {
     ["inf"],
   ])("Normalize '%s'", (input, output = input) => {
     expect(normalize_number(input)).toEqual(output);
+  });
+});
+
+describe("skip_shebang", () => {
+  test("No shebang", () => {
+    expect(skip_shebang("hoge\n#!fuga")).toBe(0);
+  });
+
+  test("Skip until LF", () => {
+    expect(skip_shebang("#!hoge\nfuga")).toBe(6);
+  });
+
+  test("Skip until CR", () => {
+    expect(skip_shebang("#!hoge\rfuga")).toBe(6);
+  });
+
+  test("Skip until CRLF", () => {
+    expect(skip_shebang("#!hoge\r\nfuga")).toBe(6);
+  });
+
+  test("Skip until EOF", () => {
+    expect(skip_shebang("#!hoge")).toBe(6);
   });
 });

@@ -92,3 +92,16 @@ export const normalize_number = (value: string): string => {
     .replace(/^(0[a-z])0+\B|^0+(?=\d)/, "$1")
     .replace(/(\.\d+?)0+$/, "$1");
 };
+
+export const skip_shebang = (source: string): number => {
+  if (source.startsWith("#!")) {
+    for (let i = 0; i < source.length; i++) {
+      const char = source[i];
+      if (char === "\n" || char === "\r") return i;
+    }
+
+    return source.length;
+  }
+
+  return 0;
+};
