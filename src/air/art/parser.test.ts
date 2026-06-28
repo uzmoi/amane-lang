@@ -32,6 +32,22 @@ describe("fn", () => {
       },
     });
   });
+
+  test("call", () => {
+    expect(art("call %0")).toEqual({
+      type: "call",
+      callee: art("%0"),
+      args: [],
+    });
+  });
+
+  test("call with args", () => {
+    expect(art("call %0(0, 1, 2)")).toEqual({
+      type: "call",
+      callee: art("%0"),
+      args: [art("0"), art("1"), art("2")],
+    });
+  });
 });
 
 describe("block", () => {

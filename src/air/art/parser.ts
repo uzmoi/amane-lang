@@ -45,6 +45,17 @@ const air = P.lazy((): P.Parser<Air, Token> => {
       .map((value): Air => ({ type: "return", value })),
 
     P.seq([
+      keyword("call").then(air),
+      P.choice([
+        P.sepBy(air, delimiter(","), { trailing: "allow" }).between(
+          delimiter("("),
+          delimiter(")"),
+        ),
+        P.pure([]),
+      ]),
+    ]).map(([callee, args]): Air => ({ type: "call", callee, args })),
+
+    P.seq([
       P.many(statement.skip(delimiter(";"))),
       P.choice([air, P.pure(null)]),
     ])

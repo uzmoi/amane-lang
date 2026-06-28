@@ -51,6 +51,9 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       writer.u8(Opcode.return);
       break;
     }
+    case "call": {
+      throw todo();
+    }
     case "block": {
       write_air_statements(writer, air.body, ctx);
 

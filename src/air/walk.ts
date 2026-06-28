@@ -18,7 +18,11 @@ export const walk_air = (air: Air, w: W) => {
       w.air(air.value, w);
       break;
     }
-    case "apply": {
+    case "call": {
+      w.air(air.callee, w);
+      for (const arg of air.args) {
+        w.air(arg, w);
+      }
       break;
     }
     case "block": {
