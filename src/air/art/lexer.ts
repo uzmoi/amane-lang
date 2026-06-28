@@ -24,7 +24,7 @@ export class Lexer {
   private read_token(): Token | undefined {
     this.read_re(/\s+/y, "ws");
     return (
-      this.read_re(/[(){},;=]/y, "delimiter") ??
+      this.read_re(/[(){},:;=]/y, "delimiter") ??
       this.read_re(/\d+/y, "number") ??
       this.read_re(/"([^"\\]|\\.)+"/y, "string") ??
       this.read_re(/\w+/y, "keyword") ??

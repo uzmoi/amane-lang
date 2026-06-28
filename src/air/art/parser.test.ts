@@ -15,9 +15,12 @@ describe("fn", () => {
   });
 
   test("with params", () => {
-    expect(art("fn (%0, %1) %2")).toEqual({
+    expect(art("fn (%0: i32, %1: i32) %2")).toEqual({
       type: "fn",
-      params: [0, 1],
+      params: [
+        { id: 0, ty: "i32" },
+        { id: 1, ty: "i32" },
+      ],
       body: art("%2"),
     });
   });

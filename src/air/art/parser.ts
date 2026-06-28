@@ -24,6 +24,10 @@ const id = token("id").map(
   ({ content }) => parseInt(content.slice(1), 10) as Id,
 );
 
+const ty = P.choice(
+  (["i32", "i64", "f32", "f64"] as const).map((t) => keyword(t).return(t)),
+);
+
 const air = P.lazy((): P.Parser<Air, Token> => {
   return P.choice([
     id.map((id): Air => ({ type: "ref", id })),
@@ -31,10 +35,11 @@ const air = P.lazy((): P.Parser<Air, Token> => {
     P.seq([
       keyword("fn"),
       P.choice([
-        P.sepBy(id, delimiter(","), { trailing: "allow" }).between(
-          delimiter("("),
-          delimiter(")"),
-        ),
+        P.sepBy(
+          P.seq([id, delimiter(":"), ty]).map(([id, , ty]) => ({ id, ty })),
+          delimiter(","),
+          { trailing: "allow" },
+        ).between(delimiter("("), delimiter(")")),
         P.pure([]),
       ]),
       air,

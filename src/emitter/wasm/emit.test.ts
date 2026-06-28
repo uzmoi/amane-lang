@@ -17,7 +17,7 @@ describe("emit_wasm", () => {
 
   test("identity func", () => {
     const wasm = emit_wasm({
-      items: [art("fn (%0) %0")],
+      items: [art("fn (%0: i32) %0")],
     });
     expect(wasm).toMatchSnapshot();
   });
@@ -70,7 +70,7 @@ describe("emit_wasm", () => {
 
   test("assign to param", () => {
     const wasm = emit_wasm({
-      items: [art("fn (%0) { %0 = 0; %0 }")],
+      items: [art("fn (%0: i32) { %0 = 0; %0 }")],
     });
     expect(wasm).toMatchSnapshot();
   });
