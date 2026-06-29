@@ -28,7 +28,7 @@
   "dependencies": {
     "@uzmoi/ut": "^0.1.6",
     "cac": "^7.0.0",
-    "emnorst": "^1.0.0-next.2",
+    "emnorst": "1.0.0-next.2",
     "parsea": "^0.10.2",
     "picocolors": "^1.1.1"
   },
