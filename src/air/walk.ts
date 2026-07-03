@@ -1,11 +1,12 @@
 import type { Air, AirStatement } from "./air";
 
-export interface W {
-  air(air: Air, w: W): void;
-  air_statement(air: AirStatement, w: W): void;
+export interface W<C> {
+  air(air: Air, w: W<C>): void;
+  air_statement(air: AirStatement, w: W<C>): void;
+  context: C;
 }
 
-export const walk_air = (air: Air, w: W) => {
+export const walk_air = <C>(air: Air, w: W<C>) => {
   switch (air.type) {
     case "ref": {
       break;
@@ -53,7 +54,7 @@ export const walk_air = (air: Air, w: W) => {
   }
 };
 
-export const walk_air_statement = (air: AirStatement, w: W) => {
+export const walk_air_statement = <C>(air: AirStatement, w: W<C>) => {
   switch (air.type) {
     case "def": {
       w.air(air.init, w);

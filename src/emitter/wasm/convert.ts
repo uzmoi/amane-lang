@@ -12,7 +12,7 @@ export const convert = (air_module: AirModule): Module => {
 
   const fns: Extract<Air, { type: "fn" }>[] = [];
 
-  const walk_toplevel_air = (air: Air, v: W): void => {
+  const walk_toplevel_air = (air: Air, v: W<null>): void => {
     if (air.type === "fn") {
       fns.push(air);
     } else {
@@ -27,6 +27,7 @@ export const convert = (air_module: AirModule): Module => {
       walk_air_statement(item, {
         air: walk_toplevel_air,
         air_statement: walk_air_statement,
+        context: null,
       });
     }
   }
@@ -68,7 +69,7 @@ export const convert = (air_module: AirModule): Module => {
 
     const locals: ValType[] = [];
 
-    const walk_fn_air_statement = (air: AirStatement, w: W): void => {
+    const walk_fn_air_statement = (air: AirStatement, w: W<null>): void => {
       walk_air_statement(air, w);
       if (air.type === "def") {
         local_refs.set(air.id, local_refs.size);
@@ -83,6 +84,7 @@ export const convert = (air_module: AirModule): Module => {
     walk_fn_air_statement(fn_air, {
       air: walk_toplevel_air,
       air_statement: walk_fn_air_statement,
+      context: null,
     });
 
     funcs.push({
