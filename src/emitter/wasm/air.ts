@@ -87,8 +87,8 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
     case "lit.num.int": {
       writer.u8(
         // biome-ignore format: match式
-        air.ty === "i32" ? Opcode.i32_const :
-        air.ty === "i64" ? Opcode.i64_const :
+        air.ty?.type === "i32" ? Opcode.i32_const :
+        air.ty?.type === "i64" ? Opcode.i64_const :
         unreachable(),
       );
       writer.u32leb128(air.value);

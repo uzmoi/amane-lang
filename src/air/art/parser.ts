@@ -1,6 +1,7 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
 import type { Air, AirStatement, Id } from "../air";
+import type { Ty } from "../ty";
 import { Lexer, type Token } from "./lexer";
 
 const token = (type: Token["type"]) =>
@@ -25,7 +26,9 @@ const id = token("id").map(
 );
 
 const ty = P.choice(
-  (["i32", "i64", "f32", "f64"] as const).map((t) => keyword(t).return(t)),
+  (["i32", "i64", "f32", "f64"] as const).map((t) =>
+    keyword(t).return<Ty>({ type: t }),
+  ),
 );
 
 const air = P.lazy((): P.Parser<Air, Token> => {

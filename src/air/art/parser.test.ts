@@ -18,8 +18,8 @@ describe("fn", () => {
     expect(art("fn (%0: i32, %1: i32) %2")).toEqual({
       type: "fn",
       params: [
-        { id: 0, ty: "i32" },
-        { id: 1, ty: "i32" },
+        { id: 0, ty: { type: "i32" } },
+        { id: 1, ty: { type: "i32" } },
       ],
       body: art("%2"),
     });

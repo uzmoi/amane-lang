@@ -9,7 +9,7 @@ export const ty = (ty: Ty | undefined): NumType | null => {
     throw new Error("型推論して♡");
   }
 
-  switch (ty) {
+  switch (ty.type) {
     case "any":
     case "never":
       return todo("");
@@ -24,6 +24,8 @@ export const ty = (ty: Ty | undefined): NumType | null => {
     case "f64":
       return NumType.f64;
     default:
-      unreachable<typeof ty>(`Unknown type '${ty}'.`);
+      unreachable<typeof ty>(
+        `Unknown type '${(ty as { type: string }).type}'.`,
+      );
   }
 };
