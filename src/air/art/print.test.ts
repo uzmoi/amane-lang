@@ -1,6 +1,20 @@
 import { describe, expect, test } from "vitest";
-import { parse_art as art } from "./parser";
-import { print_air } from "./print";
+import { parse_art as art, parse_ty } from "./parser";
+import { print_air, print_ty } from "./print";
+
+describe("ty", () => {
+  test.each([
+    "%0",
+    "i32",
+    "i64",
+    "f32",
+    "f64",
+    "fn: i32",
+    "fn (i32, i32): i32",
+  ])("%o", (ty) => {
+    expect(print_ty(parse_ty(ty))).toBe(ty);
+  });
+});
 
 test("ref", () => {
   expect(print_air(art("%0"))).toEqual("%0");

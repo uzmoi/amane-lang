@@ -25,11 +25,27 @@ const id = token("id").map(
   ({ content }) => parseInt(content.slice(1), 10) as Id,
 );
 
-const ty = P.choice(
-  (["i32", "i64", "f32", "f64"] as const).map((t) =>
-    keyword(t).return<Ty>({ type: t }),
-  ),
-);
+const ty = P.lazy((): P.Parser<Ty, Token> => {
+  return P.choice([
+    id.map((id): Ty => ({ type: "ref", id })),
+
+    ...(["i32", "i64", "f32", "f64"] as const).map((t) =>
+      keyword(t).return<Ty>({ type: t }),
+    ),
+
+    P.seq([
+      keyword("fn"),
+      P.choice([
+        P.sepBy(ty, delimiter(","), { trailing: "allow" }).between(
+          delimiter("("),
+          delimiter(")"),
+        ),
+        P.pure([]),
+      ]),
+      delimiter(":").then(ty),
+    ]).map(([, params, ret]): Ty => ({ type: "fn", params, ret })),
+  ]);
+});
 
 const air = P.lazy((): P.Parser<Air, Token> => {
   return P.choice([
@@ -99,6 +115,8 @@ const statement = P.choice([
 
   air,
 ]);
+
+export const parse_ty = (string: string): Ty => P.parseA(ty, Lexer.lex(string));
 
 export const parse_art = (string: string): AirStatement =>
   P.parseA(statement, Lexer.lex(string));

@@ -1,5 +1,31 @@
 import { describe, expect, test } from "vitest";
-import { parse_art as art } from "./parser";
+import { parse_art as art, parse_ty } from "./parser";
+
+describe("ty", () => {
+  test("ref", () => {
+    expect(parse_ty("%0")).toEqual({ type: "ref", id: 0 });
+  });
+
+  test("i32", () => {
+    expect(parse_ty("i32")).toEqual({ type: "i32" });
+  });
+
+  test("fn (no params)", () => {
+    expect(parse_ty("fn: i32")).toEqual({
+      type: "fn",
+      params: [],
+      ret: parse_ty("i32"),
+    });
+  });
+
+  test("fn (with params)", () => {
+    expect(parse_ty("fn (i32, i32): i32")).toEqual({
+      type: "fn",
+      params: [parse_ty("i32"), parse_ty("i32")],
+      ret: parse_ty("i32"),
+    });
+  });
+});
 
 test("ref", () => {
   expect(art("%0")).toEqual({ type: "ref", id: 0 });

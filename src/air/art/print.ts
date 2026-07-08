@@ -12,6 +12,12 @@ export const print_ty = (ty: Ty): string => {
     case "f32":
     case "f64":
       return ty.type;
+    case "fn":
+      return ty.params.length > 0
+        ? `fn (${ty.params.map(print_ty).join(", ")}): ${print_ty(ty.ret)}`
+        : `fn: ${print_ty(ty.ret)}`;
+    case "ref":
+      return `%${ty.id}`;
   }
 };
 

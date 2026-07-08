@@ -12,6 +12,8 @@ export const ty = (ty: Ty | undefined): NumType | null => {
   switch (ty.type) {
     case "any":
     case "never":
+    case "ref":
+    case "fn":
       return todo("");
     case "void":
       return null;
