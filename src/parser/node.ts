@@ -84,4 +84,22 @@ export type Statement<T = never> = LetStatement<T> | ExpressionStatement<T>;
 
 // #endregion
 
-export type Node<T = never> = Expression<T> | Statement<T>;
+// #region Module
+
+export type StatementModuleItem<T = never> = NodeExtend<"Statement", T> & {
+  stmt: Statement<T>;
+};
+
+export type ModuleItem<T = never> = StatementModuleItem<T>;
+
+export type Module<T = never> = NodeExtend<"Module", T> & {
+  items: ModuleItem<T>[];
+};
+
+// #endregion
+
+export type Node<T = never> =
+  | Expression<T>
+  | Statement<T>
+  | Module<T>
+  | ModuleItem<T>;

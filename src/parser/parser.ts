@@ -186,3 +186,24 @@ const ExpressionStatement = Expression.map(
 );
 
 // #endregion
+
+const ModuleItem = P.choice([
+  Statement.map(
+    (stmt): N.StatementModuleItem<ParserExt> => ({
+      type: "Statement",
+      stmt,
+      loc: stmt.loc,
+    }),
+  ),
+]);
+
+export const Module = P.many(ModuleItem).map(
+  (items): N.Module<ParserExt> => ({
+    type: "Module",
+    items,
+    loc:
+      items.length === 0
+        ? { start: 0, end: 0 }
+        : loc(items[0]!.loc, items.at(-1)!.loc),
+  }),
+);
