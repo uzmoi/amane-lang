@@ -1,0 +1,120 @@
+import { todo, unreachable } from "@uzmoi/ut/ils";
+import type { ast, Loc } from "#parser";
+import type { Air, AirModule, AirStatement, Id } from "../air";
+import type { Ty } from "../ty";
+import { Scope } from "./scope";
+
+export const lower = (module: ast.Module<Loc>): AirModule => {
+  const ctx: LowerContext = {
+    scope: new Scope(),
+  };
+
+  const items = module.items.map((item) => lower_statement(item.stmt, ctx));
+
+  return { items };
+};
+
+interface LowerContext {
+  scope: Scope;
+}
+
+export const lower_statement = (
+  stmt: ast.Statement<Loc>,
+  ctx: LowerContext,
+): AirStatement => {
+  switch (stmt.type) {
+    case "Let": {
+      const init = lower_expression(stmt.init, ctx);
+      const { id } = ctx.scope.def(stmt.dest.name);
+      return { type: "def", id, init };
+    }
+    case "Expression": {
+      return lower_expression(stmt.expr, ctx);
+    }
+  }
+};
+
+export const lower_expression = (
+  expr: ast.Expression<Loc>,
+  ctx: LowerContext,
+): Air => {
+  switch (expr.type) {
+    case "Bool": {
+      return todo();
+      // return { type: "bool", value: expr.value };
+    }
+    case "Number": {
+      return todo();
+    }
+    case "String": {
+      return todo();
+      // return { type: "string", value: expr.value };
+    }
+    case "Tuple": {
+      return todo();
+      // const elements = expr.elements.map((element) =>
+      //   lower_expression(element, ctx),
+      // );
+      // return { type: "tuple", elements };
+    }
+    case "Ident": {
+      const entry = ctx.scope.ref(expr.name);
+      if (entry == null) {
+        throw new Error(`${expr.name} is undefined`);
+      }
+      return { type: "ref", id: entry.id };
+    }
+    case "Block": {
+      ctx.scope.push();
+
+      const body = expr.stmts.map((stmt) => lower_statement(stmt, ctx));
+      const last = expr.last && lower_expression(expr.last, ctx);
+
+      ctx.scope.pop();
+
+      return { type: "block", body, last };
+    }
+    case "If": {
+      return {
+        type: "if",
+        cond: lower_expression(expr.cond, ctx),
+        then: lower_expression(expr.then, ctx),
+        else: lower_expression(expr.else, ctx),
+      };
+    }
+    case "Loop": {
+      const body = lower_expression(expr.body, ctx);
+      return { type: "loop", body };
+    }
+    case "Break": {
+      return { type: "break" };
+    }
+    case "Fn": {
+      ctx.scope.push();
+
+      const params: { id: Id; ty: Ty }[] = [];
+      for (const param of expr.params?.elements ?? []) {
+        if (param.type !== "Ident") unreachable();
+
+        const { id } = ctx.scope.def(param.name);
+        params.push({ id, ty: { type: "any" } });
+      }
+
+      const body = lower_expression(expr.body, ctx);
+
+      ctx.scope.pop();
+
+      return { type: "fn", params, body };
+    }
+    case "Return": {
+      const value = lower_expression(
+        expr.body ?? todo("airが値なしのreturnに未対応。"),
+        ctx,
+      );
+      return { type: "return", value };
+    }
+    default: {
+      unreachable<typeof expr>();
+    }
+  }
+};

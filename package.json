@@ -23,7 +23,8 @@
   "imports": {
     "#amane": "./src/index.ts",
     "#air": "./src/air/index.ts",
-    "#art": "./src/air/art/index.ts"
+    "#art": "./src/air/art/index.ts",
+    "#parser": "./src/parser/index.ts"
   },
   "dependencies": {
     "@uzmoi/ut": "^0.1.6",
