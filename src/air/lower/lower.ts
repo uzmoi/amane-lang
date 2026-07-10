@@ -25,7 +25,7 @@ export const lower_statement = (
   switch (stmt.type) {
     case "Let": {
       const init = lower_expression(stmt.init, ctx);
-      const { id } = ctx.scope.def(stmt.dest.name);
+      const { id } = ctx.scope.def(stmt.dest.name, stmt.dest.loc);
       return { type: "def", id, init };
     }
     case "Expression": {
@@ -58,7 +58,7 @@ export const lower_expression = (
       // return { type: "tuple", elements };
     }
     case "Ident": {
-      const entry = ctx.scope.ref(expr.name);
+      const entry = ctx.scope.ref(expr.name, expr.loc);
       if (entry == null) {
         throw new Error(`${expr.name} is undefined`);
       }
@@ -96,7 +96,7 @@ export const lower_expression = (
       for (const param of expr.params?.elements ?? []) {
         if (param.type !== "Ident") unreachable();
 
-        const { id } = ctx.scope.def(param.name);
+        const { id } = ctx.scope.def(param.name, param.loc);
         params.push({ id, ty: { type: "any" } });
       }
 
