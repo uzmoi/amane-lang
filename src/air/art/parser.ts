@@ -99,7 +99,7 @@ const air = P.lazy((): P.Parser<Air, Token> => {
     ]).map(([cond, then, els]): Air => ({ type: "if", cond, then, else: els })),
 
     token("number").map(
-      ({ content }): Air => ({ type: "lit.num.int", value: +content }),
+      ({ content }): Air => ({ type: "const.int", value: BigInt(+content) }),
     ),
   ]);
 });

@@ -59,7 +59,7 @@ export const print_air = (air: AirStatement): string => {
     case "if": {
       return `if ${print_air(air.cond)} then ${print_air(air.then)} else ${print_air(air.else)}`;
     }
-    case "lit.num.int": {
+    case "const.int": {
       return air.value.toString();
     }
     default: {

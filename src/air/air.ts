@@ -24,5 +24,5 @@ export type Air = { ty?: Ty } & (
   | { type: "loop"; body: Air }
   | { type: "break" }
   | { type: "if"; cond: Air; then: Air; else: Air }
-  | { type: "lit.num.int"; value: number }
+  | { type: "const.int"; value: bigint }
 );

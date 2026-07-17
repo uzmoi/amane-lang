@@ -75,7 +75,7 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       // ctx.unify(air.ty!, air.else.ty!);
       break;
     }
-    case "lit.num.int": {
+    case "const.int": {
       // FIXME: i64...
       air.ty = { type: "i32" };
       break;

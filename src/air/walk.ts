@@ -48,7 +48,7 @@ export const walk_air = <C>(air: Air, w: W<C>) => {
       w.air(air.else, w);
       break;
     }
-    case "lit.num.int": {
+    case "const.int": {
       break;
     }
   }

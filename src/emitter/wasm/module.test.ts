@@ -1,4 +1,6 @@
 import { describe, expect, test } from "vitest";
+import type { Air } from "#air";
+import { parse_art as art } from "#art";
 import {
   ImportExportDesc,
   type Module,
@@ -44,12 +46,12 @@ describe("write_module", () => {
           {
             type: NumType.i32,
             mut: false,
-            expr: { type: "lit.num.int", value: 0 },
+            expr: art("0") as Air,
           },
           {
             type: NumType.i32,
             mut: true,
-            expr: { type: "lit.num.int", value: 0 },
+            expr: art("0") as Air,
           },
         ],
       },
