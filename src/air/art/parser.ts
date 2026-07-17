@@ -7,7 +7,7 @@ import { Lexer, type Token } from "./lexer";
 const token = (type: Token["type"]) =>
   P.satisfy((token: Token) => token.type === type, {
     error: error.expected(type),
-  });
+  }).map((token) => token.content);
 
 const keyword = (keyword: string) =>
   P.satisfy(
@@ -21,9 +21,7 @@ const delimiter = (delimiter: string) =>
     { error: error.expected(`delimiter '${delimiter}'`) },
   );
 
-const id = token("id").map(
-  ({ content }) => parseInt(content.slice(1), 10) as Id,
-);
+const id = token("id").map((content) => parseInt(content.slice(1), 10) as Id);
 
 const ty = P.lazy((): P.Parser<Ty, Token> => {
   return P.choice([
@@ -35,13 +33,9 @@ const ty = P.lazy((): P.Parser<Ty, Token> => {
 
     P.seq([
       keyword("fn"),
-      P.choice([
-        P.sepBy(ty, delimiter(","), { trailing: "allow" }).between(
-          delimiter("("),
-          delimiter(")"),
-        ),
-        P.pure([]),
-      ]),
+      P.sepBy(ty, delimiter(","), { trailing: "allow" })
+        .between(delimiter("("), delimiter(")"))
+        .option([]),
       delimiter(":").then(ty),
     ]).map(([, params, ret]): Ty => ({ type: "fn", params, ret })),
   ]);
@@ -53,14 +47,11 @@ const air = P.lazy((): P.Parser<Air, Token> => {
 
     P.seq([
       keyword("fn"),
-      P.choice([
-        P.sepBy(
-          P.seq([id, delimiter(":"), ty]).map(([id, , ty]) => ({ id, ty })),
-          delimiter(","),
-          { trailing: "allow" },
-        ).between(delimiter("("), delimiter(")")),
-        P.pure([]),
-      ]),
+      P.seq([id, delimiter(":").then(ty)])
+        .map(([id, ty]) => ({ id, ty }))
+        .apply(P.sepBy, delimiter(","), { trailing: "allow" })
+        .between(delimiter("("), delimiter(")"))
+        .option([]),
       air,
     ]).map(([, params, body]): Air => ({ type: "fn", params, body })),
 
@@ -70,19 +61,13 @@ const air = P.lazy((): P.Parser<Air, Token> => {
 
     P.seq([
       keyword("call").then(air),
-      P.choice([
-        P.sepBy(air, delimiter(","), { trailing: "allow" }).between(
-          delimiter("("),
-          delimiter(")"),
-        ),
-        P.pure([]),
-      ]),
+      air
+        .apply(P.sepBy, delimiter(","), { trailing: "allow" })
+        .between(delimiter("("), delimiter(")"))
+        .option([]),
     ]).map(([callee, args]): Air => ({ type: "call", callee, args })),
 
-    P.seq([
-      P.many(statement.skip(delimiter(";"))),
-      P.choice([air, P.pure(null)]),
-    ])
+    P.seq([statement.skip(delimiter(";")).apply(P.many), air.option(null)])
       .between(delimiter("{"), delimiter("}"))
       .map(([body, last]): Air => ({ type: "block", body, last })),
 
@@ -102,22 +87,19 @@ const air = P.lazy((): P.Parser<Air, Token> => {
     keyword("false").map((): Air => ({ type: "const.bool", value: false })),
 
     token("number").map(
-      ({ content }): Air => ({ type: "const.int", value: BigInt(+content) }),
+      (content): Air => ({ type: "const.int", value: BigInt(+content) }),
     ),
 
     token("string").map(
-      ({ content }): Air => ({
-        type: "const.string",
-        value: content.slice(1, -1),
-      }),
+      (content): Air => ({ type: "const.string", value: content.slice(1, -1) }),
     ),
   ]);
 });
 
 const statement = P.choice([
-  keyword("let")
-    .then(P.seq([id, delimiter("=").then(air)]))
-    .map(([id, init]): AirStatement => ({ type: "def", id, init })),
+  P.seq([keyword("let").then(id), delimiter("=").then(air)]).map(
+    ([id, init]): AirStatement => ({ type: "def", id, init }),
+  ),
 
   P.seq([id, delimiter("=").then(air)]).map(
     ([id, val]): AirStatement => ({ type: "assign", id, val }),
