@@ -1,13 +1,20 @@
-import type { Air, AirStatement } from "./air";
+import type { Air } from "./air";
 
 export interface W<C> {
   air(air: Air, w: W<C>): void;
-  air_statement(air: AirStatement, w: W<C>): void;
   context: C;
 }
 
 export const walk_air = <C>(air: Air, w: W<C>) => {
   switch (air.type) {
+    case "def": {
+      w.air(air.init, w);
+      break;
+    }
+    case "assign": {
+      w.air(air.val, w);
+      break;
+    }
     case "ref": {
       break;
     }
@@ -28,7 +35,7 @@ export const walk_air = <C>(air: Air, w: W<C>) => {
     }
     case "block": {
       for (const stmt of air.body) {
-        w.air_statement(stmt, w);
+        w.air(stmt, w);
       }
       if (air.last != null) {
         w.air(air.last, w);
@@ -49,23 +56,6 @@ export const walk_air = <C>(air: Air, w: W<C>) => {
       break;
     }
     case "const.int": {
-      break;
-    }
-  }
-};
-
-export const walk_air_statement = <C>(air: AirStatement, w: W<C>) => {
-  switch (air.type) {
-    case "def": {
-      w.air(air.init, w);
-      break;
-    }
-    case "assign": {
-      w.air(air.val, w);
-      break;
-    }
-    default: {
-      walk_air(air, w);
       break;
     }
   }

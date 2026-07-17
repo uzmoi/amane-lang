@@ -1,6 +1,6 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import type { ast, Loc } from "#parser";
-import type { Air, AirModule, AirStatement, Id } from "../air";
+import type { Air, AirModule, Id } from "../air";
 import type { Ty } from "../ty";
 import { Scope } from "./scope";
 
@@ -21,7 +21,7 @@ interface LowerContext {
 export const lower_statement = (
   stmt: ast.Statement<Loc>,
   ctx: LowerContext,
-): AirStatement => {
+): Air => {
   switch (stmt.type) {
     case "Let": {
       const init = lower_expression(stmt.init, ctx);

@@ -1,6 +1,6 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
-import type { Air, AirStatement, Id } from "../air";
+import type { Air, Id } from "../air";
 import type { Ty } from "../ty";
 import { Lexer, type Token } from "./lexer";
 
@@ -98,11 +98,11 @@ const air = P.lazy((): P.Parser<Air, Token> => {
 
 const statement = P.choice([
   P.seq([keyword("let").then(id), delimiter("=").then(air)]).map(
-    ([id, init]): AirStatement => ({ type: "def", id, init }),
+    ([id, init]): Air => ({ type: "def", id, init }),
   ),
 
   P.seq([id, delimiter("=").then(air)]).map(
-    ([id, val]): AirStatement => ({ type: "assign", id, val }),
+    ([id, val]): Air => ({ type: "assign", id, val }),
   ),
 
   air,
@@ -110,5 +110,5 @@ const statement = P.choice([
 
 export const parse_ty = (string: string): Ty => P.parseA(ty, Lexer.lex(string));
 
-export const parse_art = (string: string): AirStatement =>
+export const parse_art = (string: string): Air =>
   P.parseA(statement, Lexer.lex(string));

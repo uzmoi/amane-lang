@@ -1,5 +1,5 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
-import type { Air, AirStatement, Id } from "#air";
+import type { Air, Id } from "#air";
 import { Opcode } from "./opcode";
 import { empty_type, ty } from "./type";
 import type { Writer } from "./writer";
@@ -10,34 +10,31 @@ export interface FuncContext {
 
 export const write_air_statements = (
   writer: Writer,
-  statements: readonly AirStatement[],
+  statements: readonly Air[],
   ctx: FuncContext,
 ) => {
   for (const statement of statements) {
-    switch (statement.type) {
-      case "def": {
-        write_air(writer, statement.init, ctx);
-        writer.u8(Opcode.local_set);
-        writer.u32leb128(ctx.get_index(statement.id));
-        break;
-      }
-      case "assign": {
-        write_air(writer, statement.val, ctx);
-        writer.u8(Opcode.local_set);
-        writer.u32leb128(ctx.get_index(statement.id));
-        break;
-      }
-      default: {
-        write_air(writer, statement, ctx);
-        writer.u8(Opcode.drop);
-        break;
-      }
+    write_air(writer, statement, ctx);
+    if (statement.ty?.type !== "void") {
+      writer.u8(Opcode.drop);
     }
   }
 };
 
 export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
   switch (air.type) {
+    case "def": {
+      write_air(writer, air.init, ctx);
+      writer.u8(Opcode.local_set);
+      writer.u32leb128(ctx.get_index(air.id));
+      break;
+    }
+    case "assign": {
+      write_air(writer, air.val, ctx);
+      writer.u8(Opcode.local_set);
+      writer.u32leb128(ctx.get_index(air.id));
+      break;
+    }
     case "ref": {
       writer.u8(Opcode.local_get);
       writer.u32leb128(ctx.get_index(air.id));

@@ -1,5 +1,5 @@
 import { unreachable } from "@uzmoi/ut/ils";
-import type { AirStatement } from "../air";
+import type { Air } from "../air";
 import type { Ty } from "../ty";
 
 export const print_ty = (ty: Ty): string => {
@@ -21,7 +21,7 @@ export const print_ty = (ty: Ty): string => {
   }
 };
 
-export const print_air = (air: AirStatement): string => {
+export const print_air = (air: Air): string => {
   switch (air.type) {
     case "def": {
       return `let %${air.id} = ${print_air(air.init)}`;

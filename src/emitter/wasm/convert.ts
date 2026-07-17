@@ -1,5 +1,5 @@
-import type { Air, AirModule, AirStatement } from "#air";
-import { type W, walk_air, walk_air_statement } from "../../air/walk";
+import type { Air, AirModule } from "#air";
+import { type W, walk_air } from "../../air/walk";
 import type { Export, Func, FuncType, Import, Module, ValType } from "./module";
 import { ty } from "./type";
 import { zip } from "./utils";
@@ -24,9 +24,8 @@ export const convert = (air_module: AirModule): Module => {
     if (item.type === "fn") {
       fns.push(item);
     } else {
-      walk_air_statement(item, {
+      walk_air(item, {
         air: walk_toplevel_air,
-        air_statement: walk_air_statement,
         context: null,
       });
     }
@@ -69,8 +68,8 @@ export const convert = (air_module: AirModule): Module => {
 
     const locals: ValType[] = [];
 
-    const walk_fn_air_statement = (air: AirStatement, w: W<null>): void => {
-      walk_air_statement(air, w);
+    const walk_fn_air = (air: Air, w: W<null>): void => {
+      walk_toplevel_air(air, w);
       if (air.type === "def") {
         local_refs.set(air.id, local_refs.size);
         const type = ty(air.init.ty);
@@ -81,9 +80,8 @@ export const convert = (air_module: AirModule): Module => {
       }
     };
 
-    walk_fn_air_statement(fn_air, {
-      air: walk_toplevel_air,
-      air_statement: walk_fn_air_statement,
+    walk_fn_air(fn_air, {
+      air: walk_fn_air,
       context: null,
     });
 
