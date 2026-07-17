@@ -40,15 +40,13 @@ export const lower_expression = (
 ): Air => {
   switch (expr.type) {
     case "Bool": {
-      return todo();
-      // return { type: "bool", value: expr.value };
+      return { type: "const.bool", value: expr.value };
     }
     case "Number": {
       return todo();
     }
     case "String": {
-      return todo();
-      // return { type: "string", value: expr.value };
+      return { type: "const.string", value: expr.value };
     }
     case "Tuple": {
       return todo();

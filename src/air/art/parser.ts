@@ -98,8 +98,18 @@ const air = P.lazy((): P.Parser<Air, Token> => {
       keyword("else").then(air),
     ]).map(([cond, then, els]): Air => ({ type: "if", cond, then, else: els })),
 
+    keyword("true").map((): Air => ({ type: "const.bool", value: true })),
+    keyword("false").map((): Air => ({ type: "const.bool", value: false })),
+
     token("number").map(
       ({ content }): Air => ({ type: "const.int", value: BigInt(+content) }),
+    ),
+
+    token("string").map(
+      ({ content }): Air => ({
+        type: "const.string",
+        value: content.slice(1, -1),
+      }),
     ),
   ]);
 });

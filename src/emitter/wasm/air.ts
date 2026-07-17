@@ -84,6 +84,11 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       writer.u8(Opcode.end);
       break;
     }
+    case "const.bool": {
+      writer.u8(Opcode.i32_const);
+      writer.u8(air.value ? 1 : 0);
+      break;
+    }
     case "const.int": {
       writer.u8(
         // biome-ignore format: match式
@@ -94,6 +99,21 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       // FIXME: 64bit対応
       writer.u32leb128(Number(air.value));
       break;
+    }
+    case "const.float": {
+      writer.u8(
+        // biome-ignore format: match式
+        air.ty?.type === "f32" ? Opcode.f32_const :
+        air.ty?.type === "f64" ? Opcode.f64_const :
+        unreachable(),
+      );
+      return todo();
+    }
+    case "const.string": {
+      return todo();
+    }
+    default: {
+      unreachable<typeof air>();
     }
   }
 };

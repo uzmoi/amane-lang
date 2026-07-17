@@ -59,8 +59,13 @@ export const print_air = (air: AirStatement): string => {
     case "if": {
       return `if ${print_air(air.cond)} then ${print_air(air.then)} else ${print_air(air.else)}`;
     }
-    case "const.int": {
+    case "const.bool":
+    case "const.int":
+    case "const.float": {
       return air.value.toString();
+    }
+    case "const.string": {
+      return `"${air.value}"`;
     }
     default: {
       unreachable<typeof air>();

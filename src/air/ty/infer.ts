@@ -75,10 +75,24 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       // ctx.unify(air.ty!, air.else.ty!);
       break;
     }
+    case "const.bool": {
+      // TODO: bool型追加
+      air.ty = { type: "i32" };
+      break;
+    }
     case "const.int": {
       // FIXME: i64...
       air.ty = { type: "i32" };
       break;
+    }
+    case "const.float": {
+      // FIXME: f64...
+      air.ty = { type: "f32" };
+      break;
+    }
+    case "const.string": {
+      // air.ty = { type: "string" };
+      return todo();
     }
     default: {
       unreachable<typeof air>();

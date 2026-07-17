@@ -24,5 +24,8 @@ export type Air = { ty?: Ty } & (
   | { type: "loop"; body: Air }
   | { type: "break" }
   | { type: "if"; cond: Air; then: Air; else: Air }
+  | { type: "const.bool"; value: boolean }
   | { type: "const.int"; value: bigint }
+  | { type: "const.float"; value: number }
+  | { type: "const.string"; value: string }
 );

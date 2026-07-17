@@ -31,6 +31,10 @@ test("ref", () => {
   expect(art("%0")).toEqual({ type: "ref", id: 0 });
 });
 
+test("string", () => {
+  expect(art('"a"')).toEqual({ type: "const.string", value: "a" });
+});
+
 describe("fn", () => {
   test("constant", () => {
     expect(art("fn 0")).toEqual({
