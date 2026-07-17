@@ -27,3 +27,5 @@ export const equals_ty = (a: Ty, b: Ty): boolean => {
 
   return a.type === b.type;
 };
+
+export const ref_ty = (id: Id): Ty => ({ type: "ref", id });
