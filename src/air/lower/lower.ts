@@ -1,5 +1,5 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
-import type { ast, Loc } from "#parser";
+import { type ast, type Loc, parse_number_literal } from "#parser";
 import type { Air, AirModule, Id } from "../air";
 import type { Ty } from "../ty";
 import { Scope } from "./scope";
@@ -43,7 +43,10 @@ export const lower_expression = (
       return { type: "const.bool", value: expr.value };
     }
     case "Number": {
-      return todo();
+      const value = parse_number_literal(expr.value);
+      return typeof value === "bigint"
+        ? { type: "const.int", value }
+        : { type: "const.float", value };
     }
     case "String": {
       return { type: "const.string", value: expr.value };
