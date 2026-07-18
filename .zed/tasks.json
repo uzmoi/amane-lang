@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Run Vitest",
+    "command": "pnpm exec vitest run",
+    "args": ["$ZED_RELATIVE_FILE", "-t", "$ZED_SYMBOL"],
+    "tags": ["js-test"], // ts-test だと実行ボタンが出てこなかった。
+    "reveal": "no_focus",
+    "hide": "on_success"
+  }
+]
