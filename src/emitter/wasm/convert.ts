@@ -12,28 +12,21 @@ export const convert = (air_module: AirModule): Module => {
 
   const fns: Extract<Air, { type: "fn" }>[] = [];
 
-  const walk_toplevel_air = (air: Air, v: W<null>): void => {
-    if (air.type === "fn") {
-      fns.push(air);
-    } else {
-      walk_air(air, v);
-    }
+  const collect_fns: W<null> = {
+    air(air, w) {
+      walk_air(air, w);
+      if (air.type === "fn") {
+        fns.push(air);
+      }
+    },
+    context: null,
   };
 
   for (const item of air_module.items) {
-    if (item.type === "fn") {
-      fns.push(item);
-    } else {
-      walk_air(item, {
-        air: walk_toplevel_air,
-        context: null,
-      });
-    }
+    collect_fns.air(item, collect_fns);
   }
 
-  while (fns.length) {
-    const fn_air = fns.shift()!;
-
+  for (const fn_air of fns) {
     const param_types = fn_air.params.map((param) => {
       const type = ty(param.ty);
       if (type == null) {
@@ -68,22 +61,24 @@ export const convert = (air_module: AirModule): Module => {
 
     const locals: ValType[] = [];
 
-    const walk_fn_air = (air: Air, w: W<null>): void => {
-      walk_toplevel_air(air, w);
-      if (air.type === "def") {
-        local_refs.set(air.id, local_refs.size);
-        const type = ty(air.init.ty);
-        if (type == null) {
-          throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");
+    const collect_local_refs: W<null> = {
+      air(air, w) {
+        if (air.type !== "fn") {
+          walk_air(air, w);
         }
-        locals.push(type);
-      }
+        if (air.type === "def") {
+          local_refs.set(air.id, local_refs.size);
+          const type = ty(air.init.ty);
+          if (type == null) {
+            throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");
+          }
+          locals.push(type);
+        }
+      },
+      context: null,
     };
 
-    walk_fn_air(fn_air, {
-      air: walk_fn_air,
-      context: null,
-    });
+    collect_local_refs.air(fn_air, collect_local_refs);
 
     funcs.push({
       signature,
