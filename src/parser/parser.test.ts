@@ -1,14 +1,13 @@
 import { type Parser, parseA } from "parsea";
 import { describe, expect, test } from "vitest";
-import { Lexer, type Token, TokenType } from "./lexer";
+import type { Token } from "./lexer";
 import type { Loc, SourceLocation } from "./location";
 import type * as N from "./node";
+import { lex } from "./parse";
 import { Expression, Statement } from "./parser";
 
 const parse = (parser: Parser<unknown, Token>, source: string) => {
-  const tokens = [...new Lexer(source)].filter(
-    (token) => token.type !== TokenType.Whitespace,
-  );
+  const tokens = lex(source);
   return parseA(parser, tokens);
 };
 
