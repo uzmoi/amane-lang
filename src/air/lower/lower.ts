@@ -26,6 +26,7 @@ export const lower_statement = (
     case "Let": {
       const init = lower_expression(stmt.init, ctx);
       const { id } = ctx.scope.def(stmt.dest.name, stmt.dest.loc);
+      // TODO: stmt.ty;
       return { type: "def", id, init };
     }
     case "Expression": {
@@ -94,9 +95,8 @@ export const lower_expression = (
       ctx.scope.push();
 
       const params: { id: Id; ty: Ty }[] = [];
-      for (const param of expr.params?.elements ?? []) {
-        if (param.type !== "Ident") unreachable();
-
+      // TODO: ty
+      for (const [param, _ty] of expr.params) {
         const { id } = ctx.scope.def(param.name, param.loc);
         params.push({ id, ty: { type: "any" } });
       }

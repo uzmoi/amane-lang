@@ -46,7 +46,8 @@ export type LoopExpression<T = never> = NodeExtend<"Loop", T> & {
 export type BreakExpression<T = never> = NodeExtend<"Break", T>;
 
 export type FnExpression<T = never> = NodeExtend<"Fn", T> & {
-  params: TupleExpression<T> | null;
+  params: [IdentExpression<T>, Ty<T> | null][];
+  ret_ty: Ty<T> | null;
   body: Expression<T>;
 };
 
@@ -69,10 +70,13 @@ export type Expression<T = never> =
 
 // #endregion
 
+type Ty<T = never> = IdentExpression<T>;
+
 // #region Statement
 
 export type LetStatement<T = never> = NodeExtend<"Let", T> & {
   dest: IdentExpression<T>;
+  ty: Ty<T> | null;
   init: Expression<T>;
 };
 

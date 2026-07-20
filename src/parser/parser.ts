@@ -103,6 +103,9 @@ const Ident = token(TokenType.Ident).map(
   }),
 );
 
+const Ty = Ident;
+const TyAnno = operator(":").then(Ty).option(null);
+
 const Block = P.seq([
   delimiter("{"),
   P.lazy(() => Statement).apply(P.many),
@@ -143,11 +146,18 @@ const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
 
 const Fn = P.seq([
   keyword("fn"),
-  Tuple.skip(operator("=>")).option(null),
+  P.seq([
+    P.seq([Ident, TyAnno])
+      .apply(P.sepBy, delimiter(","), { trailing: "allow" })
+      .between(delimiter("("), delimiter(")")),
+    TyAnno,
+    operator("=>"),
+  ]).option<[[], null]>([[], null]),
   Expression,
-]).map<N.FnExpression<ParserExt>>(([fnToken, params, body]) => ({
+]).map<N.FnExpression<ParserExt>>(([fnToken, [params, ret_ty], body]) => ({
   type: "Fn",
   params,
+  ret_ty,
   body,
   loc: loc(fnToken, body.loc),
 }));
@@ -168,10 +178,16 @@ export const Statement: P.Parser<N.Statement<ParserExt>, Token> = P.lazy(() =>
   P.choice([Let, ExpressionStatement]),
 );
 
-const Let = P.seq([keyword("let"), Ident, operator("="), Expression]).map(
-  ([letToken, dest, , init]): N.LetStatement<ParserExt> => ({
+const Let = P.seq([
+  keyword("let"),
+  Ident,
+  TyAnno,
+  operator("=").then(Expression),
+]).map(
+  ([letToken, dest, ty, init]): N.LetStatement<ParserExt> => ({
     type: "Let",
     dest,
+    ty,
     init,
     loc: loc(letToken, init.loc),
   }),

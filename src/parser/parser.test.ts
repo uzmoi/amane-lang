@@ -149,18 +149,21 @@ test("Break", () => {
 describe("Fn", () => {
   test("omit params", () => {
     expect(parse(Expression, "fn body")).toEqual(
-      node("Fn", { params: null, body: node("Ident", { name: "body" }) }),
+      node("Fn", {
+        params: [],
+        ret_ty: null,
+        body: node("Ident", { name: "body" }),
+      }),
     );
   });
   test("with params", () => {
-    expect(parse(Expression, "fn (param1, param2) => {}")).toEqual(
+    expect(parse(Expression, "fn (param1, param2: ty1): ty2 => {}")).toEqual(
       node("Fn", {
-        params: node("Tuple", {
-          elements: [
-            node("Ident", { name: "param1" }),
-            node("Ident", { name: "param2" }),
-          ],
-        }),
+        params: [
+          [node("Ident", { name: "param1" }), null],
+          [node("Ident", { name: "param2" }), node("Ident", { name: "ty1" })],
+        ],
+        ret_ty: node("Ident", { name: "ty2" }),
         body: node("Block", { stmts: [], last: null }),
       }),
     );
@@ -178,11 +181,24 @@ describe("Return", () => {
   });
 });
 
-test("Let", () => {
-  expect(parse(Statement, 'let hoge = ""')).toEqual(
-    node("Let", {
-      dest: node("Ident", { name: "hoge" }),
-      init: node("String", { value: "" }),
-    }),
-  );
+describe("Let", () => {
+  test("without type annotation", () => {
+    expect(parse(Statement, 'let hoge = ""')).toEqual(
+      node("Let", {
+        dest: node("Ident", { name: "hoge" }),
+        ty: null,
+        init: node("String", { value: "" }),
+      }),
+    );
+  });
+
+  test("with type annotation", () => {
+    expect(parse(Statement, "let hoge: i32 = 0")).toEqual(
+      node("Let", {
+        dest: node("Ident", { name: "hoge" }),
+        ty: node("Ident", { name: "i32" }),
+        init: node("Number", { value: "0" }),
+      }),
+    );
+  });
 });
