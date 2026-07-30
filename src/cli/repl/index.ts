@@ -14,7 +14,7 @@ export const start_repl = async () => {
     input: stdin,
     output: stdout,
     prompt: pc.yellow("> "),
-    async completer(line: string) {
+    async completer(line: string): Promise<[string[], string]> {
       const completions = await repl.complete(line);
       return [completions, line];
     },
