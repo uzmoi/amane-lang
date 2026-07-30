@@ -25,7 +25,7 @@ export class Lexer {
     this.read_re(/\s+/y, "ws");
     return (
       this.read_re(/[(){},:;=]/y, "delimiter") ??
-      this.read_re(/\d+/y, "number") ??
+      this.read_re(/\d+(\.\d+)?/y, "number") ??
       this.read_re(/"([^"\\]|\\.)+"/y, "string") ??
       this.read_re(/\w+/y, "keyword") ??
       this.read_re(/%\d+/y, "id")

@@ -1,14 +1,45 @@
-import { todo } from "@uzmoi/ut/ils";
 import type { Id } from "../air";
-import type { Ty } from "./ty";
+import { TypeMismatchError } from "./error";
+import { equals_ty, type Ty } from "./ty";
 
 export class InferenceContext {
-  ap(_ty: Ty): Ty {
-    todo();
+  #refs = new Map<Id, Ty>();
+
+  ap(ty: Ty): Ty {
+    switch (ty.type) {
+      case "fn": {
+        return {
+          type: "fn",
+          params: ty.params.map((param) => this.ap(param)),
+          ret: this.ap(ty.ret),
+        };
+      }
+      case "ref": {
+        const ref = this.#refs.get(ty.id);
+        return ref ? this.ap(ref) : ty;
+      }
+      default: {
+        return ty;
+      }
+    }
   }
 
-  unify(_a: Ty, _b: Ty) {
-    todo();
+  unify(a: Ty, b: Ty) {
+    a = this.ap(a);
+    b = this.ap(b);
+
+    if (equals_ty(a, b)) return;
+
+    if (a.type === "ref" && b.type === "ref") {
+      this.#refs.set(a.id, b);
+      this.#refs.set(b.id, a);
+    } else if (a.type === "ref") {
+      this.#refs.set(a.id, b);
+    } else if (b.type === "ref") {
+      this.#refs.set(b.id, a);
+    } else {
+      throw new TypeMismatchError(a, b);
+    }
   }
 
   #ty_id = -1;

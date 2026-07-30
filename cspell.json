@@ -16,6 +16,7 @@
     "popcnt",
     "rotr",
     "tsdown",
+    "tyof",
     "typecheck",
     "uzmoi",
     "vitest",

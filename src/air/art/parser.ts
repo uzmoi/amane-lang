@@ -27,8 +27,8 @@ const ty = P.lazy((): P.Parser<Ty, Token> => {
   return P.choice([
     id.map((id): Ty => ({ type: "ref", id })),
 
-    ...(["i32", "i64", "f32", "f64"] as const).map((t) =>
-      keyword(t).return<Ty>({ type: t }),
+    ...(["any", "never", "void", "i32", "i64", "f32", "f64"] as const).map(
+      (t) => keyword(t).return<Ty>({ type: t }),
     ),
 
     P.seq([
@@ -86,9 +86,11 @@ const air = P.lazy((): P.Parser<Air, Token> => {
     keyword("true").map((): Air => ({ type: "const.bool", value: true })),
     keyword("false").map((): Air => ({ type: "const.bool", value: false })),
 
-    token("number").map(
-      (content): Air => ({ type: "const.int", value: BigInt(+content) }),
-    ),
+    token("number").map((content): Air => {
+      return content.includes(".")
+        ? { type: "const.float", value: parseFloat(content) }
+        : { type: "const.int", value: BigInt(+content) };
+    }),
 
     token("string").map(
       (content): Air => ({ type: "const.string", value: content.slice(1, -1) }),
