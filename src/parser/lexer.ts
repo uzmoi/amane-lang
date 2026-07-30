@@ -101,9 +101,14 @@ export class Token implements SourceLocation {
 }
 
 export class Lexer implements IterableIterator<Token> {
-  constructor(readonly source: string) {}
+  constructor(
+    readonly source: string,
+    start_index = 0,
+  ) {
+    this.#index = start_index;
+  }
 
-  #index = 0;
+  #index: number;
 
   #peek(): string | undefined {
     return this.source[this.#index];
