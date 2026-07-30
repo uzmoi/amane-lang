@@ -56,7 +56,7 @@ const air = P.lazy((): P.Parser<Air, Token> => {
     ]).map(([, params, body]): Air => ({ type: "fn", params, body })),
 
     keyword("return")
-      .then(air)
+      .then(air.option(null))
       .map((value): Air => ({ type: "return", value })),
 
     P.seq([

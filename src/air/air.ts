@@ -15,7 +15,7 @@ export type Air = { ty?: Ty } & (
   | { type: "assign"; id: Id; val: Air }
   | { type: "ref"; id: Id }
   | { type: "fn"; params: readonly { id: Id; ty: Ty }[]; body: Air }
-  | { type: "return"; value: Air }
+  | { type: "return"; value: Air | null }
   | { type: "call"; callee: Air; args: readonly Air[] }
   | { type: "block"; body: readonly Air[]; last: Air | null }
   | { type: "loop"; body: Air }

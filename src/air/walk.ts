@@ -23,7 +23,9 @@ export const walk_air = <C>(air: Air, w: W<C>) => {
       break;
     }
     case "return": {
-      w.air(air.value, w);
+      if (air.value != null) {
+        w.air(air.value, w);
+      }
       break;
     }
     case "call": {

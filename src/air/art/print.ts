@@ -35,7 +35,7 @@ export const print_air = (air: Air): string => {
         : `fn ${print_air(air.body)}`;
     }
     case "return": {
-      return `return ${print_air(air.value)}`;
+      return air.value == null ? "return" : `return ${print_air(air.value)}`;
     }
     case "ref": {
       return `%${air.id}`;

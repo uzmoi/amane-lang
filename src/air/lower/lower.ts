@@ -108,10 +108,10 @@ export const lower_expression = (
       return { type: "fn", params, body };
     }
     case "Return": {
-      const value = lower_expression(
-        expr.body ?? todo("airが値なしのreturnに未対応。"),
-        ctx,
-      );
+      let value = null;
+      if (expr.body != null) {
+        value = lower_expression(expr.body, ctx);
+      }
       return { type: "return", value };
     }
     default: {

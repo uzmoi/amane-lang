@@ -44,7 +44,9 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       throw todo();
     }
     case "return": {
-      write_air(writer, air.value, ctx);
+      if (air.value != null) {
+        write_air(writer, air.value, ctx);
+      }
       writer.u8(Opcode.return);
       break;
     }
