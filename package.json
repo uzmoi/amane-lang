@@ -14,6 +14,7 @@
   "scripts": {
     "build": "tsdown",
     "check": "biome check",
+    "typecheck": "tsc --noEmit",
     "test": "vitest --typecheck",
     "spell": "cspell --no-progress ."
   },
