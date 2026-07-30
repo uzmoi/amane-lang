@@ -7,6 +7,7 @@ export const print_ty = (ty: Ty): string => {
     case "any":
     case "never":
     case "void":
+    case "bool":
     case "i32":
     case "i64":
     case "f32":

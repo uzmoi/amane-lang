@@ -57,7 +57,7 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       break;
     }
     case "if": {
-      ctx.unify(air.cond.ty!, { type: "i32" });
+      ctx.unify(air.cond.ty!, { type: "bool" });
       ctx.unify(air.then.ty!, air.else.ty!);
       air.ty = air.then.ty;
       // air.ty = union(air.then.ty!, air.else.ty!);
@@ -65,8 +65,7 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       break;
     }
     case "const.bool": {
-      // TODO: bool型追加
-      air.ty = { type: "i32" };
+      air.ty = { type: "bool" };
       break;
     }
     case "const.int": {

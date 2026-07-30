@@ -8,7 +8,7 @@ export type Ty =
   | { type: "any" }
   | { type: "never" }
   | { type: "void" }
-  | { type: "i32" | "i64" | "f32" | "f64" }
+  | { type: "bool" | "i32" | "i64" | "f32" | "f64" }
   | { type: "fn"; params: readonly Ty[]; ret: Ty }
   | { type: "ref"; id: Id };
 

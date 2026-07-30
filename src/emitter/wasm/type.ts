@@ -17,6 +17,7 @@ export const ty = (ty: Ty | undefined): NumType | null => {
       return todo("");
     case "void":
       return null;
+    case "bool":
     case "i32":
       return NumType.i32;
     case "i64":

@@ -68,7 +68,7 @@ describe("emit_wasm", () => {
   });
 
   test("if", () => {
-    const wasm = emit([art("fn if 0 then 0 else 0")]);
+    const wasm = emit([art("fn if false then 0 else 0")]);
     expect(wasm).toMatchSnapshot();
   });
 

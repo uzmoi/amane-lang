@@ -23,7 +23,7 @@ const tyof = (source: string, vars?: Ty[]) => infer(source, vars).ty;
 
 describe("constant", () => {
   test("bool", () => {
-    expect(tyof("true")).toEqual(ty("i32"));
+    expect(tyof("true")).toEqual(ty("bool"));
   });
 
   test("int", () => {
@@ -63,8 +63,8 @@ describe("block", () => {
 
 describe("if", () => {
   test("condition requires bool type", () => {
-    expect(() => infer("if 0.0 then {} else {}")).toThrow(
-      new TypeMismatchError(ty("f32"), ty("i32")),
+    expect(() => infer("if 0 then {} else {}")).toThrow(
+      new TypeMismatchError(ty("i32"), ty("bool")),
     );
   });
 
