@@ -1,5 +1,5 @@
+import { equals_arrays } from "#common/utils.js";
 import type { Id } from "../air";
-import { zip } from "./utils";
 
 // any is top type
 // never is bottom type
@@ -15,9 +15,7 @@ export type Ty =
 export const equals_ty = (a: Ty, b: Ty): boolean => {
   if (a.type === "fn" && b.type === "fn") {
     return (
-      a.params.length === b.params.length &&
-      zip(a.params, b.params).every(([a, b]) => equals_ty(a, b)) &&
-      equals_ty(a.ret, b.ret)
+      equals_arrays(a.params, b.params, equals_ty) && equals_ty(a.ret, b.ret)
     );
   }
 

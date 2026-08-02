@@ -22,6 +22,7 @@
   "author": "uzmoi",
   "license": "MIT",
   "imports": {
+    "#common/*": "./src/common/*",
     "#amane": "./src/index.ts",
     "#air": "./src/air/index.ts",
     "#art": "./src/air/art/index.ts",

@@ -1,8 +1,8 @@
 import type { Air, AirModule } from "#air";
+import { equals_arrays } from "#common/utils.js";
 import { type W, walk_air } from "../../air/walk";
 import type { Export, Func, FuncType, Import, Module, ValType } from "./module";
 import { ty } from "./type";
-import { zip } from "./utils";
 
 export const convert = (air_module: AirModule): Module => {
   const imports: Import[] = [];
@@ -39,11 +39,8 @@ export const convert = (air_module: AirModule): Module => {
 
     let signature = types.findIndex(
       (type) =>
-        type.params.length === fn_air.params.length &&
-        zip(type.params, param_types).every(([a, b]) => a === b) &&
-        (return_type == null
-          ? type.return.length === 0
-          : type.return.length === 1 && type.return[0] === return_type),
+        equals_arrays(type.params, param_types) &&
+        equals_arrays(type.return, return_type ? [return_type] : []),
     );
 
     if (signature === -1) {
