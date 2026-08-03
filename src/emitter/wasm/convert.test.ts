@@ -1,31 +1,11 @@
 import { describe, expect, test } from "vitest";
-import {
-  type Air,
-  type Id,
-  InferenceContext,
-  infer_type,
-  ref_ty,
-  type Ty,
-} from "#air";
-import { parse_art as art } from "#art";
-import { convert as convert_module } from "./convert";
+import { art_infer } from "#tests/helpers";
+import { convert } from "./convert";
 import { type Module, NumType } from "./module";
-
-const convert = (items: Air[], vars: Ty[] = []) => {
-  const mod = { items };
-
-  const ctx = new InferenceContext();
-  for (const [index, ty] of vars.entries()) {
-    ctx.unify(ref_ty(index as Id), ty);
-  }
-
-  infer_type(mod, ctx);
-  return convert_module(mod);
-};
 
 describe("convert", () => {
   test("empty", () => {
-    expect(convert([])).toEqual({
+    expect(convert({ items: [] })).toEqual({
       types: [],
       imports: [],
       funcs: [],
@@ -38,7 +18,7 @@ describe("convert", () => {
   });
 
   test("func", () => {
-    expect(convert([art("let %0 = fn 0")])).toEqual({
+    expect(convert({ items: [art_infer("let %0 = fn 0")] })).toEqual({
       types: [{ kind: "func", params: [], return: [NumType.i32] }],
       imports: [],
       funcs: [
@@ -46,7 +26,7 @@ describe("convert", () => {
           signature: 0,
           local_refs: new Map(),
           locals: [],
-          body: art("0") as Air,
+          body: art_infer("0"),
         },
       ],
       tables: [],

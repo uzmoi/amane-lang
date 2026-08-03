@@ -22,9 +22,8 @@ exports[`emit_wasm > block > block with last 1`] = `
 
 exports[`emit_wasm > block > empty block 1`] = `
 (module
-  (type (;0;) (func (result i32)))
-  (func (;0;) (type 0) (result i32)
-    i32.const 0))
+  (type (;0;) (func))
+  (func (;0;) (type 0)))
 `;
 
 exports[`emit_wasm > constant func 1`] = `
@@ -76,10 +75,9 @@ exports[`emit_wasm > loop > break 1`] = `
 
 exports[`emit_wasm > loop > empty block 1`] = `
 (module
-  (type (;0;) (func (result i32)))
-  (func (;0;) (type 0) (result i32)
-    loop (result i32)  ;; label = @1
-      i32.const 0
+  (type (;0;) (func))
+  (func (;0;) (type 0)
+    loop  ;; label = @1
     end))
 `;
 

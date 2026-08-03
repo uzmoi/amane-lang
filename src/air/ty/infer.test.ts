@@ -1,23 +1,8 @@
 import { describe, expect, test } from "vitest";
-import type { Id } from "../air";
-import { parse_art, parse_ty as ty } from "../art";
+import { art_infer as infer } from "#tests/helpers";
+import { parse_ty as ty } from "../art";
 import { TypeMismatchError, VoidVariableError } from "./error";
-import { infer_type } from "./infer";
-import { InferenceContext } from "./infer_context";
-import { ref_ty, type Ty } from "./ty";
-
-const infer = (source: string, vars: Ty[] = []) => {
-  const air = parse_art(source);
-  const mod = { items: [air] };
-
-  const ctx = new InferenceContext();
-  for (const [index, ty] of vars.entries()) {
-    ctx.unify(ref_ty(index as Id), ty);
-  }
-
-  infer_type(mod, ctx);
-  return air;
-};
+import type { Ty } from "./ty";
 
 const tyof = (source: string, vars?: Ty[]) => infer(source, vars).ty;
 

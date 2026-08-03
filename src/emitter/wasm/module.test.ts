@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { Air } from "#air";
-import { parse_art as art } from "#art";
+import { art_infer } from "#tests/helpers";
 import {
   ImportExportDesc,
   type Module,
@@ -43,16 +42,8 @@ describe("write_module", () => {
       },
       global: {
         globals: [
-          {
-            type: NumType.i32,
-            mut: false,
-            expr: art("0") as Air,
-          },
-          {
-            type: NumType.i32,
-            mut: true,
-            expr: art("0") as Air,
-          },
+          { type: NumType.i32, mut: false, expr: art_infer("0") },
+          { type: NumType.i32, mut: true, expr: art_infer("0") },
         ],
       },
       start: {
