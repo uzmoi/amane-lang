@@ -2,11 +2,13 @@ import { todo, unreachable } from "@uzmoi/ut/ils";
 import { type ast, type Loc, parse_number_literal } from "#parser";
 import type { Air, AirModule, Id } from "../air";
 import type { Ty } from "../ty";
+import { BlockAnalyzer } from "./block";
 import { Scope } from "./scope";
 
 export const lower = (module: ast.Module<Loc>): AirModule => {
   const ctx: LowerContext = {
     scope: new Scope(),
+    block: new BlockAnalyzer(),
   };
 
   const items = module.items.map((item) => lower_statement(item.stmt, ctx));
@@ -16,6 +18,7 @@ export const lower = (module: ast.Module<Loc>): AirModule => {
 
 interface LowerContext {
   scope: Scope;
+  block: BlockAnalyzer;
 }
 
 export const lower_statement = (
@@ -85,13 +88,20 @@ export const lower_expression = (
       };
     }
     case "Loop": {
+      const id = ctx.block.push_block(expr.loc);
       const body = lower_expression(expr.body, ctx);
-      return { type: "loop", body };
+      ctx.block.pop();
+      return { type: "loop", id, body };
     }
     case "Break": {
-      return { type: "break" };
+      const id = ctx.block.break(expr.loc);
+      if (id == null) {
+        throw new Error("target block for break was not found");
+      }
+      return { type: "break", id };
     }
     case "Fn": {
+      ctx.block.push_fn();
       ctx.scope.push();
 
       const params: { id: Id; ty: Ty }[] = [];
@@ -104,6 +114,7 @@ export const lower_expression = (
       const body = lower_expression(expr.body, ctx);
 
       ctx.scope.pop();
+      ctx.block.pop();
 
       return { type: "fn", params, body };
     }

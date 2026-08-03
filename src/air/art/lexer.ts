@@ -1,5 +1,11 @@
 export interface Token {
-  readonly type: "delimiter" | "id" | "keyword" | "string" | "number";
+  readonly type:
+    | "delimiter"
+    | "ref_id"
+    | "block_id"
+    | "keyword"
+    | "string"
+    | "number";
   readonly content: string;
 }
 
@@ -28,7 +34,8 @@ export class Lexer {
       this.read_re(/\d+(\.\d+)?/y, "number") ??
       this.read_re(/"([^"\\]|\\.)+"/y, "string") ??
       this.read_re(/\w+/y, "keyword") ??
-      this.read_re(/%\d+/y, "id")
+      this.read_re(/%\d+/y, "ref_id") ??
+      this.read_re(/#\d+/y, "block_id")
     );
   }
 

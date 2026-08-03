@@ -90,37 +90,35 @@ describe("if", () => {
 
 describe("loop", () => {
   test("break is never type", () => {
-    expect(tyof("break")).toEqual(ty("never"));
+    expect(tyof("break #0")).toEqual(ty("never #0"));
   });
 
   test("loop with break", () => {
-    expect(tyof("loop break")).toEqual(ty("void"));
+    expect(tyof("loop #0 break #0")).toEqual(ty("void"));
   });
 
   test("loop with break and other types body", () => {
-    expect(tyof("loop { break; return }")).toEqual(ty("void"));
-    expect(tyof("loop if true then break else return")).toEqual(ty("void"));
-    expect(tyof("loop if true then break else {}")).toEqual(ty("void"));
+    expect(tyof("loop #0 { break #0; return }")).toEqual(ty("void"));
+    expect(tyof("loop #0 if true then break #0 else return")).toEqual(
+      ty("void"),
+    );
+    expect(tyof("loop #0 if true then break #0 else {}")).toEqual(ty("void"));
   });
 
   test("loop without break", () => {
-    expect(tyof("loop {}")).toEqual(ty("never"));
+    expect(tyof("loop #0 {}")).toEqual(ty("never"));
   });
 
-  test("loop with nested loop-break", () => {
-    expect(tyof("loop loop break")).toEqual(ty("never"));
-  });
-
-  test("loop with break within fn", () => {
-    expect(tyof("loop fn break")).toEqual(ty("never"));
+  test("loop with unrelated break", () => {
+    expect(tyof("loop #0 break #1")).toEqual(ty("never"));
   });
 
   test("through never type of non-break", () => {
-    expect(tyof("loop return")).toEqual(ty("never"));
+    expect(tyof("loop #0 return")).toEqual(ty("never"));
   });
 
   test("body requires void type", () => {
-    expect(() => infer("loop 0")).toThrow(
+    expect(() => infer("loop #0 0")).toThrow(
       new TypeMismatchError(ty("i32"), ty("void")),
     );
   });

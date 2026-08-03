@@ -57,12 +57,12 @@ describe("emit_wasm", () => {
 
   describe("loop", () => {
     test("empty block", () => {
-      const wasm = emit([art("fn loop {}")]);
+      const wasm = emit([art("fn loop #0 {}")]);
       expect(wasm).toMatchSnapshot();
     });
 
     test("break", () => {
-      const wasm = emit([art("fn loop break")]);
+      const wasm = emit([art("fn loop #0 break #0")]);
       expect(wasm).toMatchSnapshot();
     });
   });

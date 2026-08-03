@@ -118,14 +118,15 @@ describe("block", () => {
 });
 
 test("loop", () => {
-  expect(art("loop {}")).toEqual({
+  expect(art("loop #0 {}")).toEqual({
     type: "loop",
+    id: 0,
     body: art("{}"),
   });
 });
 
 test("break", () => {
-  expect(art("break")).toEqual({ type: "break" });
+  expect(art("break #0")).toEqual({ type: "break", id: 0 });
 });
 
 test("if", () => {

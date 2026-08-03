@@ -30,7 +30,7 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
     case "return": {
       // const fn_ty = ctx.get_fn_ty(air.id);
       // ctx.unify(fn_ty.ret, air.value.ty);
-      air.ty = { type: "never" };
+      air.ty = { type: "never", break: null };
       throw todo();
       // break;
     }
@@ -53,7 +53,7 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       break;
     }
     case "break": {
-      air.ty = { type: "never" /* , id: air.id */ };
+      air.ty = { type: "never", break: air.id };
       break;
     }
     case "if": {

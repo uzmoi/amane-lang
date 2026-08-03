@@ -52,10 +52,10 @@ export const print_air = (air: Air): string => {
       return stmts.length === 0 ? "{}" : `{ ${stmts.join(" ")} }`;
     }
     case "loop": {
-      return `loop ${print_air(air.body)}`;
+      return `loop #${air.id} ${print_air(air.body)}`;
     }
     case "break": {
-      return "break";
+      return `break #${air.id}`;
     }
     case "if": {
       return `if ${print_air(air.cond)} then ${print_air(air.then)} else ${print_air(air.else)}`;

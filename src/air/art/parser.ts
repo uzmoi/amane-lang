@@ -1,6 +1,6 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
-import type { Air, Id } from "../air";
+import type { Air, BlockId, Id } from "../air";
 import type { Ty } from "../ty";
 import { Lexer, type Token } from "./lexer";
 
@@ -21,15 +21,25 @@ const delimiter = (delimiter: string) =>
     { error: error.expected(`delimiter '${delimiter}'`) },
   );
 
-const id = token("id").map((content) => parseInt(content.slice(1), 10) as Id);
+const ref_id = token("ref_id").map(
+  (content) => parseInt(content.slice(1), 10) as Id,
+);
+
+const block_id = token("block_id").map(
+  (content) => parseInt(content.slice(1), 10) as BlockId,
+);
 
 const ty = P.lazy((): P.Parser<Ty, Token> => {
   return P.choice([
-    id.map((id): Ty => ({ type: "ref", id })),
+    ref_id.map((id): Ty => ({ type: "ref", id })),
 
-    ...(
-      ["any", "never", "void", "bool", "i32", "i64", "f32", "f64"] as const
-    ).map((t) => keyword(t).return<Ty>({ type: t })),
+    ...(["any", "void", "bool", "i32", "i64", "f32", "f64"] as const).map((t) =>
+      keyword(t).return<Ty>({ type: t }),
+    ),
+
+    keyword("never")
+      .then(block_id.option(null))
+      .map<Ty>((id) => ({ type: "never", break: id })),
 
     P.seq([
       keyword("fn"),
@@ -43,11 +53,11 @@ const ty = P.lazy((): P.Parser<Ty, Token> => {
 
 const air = P.lazy((): P.Parser<Air, Token> => {
   return P.choice([
-    id.map((id): Air => ({ type: "ref", id })),
+    ref_id.map((id): Air => ({ type: "ref", id })),
 
     P.seq([
       keyword("fn"),
-      P.seq([id, delimiter(":").then(ty)])
+      P.seq([ref_id, delimiter(":").then(ty)])
         .map(([id, ty]) => ({ id, ty }))
         .apply(P.sepBy, delimiter(","), { trailing: "allow" })
         .between(delimiter("("), delimiter(")"))
@@ -72,10 +82,12 @@ const air = P.lazy((): P.Parser<Air, Token> => {
       .map(([body, last]): Air => ({ type: "block", body, last })),
 
     keyword("loop")
-      .then(air)
-      .map((body): Air => ({ type: "loop", body })),
+      .then(P.seq([block_id, air]))
+      .map(([id, body]): Air => ({ type: "loop", id, body })),
 
-    keyword("break").return<Air>({ type: "break" }),
+    keyword("break")
+      .then(block_id)
+      .map<Air>((id) => ({ type: "break", id })),
 
     P.seq([
       keyword("if").then(air),
@@ -99,11 +111,11 @@ const air = P.lazy((): P.Parser<Air, Token> => {
 });
 
 const statement = P.choice([
-  P.seq([keyword("let").then(id), delimiter("=").then(air)]).map(
+  P.seq([keyword("let").then(ref_id), delimiter("=").then(air)]).map(
     ([id, init]): Air => ({ type: "def", id, init }),
   ),
 
-  P.seq([id, delimiter("=").then(air)]).map(
+  P.seq([ref_id, delimiter("=").then(air)]).map(
     ([id, val]): Air => ({ type: "assign", id, val }),
   ),
 
