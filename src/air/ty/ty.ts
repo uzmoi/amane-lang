@@ -1,12 +1,12 @@
 import { equals_arrays } from "#common/utils.js";
-import type { BlockId, Id } from "../air";
+import type { Id } from "../air";
 
 // any is top type
 // never is bottom type
 
 export type Ty =
   | { type: "any" }
-  | { type: "never"; break: BlockId | null }
+  | { type: "never" }
   | { type: "void" }
   | { type: "bool" | "i32" | "i64" | "f32" | "f64" }
   | { type: "fn"; params: readonly Ty[]; ret: Ty }

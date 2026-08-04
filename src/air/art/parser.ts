@@ -33,13 +33,9 @@ const ty = P.lazy((): P.Parser<Ty, Token> => {
   return P.choice([
     ref_id.map((id): Ty => ({ type: "ref", id })),
 
-    ...(["any", "void", "bool", "i32", "i64", "f32", "f64"] as const).map((t) =>
-      keyword(t).return<Ty>({ type: t }),
-    ),
-
-    keyword("never")
-      .then(block_id.option(null))
-      .map<Ty>((id) => ({ type: "never", break: id })),
+    ...(
+      ["any", "never", "void", "bool", "i32", "i64", "f32", "f64"] as const
+    ).map((t) => keyword(t).return<Ty>({ type: t })),
 
     P.seq([
       keyword("fn"),

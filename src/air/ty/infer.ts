@@ -30,7 +30,7 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
     case "return": {
       // const fn_ty = ctx.get_fn_ty(air.id);
       // ctx.unify(fn_ty.ret, air.value.ty);
-      air.ty = { type: "never", break: null };
+      air.ty = { type: "never" };
       throw todo();
       // break;
     }
@@ -52,11 +52,11 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       ctx.unify(air.body.ty!, { type: "void" });
       air.ty = ctx.exists_breaks_for(air.id)
         ? { type: "void" }
-        : { type: "never", break: null };
+        : { type: "never" };
       break;
     }
     case "break": {
-      air.ty = { type: "never", break: air.id };
+      air.ty = { type: "never" };
       break;
     }
     case "if": {
