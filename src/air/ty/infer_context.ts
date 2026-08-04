@@ -10,18 +10,18 @@ export class InferenceContext {
     this.#breaks = options?.breaks ?? new Set();
   }
 
-  ap(ty: Ty): Ty {
+  deref(ty: Ty): Ty {
     switch (ty.type) {
       case "fn": {
         return {
           type: "fn",
-          params: ty.params.map((param) => this.ap(param)),
-          ret: this.ap(ty.ret),
+          params: ty.params.map((param) => this.deref(param)),
+          ret: this.deref(ty.ret),
         };
       }
       case "ref": {
         const ref = this.#refs.get(ty.id);
-        return ref ? this.ap(ref) : ty;
+        return ref ? this.deref(ref) : ty;
       }
       default: {
         return ty;
@@ -30,8 +30,8 @@ export class InferenceContext {
   }
 
   unify(a: Ty, b: Ty) {
-    a = this.ap(a);
-    b = this.ap(b);
+    a = this.deref(a);
+    b = this.deref(b);
 
     if (equals_ty(a, b)) return;
 

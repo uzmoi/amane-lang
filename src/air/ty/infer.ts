@@ -111,7 +111,7 @@ export const infer_type = (
     air(air, w) {
       walk_air(air, w);
       if ("ty" in air) {
-        air.ty = w.context.ap(air.ty!);
+        air.ty = w.context.deref(air.ty!);
       }
     },
     context: ctx,
