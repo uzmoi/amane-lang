@@ -1,9 +1,14 @@
-import type { Id } from "../air";
+import type { BlockId, Id } from "../air";
 import { TypeMismatchError } from "./error";
 import { equals_ty, type Ty } from "./ty";
 
 export class InferenceContext {
   #refs = new Map<Id, Ty>();
+
+  #breaks: Set<BlockId>;
+  constructor(options?: { breaks: Set<BlockId> }) {
+    this.#breaks = options?.breaks ?? new Set();
+  }
 
   ap(ty: Ty): Ty {
     switch (ty.type) {
@@ -45,5 +50,9 @@ export class InferenceContext {
   #ty_id = -1;
   new_ty_id(): Id {
     return this.#ty_id-- as Id;
+  }
+
+  exists_breaks_for(block_id: BlockId): boolean {
+    return this.#breaks.has(block_id);
   }
 }

@@ -49,7 +49,10 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       break;
     }
     case "loop": {
-      air.ty = air.body.ty;
+      ctx.unify(air.body.ty!, { type: "void" });
+      air.ty = ctx.exists_breaks_for(air.id)
+        ? { type: "void" }
+        : { type: "never", break: null };
       break;
     }
     case "break": {
