@@ -4,8 +4,8 @@ import {
   type Id,
   InferenceContext,
   infer_type,
-  ref_ty,
   type Ty,
+  ty,
 } from "#air";
 import { parse_art } from "#art";
 import { type W, walk_air } from "../../src/air/walk";
@@ -24,8 +24,8 @@ export const art_infer = (source: string, vars: Ty[] = []) => {
   const ctx = new InferenceContext({
     breaks: collect_breaks(air),
   });
-  for (const [index, ty] of vars.entries()) {
-    ctx.unify(ref_ty(index as Id), ty);
+  for (const [index, type] of vars.entries()) {
+    ctx.unify(ty.ref(index as Id), type);
   }
 
   infer_type(mod, ctx);

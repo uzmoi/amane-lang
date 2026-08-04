@@ -1,29 +1,25 @@
 import { describe, expect, test } from "vitest";
+import type { Id } from "../air";
+import { ty } from "../ty";
 import { parse_art as art, parse_ty } from "./parser";
 
 describe("ty", () => {
   test("ref", () => {
-    expect(parse_ty("%0")).toEqual({ type: "ref", id: 0 });
+    expect(parse_ty("%0")).toEqual(ty.ref(0 as Id));
   });
 
   test("i32", () => {
-    expect(parse_ty("i32")).toEqual({ type: "i32" });
+    expect(parse_ty("i32")).toEqual(ty.i32);
   });
 
   test("fn (no params)", () => {
-    expect(parse_ty("fn: i32")).toEqual({
-      type: "fn",
-      params: [],
-      ret: parse_ty("i32"),
-    });
+    expect(parse_ty("fn: i32")).toEqual(ty.fn([], ty.i32));
   });
 
   test("fn (with params)", () => {
-    expect(parse_ty("fn (i32, i32): i32")).toEqual({
-      type: "fn",
-      params: [parse_ty("i32"), parse_ty("i32")],
-      ret: parse_ty("i32"),
-    });
+    expect(parse_ty("fn (i32, i32): i32")).toEqual(
+      ty.fn([ty.i32, ty.i32], ty.i32),
+    );
   });
 });
 
@@ -48,8 +44,8 @@ describe("fn", () => {
     expect(art("fn (%0: i32, %1: i32) %2")).toEqual({
       type: "fn",
       params: [
-        { id: 0, ty: { type: "i32" } },
-        { id: 1, ty: { type: "i32" } },
+        { id: 0, ty: ty.i32 },
+        { id: 1, ty: ty.i32 },
       ],
       body: art("%2"),
     });

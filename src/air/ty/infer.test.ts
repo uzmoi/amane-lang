@@ -1,110 +1,107 @@
 import { describe, expect, test } from "vitest";
 import { art_infer as infer } from "#tests/helpers";
-import { parse_ty as ty } from "../art";
 import { TypeMismatchError, VoidVariableError } from "./error";
-import type { Ty } from "./ty";
+import { type Ty, ty } from "./ty";
 
 const tyof = (source: string, vars?: Ty[]) => infer(source, vars).ty;
 
 describe("constant", () => {
   test("bool", () => {
-    expect(tyof("true")).toEqual(ty("bool"));
+    expect(tyof("true")).toEqual(ty.bool);
   });
 
   test("int", () => {
-    expect(tyof("0")).toEqual(ty("i32"));
+    expect(tyof("0")).toEqual(ty.i32);
   });
 
   test("annotated int", () => {
-    expect(infer("%0 = 0", [ty("i32")])).toHaveProperty("val.ty", ty("i32"));
+    expect(infer("%0 = 0", [ty.i32])).toHaveProperty("val.ty", ty.i32);
   });
 
   test("float", () => {
-    expect(tyof("0.0")).toEqual(ty("f32"));
+    expect(tyof("0.0")).toEqual(ty.f32);
   });
 
   test("annotated float", () => {
-    expect(infer("%0 = 0.0", [ty("f32")])).toHaveProperty("val.ty", ty("f32"));
+    expect(infer("%0 = 0.0", [ty.f32])).toHaveProperty("val.ty", ty.f32);
   });
 
   test.todo("string", () => {
-    expect(tyof('""')).toEqual(ty("string"));
+    // expect(tyof('""')).toEqual(ty.string);
   });
 });
 
 describe("block", () => {
   test("空ブロックの型はvoid", () => {
-    expect(tyof("{}")).toEqual(ty("void"));
+    expect(tyof("{}")).toEqual(ty.void);
   });
 
   test("last expressionが存在するならブロックはその型になる", () => {
-    expect(tyof("{ 0 }")).toEqual(ty("i32"));
+    expect(tyof("{ 0 }")).toEqual(ty.i32);
   });
 
   test("never型の文を含むならブロック全体もnever型になる", () => {
-    expect(tyof("{ %0; 0 }", [ty("never")])).toEqual(ty("never"));
+    expect(tyof("{ %0; 0 }", [ty.never])).toEqual(ty.never);
   });
 });
 
 describe("if", () => {
   test("condition requires bool type", () => {
     expect(() => infer("if 0 then {} else {}")).toThrow(
-      new TypeMismatchError(ty("i32"), ty("bool")),
+      new TypeMismatchError(ty.i32, ty.bool),
     );
   });
 
   test("conditionがnever型ならif式もnever型になる", () => {
-    expect(tyof("if %0 then {} else {}", [ty("never")])).toEqual(ty("never"));
+    expect(tyof("if %0 then {} else {}", [ty.never])).toEqual(ty.never);
   });
 
   test("thenとelseの型をif式の型とする", () => {
-    expect(tyof("if true then 1 else 2")).toEqual(ty("i32"));
+    expect(tyof("if true then 1 else 2")).toEqual(ty.i32);
   });
 
   test("thenとelseのどちらかがnever型なら、そうでない方の型をif式の型とする", () => {
-    expect(tyof("if true then %0 else 0", [ty("never")])).toEqual(ty("i32"));
-    expect(tyof("if true then 0 else %0", [ty("never")])).toEqual(ty("i32"));
+    expect(tyof("if true then %0 else 0", [ty.never])).toEqual(ty.i32);
+    expect(tyof("if true then 0 else %0", [ty.never])).toEqual(ty.i32);
   });
 
   test("then and else branches must have same type", () => {
     expect(() => infer("if true then 0 else {}")).toThrow(
-      new TypeMismatchError(ty("i32"), ty("void")),
+      new TypeMismatchError(ty.i32, ty.void),
     );
   });
 });
 
 describe("loop", () => {
   test("break is never type", () => {
-    expect(tyof("break #0")).toEqual(ty("never #0"));
+    expect(tyof("break #0")).toEqual(ty.never);
   });
 
   test("loop with break", () => {
-    expect(tyof("loop #0 break #0")).toEqual(ty("void"));
+    expect(tyof("loop #0 break #0")).toEqual(ty.void);
   });
 
   test("loop with break and other types body", () => {
-    expect(tyof("loop #0 { break #0; return }")).toEqual(ty("void"));
-    expect(tyof("loop #0 if true then break #0 else return")).toEqual(
-      ty("void"),
-    );
-    expect(tyof("loop #0 if true then break #0 else {}")).toEqual(ty("void"));
+    expect(tyof("loop #0 { break #0; return }")).toEqual(ty.void);
+    expect(tyof("loop #0 if true then break #0 else return")).toEqual(ty.void);
+    expect(tyof("loop #0 if true then break #0 else {}")).toEqual(ty.void);
   });
 
   test("loop without break", () => {
-    expect(tyof("loop #0 {}")).toEqual(ty("never"));
+    expect(tyof("loop #0 {}")).toEqual(ty.never);
   });
 
   test("loop with unrelated break", () => {
-    expect(tyof("loop #0 break #1")).toEqual(ty("never"));
+    expect(tyof("loop #0 break #1")).toEqual(ty.never);
   });
 
   test("through never type of non-break", () => {
-    expect(tyof("loop #0 return")).toEqual(ty("never"));
+    expect(tyof("loop #0 return")).toEqual(ty.never);
   });
 
   test("body requires void type", () => {
     expect(() => infer("loop #0 0")).toThrow(
-      new TypeMismatchError(ty("i32"), ty("void")),
+      new TypeMismatchError(ty.i32, ty.void),
     );
   });
 });
@@ -115,15 +112,15 @@ describe("variable", () => {
   });
 
   test("let-ref", () => {
-    expect(tyof("{ let %0 = 0; %0 }")).toEqual(ty("i32"));
+    expect(tyof("{ let %0 = 0; %0 }")).toEqual(ty.i32);
   });
 
   test("param-ref", () => {
-    expect(infer("fn (%0: i32) %0")).toHaveProperty("body.ty", ty("i32"));
+    expect(infer("fn (%0: i32) %0")).toHaveProperty("body.ty", ty.i32);
   });
 
   test("return-ref", () => {
-    expect(infer("fn (%0): i32 %0")).toHaveProperty("params.0.ty", "i32");
+    expect(infer("fn (%0): i32 %0")).toHaveProperty("params.0.ty", ty.i32);
   });
 
   test.todo("type mismatch", () => {

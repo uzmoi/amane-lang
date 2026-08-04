@@ -2,65 +2,63 @@ import { todo, unreachable } from "@uzmoi/ut/ils";
 import type { Air, AirModule } from "../air";
 import { type W, walk_air } from "../walk";
 import { InferenceContext } from "./infer_context";
-import { ref_ty } from "./ty";
+import { ty } from "./ty";
 
 // TODO: neverを含む式/文をneverにする。
 export const infer_air_type = (air: Air, ctx: InferenceContext) => {
   switch (air.type) {
     case "def": {
-      ctx.unify(ref_ty(air.id), air.init.ty!);
+      ctx.unify(ty.ref(air.id), air.init.ty!);
       break;
     }
     case "assign": {
-      ctx.unify(ref_ty(air.id), air.val.ty!);
+      ctx.unify(ty.ref(air.id), air.val.ty!);
       break;
     }
     case "ref": {
-      air.ty = ref_ty(air.id);
+      air.ty = ty.ref(air.id);
       break;
     }
     case "fn": {
       const params = air.params.map((param) => {
-        ctx.unify(ref_ty(param.id), param.ty);
+        ctx.unify(ty.ref(param.id), param.ty);
         return param.ty;
       });
-      air.ty = { type: "fn", params, ret: air.body.ty! };
+      air.ty = ty.fn(params, air.body.ty!);
       break;
     }
     case "return": {
       // const fn_ty = ctx.get_fn_ty(air.id);
       // ctx.unify(fn_ty.ret, air.value.ty);
-      air.ty = { type: "never" };
+      air.ty = ty.never;
       throw todo();
       // break;
     }
     case "call": {
-      const ret_ty = ref_ty(ctx.new_ty_id());
+      const ret_ty = ty.ref(ctx.new_ty_id());
       air.ty = ret_ty;
-      ctx.unify(air.callee.ty!, {
-        type: "fn",
-        params: air.args.map((arg) => arg.ty!),
-        ret: ret_ty,
-      });
+      const fn_ty = ty.fn(
+        air.args.map((arg) => arg.ty!),
+        ret_ty,
+      );
+      ctx.unify(air.callee.ty!, fn_ty);
       break;
     }
     case "block": {
-      air.ty = air.last?.ty ?? { type: "void" };
+      air.ty = air.last?.ty ?? ty.void;
       break;
     }
     case "loop": {
-      ctx.unify(air.body.ty!, { type: "void" });
-      air.ty = ctx.exists_breaks_for(air.id)
-        ? { type: "void" }
-        : { type: "never" };
+      ctx.unify(air.body.ty!, ty.void);
+      air.ty = ctx.exists_breaks_for(air.id) ? ty.void : ty.never;
       break;
     }
     case "break": {
-      air.ty = { type: "never" };
+      air.ty = ty.never;
       break;
     }
     case "if": {
-      ctx.unify(air.cond.ty!, { type: "bool" });
+      ctx.unify(air.cond.ty!, ty.bool);
       ctx.unify(air.then.ty!, air.else.ty!);
       air.ty = air.then.ty;
       // air.ty = union(air.then.ty!, air.else.ty!);
@@ -68,21 +66,21 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       break;
     }
     case "const.bool": {
-      air.ty = { type: "bool" };
+      air.ty = ty.bool;
       break;
     }
     case "const.int": {
       // FIXME: i64...
-      air.ty = { type: "i32" };
+      air.ty = ty.i32;
       break;
     }
     case "const.float": {
       // FIXME: f64...
-      air.ty = { type: "f32" };
+      air.ty = ty.f32;
       break;
     }
     case "const.string": {
-      // air.ty = { type: "string" };
+      // air.ty = ty.string;
       return todo();
     }
     default: {

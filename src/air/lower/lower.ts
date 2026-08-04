@@ -1,7 +1,7 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import { type ast, type Loc, parse_number_literal } from "#parser";
 import type { Air, AirModule, Id } from "../air";
-import type { Ty } from "../ty";
+import { type Ty, ty } from "../ty";
 import { BlockAnalyzer } from "./block";
 import { Scope } from "./scope";
 
@@ -108,7 +108,7 @@ export const lower_expression = (
       // TODO: ty
       for (const [param, _ty] of expr.params) {
         const { id } = ctx.scope.def(param.name, param.loc);
-        params.push({ id, ty: { type: "any" } });
+        params.push({ id, ty: ty.any });
       }
 
       const body = lower_expression(expr.body, ctx);
