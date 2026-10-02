@@ -4,7 +4,7 @@ import { art_infer } from "#tests/helpers";
 import { emit_wasm } from "./emit";
 
 const emit = (items: Air[]) => {
-  return emit_wasm({ items });
+  return emit_wasm({ imports: [], items });
 };
 
 describe("emit_wasm", () => {

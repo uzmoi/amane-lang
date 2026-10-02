@@ -6,7 +6,13 @@ export type Id = number & Brand<"RefId">;
 export type BlockId = number & Brand<"BlockId">;
 
 export interface AirModule {
+  imports: AirImport[];
   items: readonly Air[];
+}
+
+export interface AirImport {
+  module: string;
+  imports: { name: string; id: Id }[];
 }
 
 /**

@@ -1,5 +1,6 @@
 import {
   type Air,
+  type AirModule,
   type BlockId,
   type Id,
   InferenceContext,
@@ -19,7 +20,7 @@ const collect_breaks = (air: Air, w?: W<Set<BlockId>>) => {
 
 export const art_infer = (source: string, vars: Ty[] = []) => {
   const air = parse_art(source);
-  const mod = { items: [air] };
+  const mod: AirModule = { imports: [], items: [air] };
 
   const ctx = new InferenceContext({
     breaks: collect_breaks(air),

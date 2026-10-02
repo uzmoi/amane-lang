@@ -5,7 +5,7 @@ import { type Module, NumType } from "./module";
 
 describe("convert", () => {
   test("empty", () => {
-    expect(convert({ items: [] })).toEqual({
+    expect(convert({ imports: [], items: [] })).toEqual({
       types: [],
       imports: [],
       funcs: [],
@@ -18,7 +18,9 @@ describe("convert", () => {
   });
 
   test("func", () => {
-    expect(convert({ items: [art_infer("let %0 = fn 0")] })).toEqual({
+    expect(
+      convert({ imports: [], items: [art_infer("let %0 = fn 0")] }),
+    ).toEqual({
       types: [{ kind: "func", params: [], return: [NumType.i32] }],
       imports: [],
       funcs: [

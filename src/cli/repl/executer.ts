@@ -23,7 +23,7 @@ export class ReplExecuter {
       // TODO: ASTをlowingしてAirに変換
       // REPL用にstartを設定するなどの変形を行いemit_wasmに渡す。
 
-      const module = { items: [] };
+      const module = { imports: [], items: [] };
 
       const wasm_binary = emit_wasm(module);
 

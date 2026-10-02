@@ -1,6 +1,6 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import { type ast, type Loc, parse_number_literal } from "#parser";
-import type { Air, AirModule, Id } from "../air";
+import type { Air, AirImport, AirModule, Id } from "../air";
 import { type Ty, ty } from "../ty";
 import { BlockAnalyzer } from "./block";
 import { Scope } from "./scope";
@@ -9,16 +9,21 @@ export const lower = (module: ast.Module<Loc>): AirModule => {
   const ctx: LowerContext = {
     scope: new Scope(),
     block: new BlockAnalyzer(),
+    imports: [],
   };
 
   const items = module.items.map((item) => lower_statement(item.stmt, ctx));
 
-  return { items };
+  return {
+    imports: ctx.imports,
+    items,
+  };
 };
 
 interface LowerContext {
   scope: Scope;
   block: BlockAnalyzer;
+  imports: AirImport[];
 }
 
 export const lower_statement = (
