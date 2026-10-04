@@ -1,4 +1,4 @@
-import type { Air, AirModule } from "#air";
+import type { AirFn, AirModule } from "#air";
 import { equals_arrays } from "#common/utils.js";
 import { type W, walk_air } from "../../air/walk";
 import type { Export, Func, FuncType, Import, Module, ValType } from "./module";
@@ -10,7 +10,7 @@ export const convert = (air_module: AirModule): Module => {
   const types: FuncType[] = [];
   const funcs: Func[] = [];
 
-  const fns: Extract<Air, { type: "fn" }>[] = [];
+  const fns: AirFn[] = [];
 
   const collect_fns: W<null> = {
     air(air, w) {
