@@ -1,6 +1,7 @@
 import type { Air, Id } from "#air";
 import { write_air } from "./air";
 import { Opcode } from "./opcode";
+import type { CompositeType, RefType, ValType } from "./type";
 import type { u8 } from "./types";
 import { leb128size, run_length_encoding } from "./utils";
 import type { Writer } from "./writer";
@@ -20,31 +21,6 @@ const enum SectionId {
   code = 10,
   data = 11,
   data_count = 12,
-}
-
-// https://www.w3.org/TR/wasm-core-2/#types⑦
-export const enum NumType {
-  i32 = 0x7f,
-  i64 = 0x7e,
-  f32 = 0x7d,
-  f64 = 0x7c,
-}
-
-export const enum VecType {
-  v128 = 0x7b,
-}
-
-export const enum RefType {
-  func_ref = 0x70,
-  extern_ref = 0x6f,
-}
-
-export type ValType = NumType | VecType | RefType;
-
-export interface FuncType {
-  kind: "func";
-  params: readonly ValType[];
-  return: readonly ValType[];
 }
 
 export const enum ImportExportDesc {
@@ -104,7 +80,7 @@ const write_limits = (writer: Writer, limits: Limits) => {
 };
 
 export interface Module {
-  types: readonly FuncType[];
+  types: readonly CompositeType[];
   imports: readonly Import[];
   funcs: readonly Func[];
   tables: readonly Table[];

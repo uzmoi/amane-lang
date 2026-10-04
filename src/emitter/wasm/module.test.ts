@@ -1,12 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { art_infer } from "#tests/helpers";
-import {
-  ImportExportDesc,
-  type Module,
-  NumType,
-  RefType,
-  write_module,
-} from "./module";
+import { ImportExportDesc, type Module, write_module } from "./module";
+import { NumType, RefType } from "./type";
 import { Writer } from "./writer";
 
 describe("write_module", () => {

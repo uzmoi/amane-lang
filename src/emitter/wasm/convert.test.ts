@@ -2,7 +2,8 @@ import { todo } from "@uzmoi/ut/ils";
 import { describe, expect, test } from "vitest";
 import { art_infer } from "#tests/helpers";
 import { convert } from "./convert";
-import { type Module, NumType } from "./module";
+import type { Module } from "./module";
+import { NumType } from "./type";
 
 describe("convert", () => {
   test("empty", () => {

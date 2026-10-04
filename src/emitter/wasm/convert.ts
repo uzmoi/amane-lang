@@ -1,8 +1,13 @@
 import type { AirModule } from "#air";
-import { equals_arrays } from "#common/utils.js";
 import { type W, walk_air } from "../../air/walk";
-import type { Export, Func, FuncType, Import, Module, ValType } from "./module";
-import { ty } from "./type";
+import type { Export, Func, Import, Module } from "./module";
+import {
+  type FuncType,
+  func_type,
+  get_type_index,
+  ty,
+  type ValType,
+} from "./type";
 
 export const convert = (air_module: AirModule): Module => {
   const imports: Import[] = [];
@@ -11,30 +16,11 @@ export const convert = (air_module: AirModule): Module => {
   const funcs: Func[] = [];
 
   for (const fn_air of air_module.items) {
-    const param_types = fn_air.params.map((param) => {
-      const type = ty(param.ty);
-      if (type == null) {
-        throw new Error("paramの型がvoidなのマジイミフじゃねw ウケるw");
-      }
-      return type;
-    });
-
-    const return_type = ty(fn_air.body.ty);
-
-    let signature = types.findIndex(
-      (type) =>
-        equals_arrays(type.params, param_types) &&
-        equals_arrays(type.return, return_type ? [return_type] : []),
+    const type = func_type(
+      fn_air.params.map((param) => param.ty),
+      fn_air.body.ty!,
     );
-
-    if (signature === -1) {
-      signature = types.length;
-      types.push({
-        kind: "func",
-        params: param_types,
-        return: return_type ? [return_type] : [],
-      });
-    }
+    const signature = get_type_index(types, type);
 
     const local_refs = new Map(
       fn_air.params.map((param, index) => [param.id, index]),
