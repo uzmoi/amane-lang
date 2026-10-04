@@ -1,4 +1,4 @@
-import type { AirFn, AirModule } from "#air";
+import type { AirModule } from "#air";
 import { equals_arrays } from "#common/utils.js";
 import { type W, walk_air } from "../../air/walk";
 import type { Export, Func, FuncType, Import, Module, ValType } from "./module";
@@ -10,23 +10,7 @@ export const convert = (air_module: AirModule): Module => {
   const types: FuncType[] = [];
   const funcs: Func[] = [];
 
-  const fns: AirFn[] = [];
-
-  const collect_fns: W<null> = {
-    air(air, w) {
-      walk_air(air, w);
-      if (air.type === "fn") {
-        fns.push(air);
-      }
-    },
-    context: null,
-  };
-
-  for (const item of air_module.items) {
-    collect_fns.air(item, collect_fns);
-  }
-
-  for (const fn_air of fns) {
+  for (const fn_air of air_module.items) {
     const param_types = fn_air.params.map((param) => {
       const type = ty(param.ty);
       if (type == null) {
@@ -60,9 +44,7 @@ export const convert = (air_module: AirModule): Module => {
 
     const collect_local_refs: W<null> = {
       air(air, w) {
-        if (air.type !== "fn") {
-          walk_air(air, w);
-        }
+        walk_air(air, w);
         if (air.type === "def") {
           local_refs.set(air.id, local_refs.size);
           const type = ty(air.init.ty);
@@ -75,7 +57,7 @@ export const convert = (air_module: AirModule): Module => {
       context: null,
     };
 
-    collect_local_refs.air(fn_air, collect_local_refs);
+    collect_local_refs.air(fn_air.body, collect_local_refs);
 
     funcs.push({
       signature,

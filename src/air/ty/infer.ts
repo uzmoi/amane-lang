@@ -21,14 +21,6 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       air.ty = ty.ref(air.id);
       break;
     }
-    case "fn": {
-      const params = air.params.map((param) => {
-        ctx.unify(ty.ref(param.id), param.ty);
-        return param.ty;
-      });
-      air.ty = ty.fn(params, air.body.ty!);
-      break;
-    }
     case "return": {
       // const fn_ty = ctx.get_fn_ty(air.id);
       // ctx.unify(fn_ty.ret, air.value.ty);
@@ -104,7 +96,7 @@ export const infer_type = (
   };
 
   for (const item of module.items) {
-    infer.air(item, infer);
+    infer.air(item.body, infer);
   }
 
   const ap: W<InferenceContext> = {
@@ -118,7 +110,7 @@ export const infer_type = (
   };
 
   for (const item of module.items) {
-    ap.air(item, ap);
+    ap.air(item.body, ap);
   }
 
   return module;

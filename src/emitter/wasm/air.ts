@@ -40,9 +40,6 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       writer.u32leb128(ctx.get_index(air.id));
       break;
     }
-    case "fn": {
-      throw todo();
-    }
     case "return": {
       if (air.value != null) {
         write_air(writer, air.value, ctx);

@@ -1,7 +1,11 @@
 import { describe, expect, test } from "vitest";
 import type { Id } from "../air";
 import { ty } from "../ty";
-import { parse_art as art, parse_ty } from "./parser";
+import {
+  parse_art as art,
+  parse_art_module_item as module_item,
+  parse_ty,
+} from "./parser";
 
 describe("ty", () => {
   test("ref", () => {
@@ -33,7 +37,7 @@ test("string", () => {
 
 describe("fn", () => {
   test("constant", () => {
-    expect(art("fn 0")).toEqual({
+    expect(module_item("fn 0")).toEqual({
       type: "fn",
       params: [],
       body: art("0"),
@@ -41,7 +45,7 @@ describe("fn", () => {
   });
 
   test("with params", () => {
-    expect(art("fn (%0: i32, %1: i32) %2")).toEqual({
+    expect(module_item("fn (%0: i32, %1: i32) %2")).toEqual({
       type: "fn",
       params: [
         { id: 0, ty: ty.i32 },
@@ -52,7 +56,7 @@ describe("fn", () => {
   });
 
   test("return", () => {
-    expect(art("fn return 0")).toEqual({
+    expect(module_item("fn return 0")).toEqual({
       type: "fn",
       params: [],
       body: {

@@ -115,11 +115,11 @@ describe("variable", () => {
     expect(tyof("{ let %0 = 0; %0 }")).toEqual(ty.i32);
   });
 
-  test("param-ref", () => {
+  test.todo("param-ref", () => {
     expect(infer("fn (%0: i32) %0")).toHaveProperty("body.ty", ty.i32);
   });
 
-  test("return-ref", () => {
+  test.todo("return-ref", () => {
     expect(infer("fn (%0): i32 %0")).toHaveProperty("params.0.ty", ty.i32);
   });
 

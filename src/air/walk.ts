@@ -18,10 +18,6 @@ export const walk_air = <C>(air: Air, w: W<C>) => {
     case "ref": {
       break;
     }
-    case "fn": {
-      w.air(air.body, w);
-      break;
-    }
     case "return": {
       if (air.value != null) {
         w.air(air.value, w);

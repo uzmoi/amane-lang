@@ -7,12 +7,20 @@ export type BlockId = number & Brand<"BlockId">;
 
 export interface AirModule {
   imports: AirImport[];
-  items: readonly Air[];
+  items: readonly AirModuleItem[];
 }
 
 export interface AirImport {
   module: string;
   imports: { name: string; id: Id }[];
+}
+
+export type AirModuleItem = AirFn;
+
+export interface AirFn {
+  type: "fn";
+  params: readonly { id: Id; ty: Ty }[];
+  body: Air;
 }
 
 /**
@@ -22,7 +30,6 @@ export type Air = { ty?: Ty | undefined } & (
   | AirDef
   | AirAssign
   | AirRef
-  | AirFn
   | AirReturn
   | AirCall
   | AirBlock
@@ -47,12 +54,6 @@ export interface AirAssign {
 export interface AirRef {
   type: "ref";
   id: Id;
-}
-
-export interface AirFn {
-  type: "fn";
-  params: readonly { id: Id; ty: Ty }[];
-  body: Air;
 }
 
 export interface AirReturn {

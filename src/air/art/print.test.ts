@@ -1,6 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { parse_art as art, parse_ty } from "./parser";
-import { print_air, print_ty } from "./print";
+import {
+  parse_art as art,
+  parse_art_module_item as module_item,
+  parse_ty,
+} from "./parser";
+import { print_air, print_air_module_item, print_ty } from "./print";
 
 describe("ty", () => {
   test.each([
@@ -25,9 +29,11 @@ describe("fn", () => {
     "fn 0",
     "fn (%0: i32, %1: i32) %2",
     "fn return 0",
-    "call %0",
-    "call %0(0, 1, 2)",
   ])("%o", (art_code) => {
+    expect(print_air_module_item(module_item(art_code))).toBe(art_code);
+  });
+
+  test.each(["call %0", "call %0(0, 1, 2)"])("%o", (art_code) => {
     expect(print_air(art(art_code))).toBe(art_code);
   });
 });

@@ -1,6 +1,6 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
-import type { Air, BlockId, Id } from "../air";
+import type { Air, AirModuleItem, BlockId, Id } from "../air";
 import type { Ty } from "../ty";
 import { Lexer, type Token } from "./lexer";
 
@@ -50,16 +50,6 @@ const ty = P.lazy((): P.Parser<Ty, Token> => {
 const air = P.lazy((): P.Parser<Air, Token> => {
   return P.choice([
     ref_id.map((id): Air => ({ type: "ref", id })),
-
-    P.seq([
-      keyword("fn"),
-      P.seq([ref_id, delimiter(":").then(ty)])
-        .map(([id, ty]) => ({ id, ty }))
-        .apply(P.sepBy, delimiter(","), { trailing: "allow" })
-        .between(delimiter("("), delimiter(")"))
-        .option([]),
-      air,
-    ]).map(([, params, body]): Air => ({ type: "fn", params, body })),
 
     keyword("return")
       .then(air.option(null))
@@ -118,7 +108,22 @@ const statement = P.choice([
   air,
 ]);
 
+const module_item = P.choice([
+  P.seq([
+    keyword("fn"),
+    P.seq([ref_id, delimiter(":").then(ty)])
+      .map(([id, ty]) => ({ id, ty }))
+      .apply(P.sepBy, delimiter(","), { trailing: "allow" })
+      .between(delimiter("("), delimiter(")"))
+      .option([]),
+    air,
+  ]).map(([, params, body]): AirModuleItem => ({ type: "fn", params, body })),
+]);
+
 export const parse_ty = (string: string): Ty => P.parseA(ty, Lexer.lex(string));
 
 export const parse_art = (string: string): Air =>
   P.parseA(statement, Lexer.lex(string));
+
+export const parse_art_module_item = (string: string): AirModuleItem =>
+  P.parseA(module_item, Lexer.lex(string));

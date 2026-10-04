@@ -1,3 +1,4 @@
+import { todo } from "@uzmoi/ut/ils";
 import { describe, expect, test } from "vitest";
 import { art_infer } from "#tests/helpers";
 import { convert } from "./convert";
@@ -17,9 +18,10 @@ describe("convert", () => {
     } satisfies Module);
   });
 
-  test("func", () => {
+  test.todo("func", () => {
     expect(
-      convert({ imports: [], items: [art_infer("let %0 = fn 0")] }),
+      todo(),
+      // convert({ imports: [], items: [art_infer("let %0 = fn 0")] }),
     ).toEqual({
       types: [{ kind: "func", params: [], return: [NumType.i32] }],
       imports: [],

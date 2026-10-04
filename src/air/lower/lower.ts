@@ -12,11 +12,11 @@ export const lower = (module: ast.Module<Loc>): AirModule => {
     imports: [],
   };
 
-  const items = module.items.map((item) => lower_statement(item.stmt, ctx));
+  const _items = module.items.map((item) => lower_statement(item.stmt, ctx));
 
   return {
     imports: ctx.imports,
-    items,
+    items: todo(),
   };
 };
 
@@ -116,12 +116,13 @@ export const lower_expression = (
         params.push({ id, ty: ty.any });
       }
 
-      const body = lower_expression(expr.body, ctx);
+      const _body = lower_expression(expr.body, ctx);
 
       ctx.scope.pop();
       ctx.block.pop();
 
-      return { type: "fn", params, body };
+      // return { type: "fn", params, body };
+      return todo();
     }
     case "Return": {
       let value = null;

@@ -1,5 +1,5 @@
 import { unreachable } from "@uzmoi/ut/ils";
-import type { Air } from "../air";
+import type { Air, AirModuleItem } from "../air";
 import type { Ty } from "../ty";
 
 export const print_ty = (ty: Ty): string => {
@@ -29,11 +29,6 @@ export const print_air = (air: Air): string => {
     }
     case "assign": {
       return `%${air.id} = ${print_air(air.val)}`;
-    }
-    case "fn": {
-      return air.params.length > 0
-        ? `fn (${air.params.map((param) => `%${param.id}: ${print_ty(param.ty)}`).join(", ")}) ${print_air(air.body)}`
-        : `fn ${print_air(air.body)}`;
     }
     case "return": {
       return air.value == null ? "return" : `return ${print_air(air.value)}`;
@@ -70,6 +65,19 @@ export const print_air = (air: Air): string => {
     }
     default: {
       unreachable<typeof air>();
+    }
+  }
+};
+
+export const print_air_module_item = (item: AirModuleItem) => {
+  switch (item.type) {
+    case "fn": {
+      return item.params.length > 0
+        ? `fn (${item.params.map((param) => `%${param.id}: ${print_ty(param.ty)}`).join(", ")}) ${print_air(item.body)}`
+        : `fn ${print_air(item.body)}`;
+    }
+    default: {
+      // unreachable<typeof item>();
     }
   }
 };
