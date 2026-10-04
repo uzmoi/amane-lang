@@ -46,6 +46,7 @@ export const convert = (air_module: AirModule): Module => {
     collect_local_refs.air(fn_air.body, collect_local_refs);
 
     funcs.push({
+      id: fn_air.id,
       signature,
       local_refs,
       locals,

@@ -1,5 +1,6 @@
 import { todo } from "@uzmoi/ut/ils";
 import { describe, expect, test } from "vitest";
+import type { Id } from "#air";
 import { art_infer } from "#tests/helpers";
 import { convert } from "./convert";
 import type { Module } from "./module";
@@ -28,6 +29,7 @@ describe("convert", () => {
       imports: [],
       funcs: [
         {
+          id: 0 as Id,
           signature: 0,
           local_refs: new Map(),
           locals: [],

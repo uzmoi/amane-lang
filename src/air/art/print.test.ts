@@ -26,9 +26,9 @@ test("ref", () => {
 
 describe("fn", () => {
   test.each([
-    "fn 0",
-    "fn (%0: i32, %1: i32) %2",
-    "fn return 0",
+    "fn %0 0",
+    "fn %0(%1: i32, %2: i32) %3",
+    "fn %0 return 0",
   ])("%o", (art_code) => {
     expect(print_air_module_item(module_item(art_code))).toBe(art_code);
   });

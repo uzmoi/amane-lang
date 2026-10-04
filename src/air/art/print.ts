@@ -73,8 +73,8 @@ export const print_air_module_item = (item: AirModuleItem) => {
   switch (item.type) {
     case "fn": {
       return item.params.length > 0
-        ? `fn (${item.params.map((param) => `%${param.id}: ${print_ty(param.ty)}`).join(", ")}) ${print_air(item.body)}`
-        : `fn ${print_air(item.body)}`;
+        ? `fn %${item.id}(${item.params.map((param) => `%${param.id}: ${print_ty(param.ty)}`).join(", ")}) ${print_air(item.body)}`
+        : `fn %${item.id} ${print_air(item.body)}`;
     }
     default: {
       // unreachable<typeof item>();

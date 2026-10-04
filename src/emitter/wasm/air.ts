@@ -6,6 +6,7 @@ import type { Writer } from "./writer";
 
 export interface FuncContext {
   get_index(id: Id): number;
+  get_func_index(id: Id): number;
 }
 
 export const write_air_statements = (
@@ -48,6 +49,19 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       break;
     }
     case "call": {
+      if (air.callee.type === "ref") {
+        const index = ctx.get_func_index(air.callee.id);
+        if (index != null) {
+          for (const arg of air.args) {
+            write_air(writer, arg, ctx);
+          }
+
+          writer.u8(Opcode.call);
+          writer.u32leb128(index);
+          break;
+        }
+      }
+
       throw todo();
     }
     case "block": {

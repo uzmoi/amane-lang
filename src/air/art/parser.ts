@@ -111,13 +111,16 @@ const statement = P.choice([
 const module_item = P.choice([
   P.seq([
     keyword("fn"),
+    ref_id,
     P.seq([ref_id, delimiter(":").then(ty)])
       .map(([id, ty]) => ({ id, ty }))
       .apply(P.sepBy, delimiter(","), { trailing: "allow" })
       .between(delimiter("("), delimiter(")"))
       .option([]),
     air,
-  ]).map(([, params, body]): AirModuleItem => ({ type: "fn", params, body })),
+  ]).map(
+    ([, id, params, body]): AirModuleItem => ({ type: "fn", id, params, body }),
+  ),
 ]);
 
 export const parse_ty = (string: string): Ty => P.parseA(ty, Lexer.lex(string));

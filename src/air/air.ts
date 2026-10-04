@@ -19,6 +19,7 @@ export type AirModuleItem = AirFn;
 
 export interface AirFn {
   type: "fn";
+  id: Id;
   params: readonly { id: Id; ty: Ty }[];
   body: Air;
 }

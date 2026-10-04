@@ -25,6 +25,7 @@ export const art_infer = (source: string, vars: Ty[] = []) => {
     items: [
       {
         type: "fn",
+        id: -1 as Id,
         params: [],
         body: {
           type: "block",

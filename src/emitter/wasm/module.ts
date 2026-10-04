@@ -35,9 +35,11 @@ export interface Import {
   name: string;
   desc: ImportExportDesc;
   type: number;
+  id: Id;
 }
 
 export interface Func {
+  id: Id;
   signature: number;
   local_refs: Map<Id, number>;
   locals: readonly ValType[];
@@ -165,6 +167,9 @@ export const write_module = (writer: Writer, module: Module) => {
         get_index() {
           throw new Error();
         },
+        get_func_index() {
+          throw new Error();
+        },
       });
       writer.u8(Opcode.end);
     }
@@ -205,9 +210,23 @@ export const write_module = (writer: Writer, module: Module) => {
       }
 
       if (func.body != null) {
+        const func_refs = [
+          ...imports
+            .filter((i) => i.desc === ImportExportDesc.func)
+            .map((i) => i.id),
+          ...funcs.map((f) => f.id),
+        ];
+
         write_air(writer, func.body, {
           get_index(id) {
             return func.local_refs.get(id)!;
+          },
+          get_func_index(id) {
+            const func_idx = func_refs.indexOf(id);
+            if (func_idx === -1) {
+              throw new Error();
+            }
+            return func_idx;
           },
         });
       }

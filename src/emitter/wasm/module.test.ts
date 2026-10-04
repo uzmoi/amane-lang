@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import type { Id } from "#air";
 import { art_infer } from "#tests/helpers";
 import { ImportExportDesc, type Module, write_module } from "./module";
 import { NumType, RefType } from "./type";
@@ -11,13 +12,25 @@ describe("write_module", () => {
       import: {
         types: [{ kind: "func", params: [], return: [] }],
         imports: [
-          { mod: "hoge", name: "fuga", desc: ImportExportDesc.func, type: 0 },
+          {
+            mod: "hoge",
+            name: "fuga",
+            desc: ImportExportDesc.func,
+            type: 0,
+            id: 0 as Id,
+          },
         ],
       },
       export_func: {
         types: [{ kind: "func", params: [], return: [] }],
         funcs: [
-          { signature: 0, local_refs: new Map(), locals: [], body: null },
+          {
+            id: 0 as Id,
+            signature: 0,
+            local_refs: new Map(),
+            locals: [],
+            body: null,
+          },
         ],
         exports: [{ name: "noop", desc: ImportExportDesc.func, idx: 0 }],
       },
@@ -44,7 +57,13 @@ describe("write_module", () => {
       start: {
         types: [{ kind: "func", params: [], return: [] }],
         funcs: [
-          { signature: 0, local_refs: new Map(), locals: [], body: null },
+          {
+            id: 0 as Id,
+            signature: 0,
+            local_refs: new Map(),
+            locals: [],
+            body: null,
+          },
         ],
         start: { idx: 0 },
       },
@@ -71,7 +90,15 @@ describe("write_module", () => {
     write_module(writer, {
       types: [{ kind: "func", params: [], return: [] }],
       imports: [],
-      funcs: [{ signature: 0, local_refs: new Map(), locals: [], body: null }],
+      funcs: [
+        {
+          id: 0 as Id,
+          signature: 0,
+          local_refs: new Map(),
+          locals: [],
+          body: null,
+        },
+      ],
       tables: [],
       memories: [],
       globals: [],

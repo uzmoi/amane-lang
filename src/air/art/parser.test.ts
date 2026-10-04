@@ -37,27 +37,30 @@ test("string", () => {
 
 describe("fn", () => {
   test("constant", () => {
-    expect(module_item("fn 0")).toEqual({
+    expect(module_item("fn %0 0")).toEqual({
       type: "fn",
+      id: 0,
       params: [],
       body: art("0"),
     });
   });
 
   test("with params", () => {
-    expect(module_item("fn (%0: i32, %1: i32) %2")).toEqual({
+    expect(module_item("fn %0(%1: i32, %2: i32) %3")).toEqual({
       type: "fn",
+      id: 0,
       params: [
-        { id: 0, ty: ty.i32 },
         { id: 1, ty: ty.i32 },
+        { id: 2, ty: ty.i32 },
       ],
-      body: art("%2"),
+      body: art("%3"),
     });
   });
 
   test("return", () => {
-    expect(module_item("fn return 0")).toEqual({
+    expect(module_item("fn %0 return 0")).toEqual({
       type: "fn",
+      id: 0,
       params: [],
       body: {
         type: "return",
