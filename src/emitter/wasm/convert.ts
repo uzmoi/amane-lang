@@ -18,7 +18,7 @@ export const convert = (air_module: AirModule): Module => {
   for (const fn_air of air_module.items) {
     const type = func_type(
       fn_air.params.map((param) => param.ty),
-      fn_air.body.ty!,
+      fn_air.ret_ty,
     );
     const signature = get_type_index(types, type);
 

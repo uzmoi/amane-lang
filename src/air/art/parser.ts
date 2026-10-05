@@ -47,6 +47,8 @@ const ty = P.lazy((): P.Parser<Ty, Token> => {
   ]);
 });
 
+const ty_anno = delimiter(":").then(ty);
+
 const air = P.lazy((): P.Parser<Air, Token> => {
   return P.choice([
     ref_id.map((id): Air => ({ type: "ref", id })),
@@ -117,9 +119,16 @@ const module_item = P.choice([
       .apply(P.sepBy, delimiter(","), { trailing: "allow" })
       .between(delimiter("("), delimiter(")"))
       .option([]),
+    ty_anno,
     air,
   ]).map(
-    ([, id, params, body]): AirModuleItem => ({ type: "fn", id, params, body }),
+    ([, id, params, ret_ty, body]): AirModuleItem => ({
+      type: "fn",
+      id,
+      params,
+      ret_ty,
+      body,
+    }),
   ),
 ]);
 

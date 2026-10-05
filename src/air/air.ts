@@ -21,6 +21,7 @@ export interface AirFn {
   type: "fn";
   id: Id;
   params: readonly { id: Id; ty: Ty }[];
+  ret_ty: Ty;
   body: Air;
 }
 

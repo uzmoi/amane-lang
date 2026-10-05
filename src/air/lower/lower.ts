@@ -43,12 +43,15 @@ export const lower_module_item = (
           params.push({ id, ty: ty.any });
         }
 
+        // item.ret_ty
+        const ret_ty = ty.any;
+
         const body = lower_expression(item.body, ctx);
 
         ctx.scope.pop();
         ctx.block.pop();
 
-        return { type: "fn", id, params, body };
+        return { type: "fn", id, params, ret_ty, body };
       };
     }
     case "Statement": {
