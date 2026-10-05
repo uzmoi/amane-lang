@@ -52,7 +52,6 @@ export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
     If,
     Loop,
     Break,
-    Fn,
     Return,
   ]),
 );
@@ -104,7 +103,7 @@ const Ident = token(TokenType.Ident).map(
 );
 
 const Ty = Ident;
-const TyAnno = operator(":").then(Ty).option(null);
+const TyAnno = operator(":").then(Ty);
 
 const Block = P.seq([
   delimiter("{"),
@@ -144,24 +143,6 @@ const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
   loc: token,
 }));
 
-const Fn = P.seq([
-  keyword("fn"),
-  P.seq([
-    P.seq([Ident, TyAnno])
-      .apply(P.sepBy, delimiter(","), { trailing: "allow" })
-      .between(delimiter("("), delimiter(")")),
-    TyAnno,
-    operator("=>"),
-  ]).option<[[], null]>([[], null]),
-  Expression,
-]).map<N.FnExpression<ParserExt>>(([fnToken, [params, ret_ty], body]) => ({
-  type: "Fn",
-  params,
-  ret_ty,
-  body,
-  loc: loc(fnToken, body.loc),
-}));
-
 const Return = P.seq([keyword("return"), Expression.option(null)]).map(
   ([returnToken, body]): N.ReturnExpression<ParserExt> => ({
     type: "Return",
@@ -181,7 +162,7 @@ export const Statement: P.Parser<N.Statement<ParserExt>, Token> = P.lazy(() =>
 const Let = P.seq([
   keyword("let"),
   Ident,
-  TyAnno,
+  TyAnno.option(null),
   operator("=").then(Expression),
 ]).map(
   ([letToken, dest, ty, init]): N.LetStatement<ParserExt> => ({
@@ -203,7 +184,29 @@ const ExpressionStatement = Expression.map(
 
 // #endregion
 
-const ModuleItem = P.choice([
+const Fn = P.seq([
+  keyword("fn"),
+  Ident,
+  P.seq([Ident, TyAnno])
+    .apply(P.sepBy, delimiter(","), { trailing: "allow" })
+    .between(delimiter("("), delimiter(")"))
+    .option<[]>([]),
+  TyAnno,
+  operator("=>"),
+  Expression,
+]).map<N.FnModuleItem<ParserExt>>(
+  ([fnToken, name, params, ret_ty, , body]) => ({
+    type: "Fn",
+    name,
+    params,
+    ret_ty,
+    body,
+    loc: loc(fnToken, body.loc),
+  }),
+);
+
+export const ModuleItem = P.choice([
+  Fn,
   Statement.map(
     (stmt): N.StatementModuleItem<ParserExt> => ({
       type: "Statement",

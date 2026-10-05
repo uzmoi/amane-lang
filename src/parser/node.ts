@@ -45,12 +45,6 @@ export type LoopExpression<T = never> = NodeExtend<"Loop", T> & {
 
 export type BreakExpression<T = never> = NodeExtend<"Break", T>;
 
-export type FnExpression<T = never> = NodeExtend<"Fn", T> & {
-  params: [IdentExpression<T>, Ty<T> | null][];
-  ret_ty: Ty<T> | null;
-  body: Expression<T>;
-};
-
 export type ReturnExpression<T = never> = NodeExtend<"Return", T> & {
   body: Expression<T> | null;
 };
@@ -65,7 +59,6 @@ export type Expression<T = never> =
   | IfExpression<T>
   | LoopExpression<T>
   | BreakExpression<T>
-  | FnExpression<T>
   | ReturnExpression<T>;
 
 // #endregion
@@ -90,11 +83,18 @@ export type Statement<T = never> = LetStatement<T> | ExpressionStatement<T>;
 
 // #region Module
 
+export type FnModuleItem<T = never> = NodeExtend<"Fn", T> & {
+  name: IdentExpression<T>;
+  params: [IdentExpression<T>, Ty<T>][];
+  ret_ty: Ty<T>;
+  body: Expression<T>;
+};
+
 export type StatementModuleItem<T = never> = NodeExtend<"Statement", T> & {
   stmt: Statement<T>;
 };
 
-export type ModuleItem<T = never> = StatementModuleItem<T>;
+export type ModuleItem<T = never> = FnModuleItem<T> | StatementModuleItem<T>;
 
 export type Module<T = never> = NodeExtend<"Module", T> & {
   items: ModuleItem<T>[];

@@ -1,6 +1,6 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import { type ast, type Loc, parse_number_literal } from "#parser";
-import type { Air, AirImport, AirModule, Id } from "../air";
+import type { Air, AirImport, AirModule, AirModuleItem, Id } from "../air";
 import { type Ty, ty } from "../ty";
 import { BlockAnalyzer } from "./block";
 import { Scope } from "./scope";
@@ -12,12 +12,11 @@ export const lower = (module: ast.Module<Loc>): AirModule => {
     imports: [],
   };
 
-  const _items = module.items.map((item) => lower_statement(item.stmt, ctx));
+  const items = module.items
+    .map((item) => lower_module_item(item, ctx))
+    .map((low) => low());
 
-  return {
-    imports: ctx.imports,
-    items: todo(),
-  };
+  return { imports: ctx.imports, items };
 };
 
 interface LowerContext {
@@ -25,6 +24,41 @@ interface LowerContext {
   block: BlockAnalyzer;
   imports: AirImport[];
 }
+
+export const lower_module_item = (
+  item: ast.ModuleItem<Loc>,
+  ctx: LowerContext,
+): (() => AirModuleItem) => {
+  switch (item.type) {
+    case "Fn": {
+      const { id } = ctx.scope.def(item.name.name, item.name.loc);
+      return () => {
+        ctx.block.push_fn();
+        ctx.scope.push();
+
+        const params: { id: Id; ty: Ty }[] = [];
+        // TODO: ty
+        for (const [param, _ty] of item.params) {
+          const { id } = ctx.scope.def(param.name, param.loc);
+          params.push({ id, ty: ty.any });
+        }
+
+        const body = lower_expression(item.body, ctx);
+
+        ctx.scope.pop();
+        ctx.block.pop();
+
+        return { type: "fn", id, params, body };
+      };
+    }
+    case "Statement": {
+      return todo();
+    }
+    default: {
+      unreachable<typeof item>();
+    }
+  }
+};
 
 export const lower_statement = (
   stmt: ast.Statement<Loc>,
@@ -104,25 +138,6 @@ export const lower_expression = (
         throw new Error("target block for break was not found");
       }
       return { type: "break", id };
-    }
-    case "Fn": {
-      ctx.block.push_fn();
-      ctx.scope.push();
-
-      const params: { id: Id; ty: Ty }[] = [];
-      // TODO: ty
-      for (const [param, _ty] of expr.params) {
-        const { id } = ctx.scope.def(param.name, param.loc);
-        params.push({ id, ty: ty.any });
-      }
-
-      const _body = lower_expression(expr.body, ctx);
-
-      ctx.scope.pop();
-      ctx.block.pop();
-
-      // return { type: "fn", params, body };
-      return todo();
     }
     case "Return": {
       let value = null;

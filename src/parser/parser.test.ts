@@ -4,7 +4,7 @@ import type { Token } from "./lexer";
 import type { Loc, SourceLocation } from "./location";
 import type * as N from "./node";
 import { lex } from "./parse";
-import { Expression, Statement } from "./parser";
+import { Expression, ModuleItem, Statement } from "./parser";
 
 const parse = (parser: Parser<unknown, Token>, source: string) => {
   const tokens = lex(source);
@@ -146,30 +146,6 @@ test("Break", () => {
   expect(parse(Expression, "break")).toEqual(node("Break"));
 });
 
-describe("Fn", () => {
-  test("omit params", () => {
-    expect(parse(Expression, "fn body")).toEqual(
-      node("Fn", {
-        params: [],
-        ret_ty: null,
-        body: node("Ident", { name: "body" }),
-      }),
-    );
-  });
-  test("with params", () => {
-    expect(parse(Expression, "fn (param1, param2: ty1): ty2 => {}")).toEqual(
-      node("Fn", {
-        params: [
-          [node("Ident", { name: "param1" }), null],
-          [node("Ident", { name: "param2" }), node("Ident", { name: "ty1" })],
-        ],
-        ret_ty: node("Ident", { name: "ty2" }),
-        body: node("Block", { stmts: [], last: null }),
-      }),
-    );
-  });
-});
-
 describe("Return", () => {
   test("without value", () => {
     expect(parse(Expression, "return")).toEqual(node("Return", { body: null }));
@@ -200,5 +176,36 @@ describe("Let", () => {
         init: node("Number", { value: "0" }),
       }),
     );
+  });
+});
+
+describe("ModuleItem", () => {
+  describe("Fn", () => {
+    test("omit params", () => {
+      expect(parse(ModuleItem, "fn f: ty => body")).toEqual(
+        node("Fn", {
+          name: node("Ident", { name: "f" }),
+          params: [],
+          ret_ty: node("Ident", { name: "ty" }),
+          body: node("Ident", { name: "body" }),
+        }),
+      );
+    });
+
+    test("with params", () => {
+      expect(
+        parse(ModuleItem, "fn f(param1: ty1, param2: ty2): ty3 => {}"),
+      ).toEqual(
+        node("Fn", {
+          name: node("Ident", { name: "f" }),
+          params: [
+            [node("Ident", { name: "param1" }), node("Ident", { name: "ty1" })],
+            [node("Ident", { name: "param2" }), node("Ident", { name: "ty2" })],
+          ],
+          ret_ty: node("Ident", { name: "ty3" }),
+          body: node("Block", { stmts: [], last: null }),
+        }),
+      );
+    });
   });
 });
