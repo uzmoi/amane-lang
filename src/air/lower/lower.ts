@@ -149,6 +149,13 @@ export const lower_expression = (
       }
       return { type: "return", value };
     }
+    case "Call": {
+      return {
+        type: "call",
+        callee: lower_expression(expr.callee, ctx),
+        args: expr.args.map((arg) => lower_expression(arg, ctx)),
+      };
+    }
     default: {
       unreachable<typeof expr>();
     }

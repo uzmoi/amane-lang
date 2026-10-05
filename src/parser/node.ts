@@ -49,6 +49,11 @@ export type ReturnExpression<T = never> = NodeExtend<"Return", T> & {
   body: Expression<T> | null;
 };
 
+export type CallExpression<T = never> = NodeExtend<"Call", T> & {
+  callee: Expression<T>;
+  args: Expression<T>[];
+};
+
 export type Expression<T = never> =
   | BoolExpression<T>
   | NumberExpression<T>
@@ -59,7 +64,8 @@ export type Expression<T = never> =
   | IfExpression<T>
   | LoopExpression<T>
   | BreakExpression<T>
-  | ReturnExpression<T>;
+  | ReturnExpression<T>
+  | CallExpression<T>;
 
 // #endregion
 

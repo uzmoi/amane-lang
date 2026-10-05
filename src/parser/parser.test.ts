@@ -157,6 +157,51 @@ describe("Return", () => {
   });
 });
 
+describe("Call", () => {
+  test("call", () => {
+    expect(parse(Expression, "f()")).toEqual(
+      node("Call", { callee: node("Ident", { name: "f" }), args: [] }),
+    );
+  });
+
+  test("with arguments", () => {
+    expect(parse(Expression, "f(0)")).toEqual(
+      node("Call", {
+        callee: node("Ident", { name: "f" }),
+        args: [node("Number", { value: "0" })],
+      }),
+    );
+  });
+
+  test("trailing comma", () => {
+    expect(parse(Expression, "f(0, 1, 2,)")).toEqual(
+      node("Call", {
+        callee: node("Ident", { name: "f" }),
+        args: [
+          node("Number", { value: "0" }),
+          node("Number", { value: "1" }),
+          node("Number", { value: "2" }),
+        ],
+      }),
+    );
+  });
+
+  test("callee", () => {
+    expect(parse(Expression, "{ f }(0)(1)")).toEqual(
+      node("Call", {
+        callee: node("Call", {
+          callee: node("Block", {
+            stmts: [],
+            last: node("Ident", { name: "f" }),
+          }),
+          args: [node("Number", { value: "0" })],
+        }),
+        args: [node("Number", { value: "1" })],
+      }),
+    );
+  });
+});
+
 describe("Let", () => {
   test("without type annotation", () => {
     expect(parse(Statement, 'let hoge = ""')).toEqual(

@@ -53,8 +53,13 @@ export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
     Loop,
     Break,
     Return,
-  ]),
+  ]).flatMap(tail),
 );
+
+const tail = (
+  expr: N.Expression<ParserExt>,
+): P.Parser<N.Expression<ParserExt>, Token> =>
+  Call(expr).flatMap(tail).option(expr);
 
 const BoolLiteral = P.choice([keyword("true"), keyword("false")]).map(
   (token): N.BoolExpression<ParserExt> => ({
@@ -150,6 +155,20 @@ const Return = P.seq([keyword("return"), Expression.option(null)]).map(
     loc: loc(returnToken, body?.loc ?? returnToken),
   }),
 );
+
+const Call = (expr: N.Expression<ParserExt>) =>
+  P.seq([
+    delimiter("("),
+    Expression.apply(P.sepBy, delimiter(","), { trailing: "allow" }),
+    delimiter(")"),
+  ]).map(
+    ([, args, endToken]): N.CallExpression<ParserExt> => ({
+      type: "Call",
+      callee: expr,
+      args,
+      loc: loc(expr.loc, endToken),
+    }),
+  );
 
 // #endregion
 
