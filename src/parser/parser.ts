@@ -114,7 +114,9 @@ const TyAnno = operator(":").then(Ty);
 
 const BlockExpression = P.seq([
   delimiter("{"),
-  P.lazy(() => Statement).apply(P.many),
+  P.lazy(() => Statement)
+    .skip(delimiter(";"))
+    .apply(P.many),
   Expression.option(null),
   delimiter("}"),
 ]).map(
