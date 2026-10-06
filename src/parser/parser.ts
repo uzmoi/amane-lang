@@ -135,8 +135,8 @@ const IfExpression = P.seq([
   ([ifToken, cond, then_body, else_body]): N.IfExpression<ParserExt> => ({
     type: "If",
     cond,
-    then: then_body,
-    else: else_body,
+    then_body,
+    else_body,
     loc: loc(ifToken, else_body.loc),
   }),
 );

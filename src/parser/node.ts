@@ -35,8 +35,8 @@ export type BlockExpression<T = never> = NodeExtend<"Block", T> & {
 
 export type IfExpression<T = never> = NodeExtend<"If", T> & {
   cond: Expression<T>;
-  then: Expression<T>;
-  else: Expression<T>;
+  then_body: Expression<T>;
+  else_body: Expression<T>;
 };
 
 export type LoopExpression<T = never> = NodeExtend<"Loop", T> & {

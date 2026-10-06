@@ -31,7 +31,7 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       break;
     }
     case "assign": {
-      write_air(writer, air.val, ctx);
+      write_air(writer, air.value, ctx);
       writer.u8(Opcode.local_set);
       writer.u32leb128(ctx.get_index(air.id));
       break;
@@ -89,9 +89,9 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       write_air(writer, air.cond, ctx);
       writer.u8(Opcode.if);
       writer.u8(ty(air.ty) ?? empty_type); // block type
-      write_air(writer, air.then, ctx);
+      write_air(writer, air.then_body, ctx);
       writer.u8(Opcode.else);
-      write_air(writer, air.else, ctx);
+      write_air(writer, air.else_body, ctx);
       writer.u8(Opcode.end);
       break;
     }

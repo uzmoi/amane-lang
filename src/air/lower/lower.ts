@@ -125,8 +125,8 @@ export const lower_expression = (
       return {
         type: "if",
         cond: lower_expression(expr.cond, ctx),
-        then: lower_expression(expr.then, ctx),
-        else: lower_expression(expr.else, ctx),
+        then_body: lower_expression(expr.then_body, ctx),
+        else_body: lower_expression(expr.else_body, ctx),
       };
     }
     case "Loop": {

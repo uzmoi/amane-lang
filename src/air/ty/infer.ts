@@ -13,7 +13,7 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
       break;
     }
     case "assign": {
-      ctx.unify(ty.ref(air.id), air.val.ty!);
+      ctx.unify(ty.ref(air.id), air.value.ty!);
       air.ty = ty.void;
       break;
     }
@@ -53,8 +53,8 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
     }
     case "if": {
       ctx.unify(air.cond.ty!, ty.bool);
-      ctx.unify(air.then.ty!, air.else.ty!);
-      air.ty = air.then.ty;
+      ctx.unify(air.then_body.ty!, air.else_body.ty!);
+      air.ty = air.then_body.ty;
       // air.ty = union(air.then.ty!, air.else.ty!);
       // ctx.unify(air.ty!, air.else.ty!);
       break;

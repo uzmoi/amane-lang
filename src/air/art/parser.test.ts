@@ -139,8 +139,8 @@ test("if", () => {
   expect(art("if %0 then %1 else %2")).toEqual({
     type: "if",
     cond: art("%0"),
-    then: art("%1"),
-    else: art("%2"),
+    then_body: art("%1"),
+    else_body: art("%2"),
   });
 });
 
@@ -156,6 +156,6 @@ test("assign", () => {
   expect(art("%0 = 0")).toEqual({
     type: "assign",
     id: 0,
-    val: art("0"),
+    value: art("0"),
   });
 });

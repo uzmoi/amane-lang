@@ -81,7 +81,9 @@ const air = P.lazy((): P.Parser<Air, Token> => {
       keyword("if").then(air),
       keyword("then").then(air),
       keyword("else").then(air),
-    ]).map(([cond, then, els]): Air => ({ type: "if", cond, then, else: els })),
+    ]).map(([cond, then_body, else_body]): Air => {
+      return { type: "if", cond, then_body, else_body };
+    }),
 
     keyword("true").map((): Air => ({ type: "const.bool", value: true })),
     keyword("false").map((): Air => ({ type: "const.bool", value: false })),
@@ -104,7 +106,7 @@ const statement = P.choice([
   ),
 
   P.seq([ref_id, delimiter("=").then(air)]).map(
-    ([id, val]): Air => ({ type: "assign", id, val }),
+    ([id, value]): Air => ({ type: "assign", id, value }),
   ),
 
   air,

@@ -154,8 +154,8 @@ describe("expression", () => {
     ).toEqual(
       node("If", {
         cond: node("Ident", { name: "condition" }),
-        then: node("Ident", { name: "then_body" }),
-        else: node("Ident", { name: "else_body" }),
+        then_body: node("Ident", { name: "then_body" }),
+        else_body: node("Ident", { name: "else_body" }),
       }),
     );
   });

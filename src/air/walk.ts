@@ -12,7 +12,7 @@ export const walk_air = <C>(air: Air, w: W<C>) => {
       break;
     }
     case "assign": {
-      w.air(air.val, w);
+      w.air(air.value, w);
       break;
     }
     case "ref": {
@@ -49,8 +49,8 @@ export const walk_air = <C>(air: Air, w: W<C>) => {
     }
     case "if": {
       w.air(air.cond, w);
-      w.air(air.then, w);
-      w.air(air.else, w);
+      w.air(air.then_body, w);
+      w.air(air.else_body, w);
       break;
     }
     case "const.int": {

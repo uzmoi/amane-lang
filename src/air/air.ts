@@ -50,7 +50,7 @@ export interface AirDef {
 export interface AirAssign {
   type: "assign";
   id: Id;
-  val: Air;
+  value: Air;
 }
 
 export interface AirRef {
@@ -89,8 +89,8 @@ export interface AirBreak {
 export interface AirIf {
   type: "if";
   cond: Air;
-  then: Air;
-  else: Air;
+  then_body: Air;
+  else_body: Air;
 }
 
 export type AirConst =

@@ -28,7 +28,7 @@ export const print_air = (air: Air): string => {
       return `let %${air.id} = ${print_air(air.init)}`;
     }
     case "assign": {
-      return `%${air.id} = ${print_air(air.val)}`;
+      return `%${air.id} = ${print_air(air.value)}`;
     }
     case "return": {
       return air.value == null ? "return" : `return ${print_air(air.value)}`;
@@ -53,7 +53,7 @@ export const print_air = (air: Air): string => {
       return `break #${air.id}`;
     }
     case "if": {
-      return `if ${print_air(air.cond)} then ${print_air(air.then)} else ${print_air(air.else)}`;
+      return `if ${print_air(air.cond)} then ${print_air(air.then_body)} else ${print_air(air.else_body)}`;
     }
     case "const.bool":
     case "const.int":
