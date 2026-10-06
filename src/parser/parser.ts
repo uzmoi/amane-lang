@@ -39,7 +39,7 @@ const operator = <T extends string>(operator: Operator<T>) =>
 
 type ParserExt = Loc;
 
-// #region Expression
+// Expression
 
 export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
   P.choice([
@@ -48,21 +48,21 @@ export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
     StringLiteral,
     Tuple,
     Ident,
-    Block,
-    If,
-    Loop,
-    Break,
-    Return,
+    BlockExpression,
+    IfExpression,
+    LoopExpression,
+    BreakExpression,
+    ReturnExpression,
   ]).flatMap(tail),
 );
 
 const tail = (
   expr: N.Expression<ParserExt>,
 ): P.Parser<N.Expression<ParserExt>, Token> =>
-  Call(expr).flatMap(tail).option(expr);
+  CallExpression(expr).flatMap(tail).option(expr);
 
 const BoolLiteral = P.choice([keyword("true"), keyword("false")]).map(
-  (token): N.BoolExpression<ParserExt> => ({
+  (token): N.BoolLiteral<ParserExt> => ({
     type: "Bool",
     value: token.value === "true",
     loc: token,
@@ -74,7 +74,7 @@ const NumberLiteral = P.choice([
   keyword("nan"),
   token(TokenType.Number),
 ]).map(
-  (token): N.NumberExpression<ParserExt> => ({
+  (token): N.NumberLiteral<ParserExt> => ({
     type: "Number",
     value: normalize_number(token.value),
     loc: token,
@@ -82,7 +82,7 @@ const NumberLiteral = P.choice([
 );
 
 const StringLiteral = token(TokenType.String).map(
-  (token): N.StringExpression<ParserExt> => ({
+  (token): N.StringLiteral<ParserExt> => ({
     type: "String",
     value: unescape_string_content(token.value.slice(1, -1)),
     loc: token,
@@ -93,11 +93,13 @@ const Tuple = P.seq([
   delimiter("("),
   Expression.apply(P.sepBy, delimiter(","), { trailing: "allow" }),
   delimiter(")"),
-]).map<N.TupleExpression<ParserExt>>(([start, elements, end]) => ({
-  type: "Tuple",
-  elements,
-  loc: loc(start, end),
-}));
+]).map(
+  ([start, elements, end]): N.TupleExpression<ParserExt> => ({
+    type: "Tuple",
+    elements,
+    loc: loc(start, end),
+  }),
+);
 
 const Ident = token(TokenType.Ident).map(
   (token): N.IdentExpression<ParserExt> => ({
@@ -110,32 +112,36 @@ const Ident = token(TokenType.Ident).map(
 const Ty = Ident;
 const TyAnno = operator(":").then(Ty);
 
-const Block = P.seq([
+const BlockExpression = P.seq([
   delimiter("{"),
   P.lazy(() => Statement).apply(P.many),
   Expression.option(null),
   delimiter("}"),
-]).map<N.BlockExpression<ParserExt>>(([start, stmts, last, end]) => ({
-  type: "Block",
-  stmts,
-  last,
-  loc: loc(start, end),
-}));
+]).map(
+  ([start, stmts, last, end]): N.BlockExpression<ParserExt> => ({
+    type: "Block",
+    stmts,
+    last,
+    loc: loc(start, end),
+  }),
+);
 
-const If = P.seq([
+const IfExpression = P.seq([
   keyword("if"),
   Expression,
   keyword("then").then(Expression),
   keyword("else").then(Expression),
-]).map<N.IfExpression<ParserExt>>(([ifToken, cond, then_, else_]) => ({
-  type: "If",
-  cond,
-  then: then_,
-  else: else_,
-  loc: loc(ifToken, else_.loc),
-}));
+]).map(
+  ([ifToken, cond, then_body, else_body]): N.IfExpression<ParserExt> => ({
+    type: "If",
+    cond,
+    then: then_body,
+    else: else_body,
+    loc: loc(ifToken, else_body.loc),
+  }),
+);
 
-const Loop = P.seq([keyword("loop"), Expression]).map(
+const LoopExpression = P.seq([keyword("loop"), Expression]).map(
   ([loopToken, body]): N.LoopExpression<ParserExt> => ({
     type: "Loop",
     body,
@@ -143,12 +149,17 @@ const Loop = P.seq([keyword("loop"), Expression]).map(
   }),
 );
 
-const Break = keyword("break").map<N.BreakExpression<ParserExt>>((token) => ({
-  type: "Break",
-  loc: token,
-}));
+const BreakExpression = keyword("break").map(
+  (token): N.BreakExpression<ParserExt> => ({
+    type: "Break",
+    loc: token,
+  }),
+);
 
-const Return = P.seq([keyword("return"), Expression.option(null)]).map(
+const ReturnExpression = P.seq([
+  keyword("return"),
+  Expression.option(null),
+]).map(
   ([returnToken, body]): N.ReturnExpression<ParserExt> => ({
     type: "Return",
     body,
@@ -156,7 +167,7 @@ const Return = P.seq([keyword("return"), Expression.option(null)]).map(
   }),
 );
 
-const Call = (expr: N.Expression<ParserExt>) =>
+const CallExpression = (expr: N.Expression<ParserExt>) =>
   P.seq([
     delimiter("("),
     Expression.apply(P.sepBy, delimiter(","), { trailing: "allow" }),
@@ -170,15 +181,9 @@ const Call = (expr: N.Expression<ParserExt>) =>
     }),
   );
 
-// #endregion
+// Statement
 
-// #region Statement
-
-export const Statement: P.Parser<N.Statement<ParserExt>, Token> = P.lazy(() =>
-  P.choice([Let, ExpressionStatement]),
-);
-
-const Let = P.seq([
+const LetStatement = P.seq([
   keyword("let"),
   Ident,
   TyAnno.option(null),
@@ -201,9 +206,14 @@ const ExpressionStatement = Expression.map(
   }),
 );
 
-// #endregion
+export const Statement: P.Parser<N.Statement<ParserExt>, Token> = P.choice([
+  LetStatement,
+  ExpressionStatement,
+]);
 
-const Fn = P.seq([
+// ModuleItem
+
+const FnModuleItem = P.seq([
   keyword("fn"),
   Ident,
   P.seq([Ident, TyAnno])
@@ -211,10 +221,9 @@ const Fn = P.seq([
     .between(delimiter("("), delimiter(")"))
     .option<[]>([]),
   TyAnno,
-  operator("=>"),
-  Expression,
-]).map<N.FnModuleItem<ParserExt>>(
-  ([fnToken, name, params, ret_ty, , body]) => ({
+  operator("=>").then(Expression),
+]).map(
+  ([fnToken, name, params, ret_ty, body]): N.FnModuleItem<ParserExt> => ({
     type: "Fn",
     name,
     params,
@@ -224,8 +233,8 @@ const Fn = P.seq([
   }),
 );
 
-export const ModuleItem = P.choice([
-  Fn,
+export const ModuleItem: P.Parser<N.ModuleItem<ParserExt>, Token> = P.choice([
+  FnModuleItem,
   Statement.map(
     (stmt): N.StatementModuleItem<ParserExt> => ({
       type: "Statement",

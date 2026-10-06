@@ -8,15 +8,15 @@ type NodeExtend<T extends string, U> = { type: T } & NonNever<
 
 // #region Expression
 
-export type BoolExpression<T = never> = NodeExtend<"Bool", T> & {
+export type BoolLiteral<T = never> = NodeExtend<"Bool", T> & {
   value: boolean;
 };
 
-export type NumberExpression<T = never> = NodeExtend<"Number", T> & {
+export type NumberLiteral<T = never> = NodeExtend<"Number", T> & {
   value: string;
 };
 
-export type StringExpression<T = never> = NodeExtend<"String", T> & {
+export type StringLiteral<T = never> = NodeExtend<"String", T> & {
   value: string;
 };
 
@@ -55,9 +55,9 @@ export type CallExpression<T = never> = NodeExtend<"Call", T> & {
 };
 
 export type Expression<T = never> =
-  | BoolExpression<T>
-  | NumberExpression<T>
-  | StringExpression<T>
+  | BoolLiteral<T>
+  | NumberLiteral<T>
+  | StringLiteral<T>
   | TupleExpression<T>
   | IdentExpression<T>
   | BlockExpression<T>
