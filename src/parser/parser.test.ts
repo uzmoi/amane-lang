@@ -25,48 +25,65 @@ const node = <T extends N.Node["type"]>(
     : [node: Omit<SelectNode<T>, "type">]
 ) => ({ type, ...node, loc }) as SelectNode<T, Loc>;
 
-describe("Bool", () => {
-  test("true", () => {
-    expect(parse(Expression, "true")).toEqual(node("Bool", { value: true }));
-  });
-  test("false", () => {
-    expect(parse(Expression, "false")).toEqual(node("Bool", { value: false }));
-  });
-});
+describe("literals", () => {
+  describe("Bool", () => {
+    test("true", () => {
+      expect(parse(Expression, "true")).toEqual(node("Bool", { value: true }));
+    });
 
-describe("Number", () => {
-  test("number", () => {
-    expect(parse(Expression, "0")).toEqual(node("Number", { value: "0" }));
+    test("false", () => {
+      expect(parse(Expression, "false")).toEqual(
+        node("Bool", { value: false }),
+      );
+    });
   });
-  test("remove underscores", () => {
-    expect(parse(Expression, "1_000")).toEqual(
-      node("Number", { value: "1000" }),
-    );
-  });
-  test("remove leading zeros", () => {
-    expect(parse(Expression, "0_000.0")).toEqual(
-      node("Number", { value: "0.0" }),
-    );
-  });
-  test("nan", () => {
-    expect(parse(Expression, "nan")).toEqual(node("Number", { value: "nan" }));
-  });
-  test("inf", () => {
-    expect(parse(Expression, "inf")).toEqual(node("Number", { value: "inf" }));
-  });
-});
 
-describe("String", () => {
-  test("empty", () => {
-    expect(parse(Expression, '""')).toEqual(node("String", { value: "" }));
+  describe("Number", () => {
+    test("number", () => {
+      expect(parse(Expression, "0")).toEqual(node("Number", { value: "0" }));
+    });
+
+    test("remove underscores", () => {
+      expect(parse(Expression, "1_000")).toEqual(
+        node("Number", { value: "1000" }),
+      );
+    });
+
+    test("remove leading zeros", () => {
+      expect(parse(Expression, "0_000.0")).toEqual(
+        node("Number", { value: "0.0" }),
+      );
+    });
+
+    test("nan", () => {
+      expect(parse(Expression, "nan")).toEqual(
+        node("Number", { value: "nan" }),
+      );
+    });
+
+    test("inf", () => {
+      expect(parse(Expression, "inf")).toEqual(
+        node("Number", { value: "inf" }),
+      );
+    });
   });
-  test("unescape", () => {
-    expect(parse(Expression, '"\\\\"')).toEqual(
-      node("String", { value: "\\" }),
-    );
-  });
-  test("escape sequence", () => {
-    expect(parse(Expression, '"\\n"')).toEqual(node("String", { value: "\n" }));
+
+  describe("String", () => {
+    test("empty", () => {
+      expect(parse(Expression, '""')).toEqual(node("String", { value: "" }));
+    });
+
+    test("unescape", () => {
+      expect(parse(Expression, '"\\\\"')).toEqual(
+        node("String", { value: "\\" }),
+      );
+    });
+
+    test("escape sequence", () => {
+      expect(parse(Expression, '"\\n"')).toEqual(
+        node("String", { value: "\n" }),
+      );
+    });
   });
 });
 
@@ -74,11 +91,13 @@ describe("Tuple", () => {
   test("empty", () => {
     expect(parse(Expression, "()")).toEqual(node("Tuple", { elements: [] }));
   });
+
   test("single element", () => {
     expect(parse(Expression, "(0)")).toEqual(
       node("Tuple", { elements: [node("Number", { value: "0" })] }),
     );
   });
+
   test("elements", () => {
     expect(parse(Expression, "(0, 1, 2)")).toEqual(
       node("Tuple", {
@@ -90,6 +109,7 @@ describe("Tuple", () => {
       }),
     );
   });
+
   test("trailing comma", () => {
     expect(parse(Expression, "(0, )")).toEqual(
       node("Tuple", { elements: [node("Number", { value: "0" })] }),
@@ -101,13 +121,16 @@ describe("Ident", () => {
   test("ident", () => {
     expect(parse(Expression, "hoge")).toEqual(node("Ident", { name: "hoge" }));
   });
+
   test("unescape", () => {
     expect(parse(Expression, "\\!")).toEqual(node("Ident", { name: "!" }));
   });
+
   describe("string ident", () => {
     test("empty", () => {
       expect(parse(Expression, '\\""')).toEqual(node("Ident", { name: "" }));
     });
+
     test("unescape", () => {
       expect(parse(Expression, '\\"\\0"')).toEqual(
         node("Ident", { name: "\0" }),
@@ -116,89 +139,94 @@ describe("Ident", () => {
   });
 });
 
-describe("Block", () => {
-  test("empty", () => {
-    expect(parse(Expression, "{}")).toEqual(
-      node("Block", { stmts: [], last: null }),
-    );
-  });
-});
-
-test("If", () => {
-  expect(
-    parse(Expression, "if condition then then_body else else_body"),
-  ).toEqual(
-    node("If", {
-      cond: node("Ident", { name: "condition" }),
-      then: node("Ident", { name: "then_body" }),
-      else: node("Ident", { name: "else_body" }),
-    }),
-  );
-});
-
-test("Loop", () => {
-  expect(parse(Expression, "loop body")).toEqual(
-    node("Loop", { body: node("Ident", { name: "body" }) }),
-  );
-});
-
-test("Break", () => {
-  expect(parse(Expression, "break")).toEqual(node("Break"));
-});
-
-describe("Return", () => {
-  test("without value", () => {
-    expect(parse(Expression, "return")).toEqual(node("Return", { body: null }));
-  });
-  test("with value", () => {
-    expect(parse(Expression, "return result")).toEqual(
-      node("Return", { body: node("Ident", { name: "result" }) }),
-    );
-  });
-});
-
-describe("Call", () => {
-  test("call", () => {
-    expect(parse(Expression, "f()")).toEqual(
-      node("Call", { callee: node("Ident", { name: "f" }), args: [] }),
-    );
+describe("expression", () => {
+  describe("Block", () => {
+    test("empty", () => {
+      expect(parse(Expression, "{}")).toEqual(
+        node("Block", { stmts: [], last: null }),
+      );
+    });
   });
 
-  test("with arguments", () => {
-    expect(parse(Expression, "f(0)")).toEqual(
-      node("Call", {
-        callee: node("Ident", { name: "f" }),
-        args: [node("Number", { value: "0" })],
+  test("If", () => {
+    expect(
+      parse(Expression, "if condition then then_body else else_body"),
+    ).toEqual(
+      node("If", {
+        cond: node("Ident", { name: "condition" }),
+        then: node("Ident", { name: "then_body" }),
+        else: node("Ident", { name: "else_body" }),
       }),
     );
   });
 
-  test("trailing comma", () => {
-    expect(parse(Expression, "f(0, 1, 2,)")).toEqual(
-      node("Call", {
-        callee: node("Ident", { name: "f" }),
-        args: [
-          node("Number", { value: "0" }),
-          node("Number", { value: "1" }),
-          node("Number", { value: "2" }),
-        ],
-      }),
+  test("Loop", () => {
+    expect(parse(Expression, "loop body")).toEqual(
+      node("Loop", { body: node("Ident", { name: "body" }) }),
     );
   });
 
-  test("callee", () => {
-    expect(parse(Expression, "{ f }(0)(1)")).toEqual(
-      node("Call", {
-        callee: node("Call", {
-          callee: node("Block", {
-            stmts: [],
-            last: node("Ident", { name: "f" }),
-          }),
+  test("Break", () => {
+    expect(parse(Expression, "break")).toEqual(node("Break"));
+  });
+
+  describe("Return", () => {
+    test("without value", () => {
+      expect(parse(Expression, "return")).toEqual(
+        node("Return", { body: null }),
+      );
+    });
+
+    test("with value", () => {
+      expect(parse(Expression, "return result")).toEqual(
+        node("Return", { body: node("Ident", { name: "result" }) }),
+      );
+    });
+  });
+
+  describe("Call", () => {
+    test("call", () => {
+      expect(parse(Expression, "f()")).toEqual(
+        node("Call", { callee: node("Ident", { name: "f" }), args: [] }),
+      );
+    });
+
+    test("with arguments", () => {
+      expect(parse(Expression, "f(0)")).toEqual(
+        node("Call", {
+          callee: node("Ident", { name: "f" }),
           args: [node("Number", { value: "0" })],
         }),
-        args: [node("Number", { value: "1" })],
-      }),
-    );
+      );
+    });
+
+    test("trailing comma", () => {
+      expect(parse(Expression, "f(0, 1, 2,)")).toEqual(
+        node("Call", {
+          callee: node("Ident", { name: "f" }),
+          args: [
+            node("Number", { value: "0" }),
+            node("Number", { value: "1" }),
+            node("Number", { value: "2" }),
+          ],
+        }),
+      );
+    });
+
+    test("callee", () => {
+      expect(parse(Expression, "{ f }(0)(1)")).toEqual(
+        node("Call", {
+          callee: node("Call", {
+            callee: node("Block", {
+              stmts: [],
+              last: node("Ident", { name: "f" }),
+            }),
+            args: [node("Number", { value: "0" })],
+          }),
+          args: [node("Number", { value: "1" })],
+        }),
+      );
+    });
   });
 });
 
@@ -224,7 +252,7 @@ describe("Let", () => {
   });
 });
 
-describe("ModuleItem", () => {
+describe("module item", () => {
   describe("Fn", () => {
     test("omit params", () => {
       expect(parse(ModuleItem, "fn f: ty => body")).toEqual(
