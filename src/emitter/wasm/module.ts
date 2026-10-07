@@ -1,3 +1,4 @@
+import { todo, unreachable } from "@uzmoi/ut/ils";
 import type { Air, Id } from "#air";
 import { write_air } from "./air";
 import { Opcode } from "./opcode";
@@ -52,6 +53,7 @@ export interface Table {
 }
 
 export interface Global {
+  id: Id;
   type: ValType;
   mut: boolean;
   expr: Air;
@@ -164,11 +166,11 @@ export const write_module = (writer: Writer, module: Module) => {
       writer.u8(global.type);
       writer.u8(global.mut ? 1 : 0);
       write_air(writer, global.expr, {
-        get_index() {
-          throw new Error();
+        get_variable_entry() {
+          todo();
         },
         get_func_index() {
-          throw new Error();
+          todo();
         },
       });
       writer.u8(Opcode.end);
@@ -216,15 +218,31 @@ export const write_module = (writer: Writer, module: Module) => {
             .map((i) => i.id),
           ...funcs.map((f) => f.id),
         ];
+        const global_refs = [
+          ...imports
+            .filter((i) => i.desc === ImportExportDesc.global)
+            .map((i) => i.id),
+          ...globals.map((global) => global.id),
+        ];
 
         write_air(writer, func.body, {
-          get_index(id) {
-            return func.local_refs.get(id)!;
+          get_variable_entry(id) {
+            const local_idx = func.local_refs.get(id);
+            if (local_idx != null) {
+              return { type: "local", index: local_idx };
+            }
+
+            const global_idx = global_refs.indexOf(id);
+            if (global_idx !== -1) {
+              return { type: "global", index: global_idx };
+            }
+
+            unreachable(`おや、${id}は変数のidじゃないようだね。`);
           },
           get_func_index(id) {
             const func_idx = func_refs.indexOf(id);
             if (func_idx === -1) {
-              throw new Error();
+              unreachable(`おや、${id}は関数のidじゃないようだね。`);
             }
             return func_idx;
           },

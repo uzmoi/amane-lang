@@ -15,7 +15,7 @@ export interface AirImport {
   imports: { name: string; id: Id }[];
 }
 
-export type AirModuleItem = AirFn;
+export type AirModuleItem = AirFn | AirDef;
 
 export interface AirFn {
   type: "fn";

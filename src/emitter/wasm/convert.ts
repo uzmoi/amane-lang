@@ -1,6 +1,7 @@
+import { unreachable } from "@uzmoi/ut/ils";
 import type { AirModule } from "#air";
 import { type W, walk_air } from "../../air/walk";
-import type { Export, Func, Import, Module } from "./module";
+import type { Export, Func, Global, Import, Module } from "./module";
 import {
   type FuncType,
   func_type,
@@ -14,44 +15,62 @@ export const convert = (air_module: AirModule): Module => {
   const exports: Export[] = [];
   const types: FuncType[] = [];
   const funcs: Func[] = [];
+  const globals: Global[] = [];
 
-  for (const fn_air of air_module.items) {
-    const type = func_type(
-      fn_air.params.map((param) => param.ty),
-      fn_air.ret_ty,
-    );
-    const signature = get_type_index(types, type);
+  for (const item of air_module.items) {
+    switch (item.type) {
+      case "def": {
+        globals.push({
+          id: item.id,
+          type: ty(item.init.ty)!,
+          mut: true,
+          expr: item.init,
+        });
+        break;
+      }
+      case "fn": {
+        const type = func_type(
+          item.params.map((param) => param.ty),
+          item.ret_ty,
+        );
+        const signature = get_type_index(types, type);
 
-    const local_refs = new Map(
-      fn_air.params.map((param, index) => [param.id, index]),
-    );
+        const local_refs = new Map(
+          item.params.map((param, index) => [param.id, index]),
+        );
 
-    const locals: ValType[] = [];
+        const locals: ValType[] = [];
 
-    const collect_local_refs: W<null> = {
-      air(air, w) {
-        walk_air(air, w);
-        if (air.type === "def") {
-          local_refs.set(air.id, local_refs.size);
-          const type = ty(air.init.ty);
-          if (type == null) {
-            throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");
-          }
-          locals.push(type);
-        }
-      },
-      context: null,
-    };
+        const collect_local_refs: W<null> = {
+          air(air, w) {
+            walk_air(air, w);
+            if (air.type === "def") {
+              local_refs.set(air.id, local_refs.size);
+              const type = ty(air.init.ty);
+              if (type == null) {
+                throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");
+              }
+              locals.push(type);
+            }
+          },
+          context: null,
+        };
 
-    collect_local_refs.air(fn_air.body, collect_local_refs);
+        collect_local_refs.air(item.body, collect_local_refs);
 
-    funcs.push({
-      id: fn_air.id,
-      signature,
-      local_refs,
-      locals,
-      body: fn_air.body,
-    });
+        funcs.push({
+          id: item.id,
+          signature,
+          local_refs,
+          locals,
+          body: item.body,
+        });
+        break;
+      }
+      default: {
+        unreachable<typeof item>();
+      }
+    }
   }
 
   return {
@@ -60,7 +79,7 @@ export const convert = (air_module: AirModule): Module => {
     funcs,
     tables: [],
     memories: [],
-    globals: [],
+    globals,
     exports,
     start: null,
   };

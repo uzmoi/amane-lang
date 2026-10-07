@@ -96,7 +96,16 @@ export const infer_type = (
   };
 
   for (const item of module.items) {
-    infer.air(item.body, infer);
+    switch (item.type) {
+      case "def": {
+        infer.air(item.init, infer);
+        break;
+      }
+      case "fn": {
+        infer.air(item.body, infer);
+        break;
+      }
+    }
   }
 
   const ap: W<InferenceContext> = {
@@ -110,7 +119,16 @@ export const infer_type = (
   };
 
   for (const item of module.items) {
-    ap.air(item.body, ap);
+    switch (item.type) {
+      case "def": {
+        ap.air(item.init, ap);
+        break;
+      }
+      case "fn": {
+        ap.air(item.body, ap);
+        break;
+      }
+    }
   }
 
   return module;

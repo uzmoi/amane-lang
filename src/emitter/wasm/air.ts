@@ -5,7 +5,7 @@ import { empty_type, ty } from "./type";
 import type { Writer } from "./writer";
 
 export interface FuncContext {
-  get_index(id: Id): number;
+  get_variable_entry(id: Id): { type: "global" | "local"; index: number };
   get_func_index(id: Id): number;
 }
 
@@ -25,20 +25,28 @@ export const write_air_statements = (
 export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
   switch (air.type) {
     case "def": {
+      const entry = ctx.get_variable_entry(air.id);
+      if (entry.type === "global") {
+        unreachable("Cannot define a global variable within a function.");
+      }
+
       write_air(writer, air.init, ctx);
       writer.u8(Opcode.local_set);
-      writer.u32leb128(ctx.get_index(air.id));
+      writer.u32leb128(entry.index);
       break;
     }
     case "assign": {
       write_air(writer, air.value, ctx);
-      writer.u8(Opcode.local_set);
-      writer.u32leb128(ctx.get_index(air.id));
+
+      const entry = ctx.get_variable_entry(air.id);
+      writer.u8(entry.type === "local" ? Opcode.local_set : Opcode.global_set);
+      writer.u32leb128(entry.index);
       break;
     }
     case "ref": {
-      writer.u8(Opcode.local_get);
-      writer.u32leb128(ctx.get_index(air.id));
+      const entry = ctx.get_variable_entry(air.id);
+      writer.u8(entry.type === "local" ? Opcode.local_get : Opcode.global_get);
+      writer.u32leb128(entry.index);
       break;
     }
     case "return": {
