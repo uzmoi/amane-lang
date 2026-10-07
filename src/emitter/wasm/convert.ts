@@ -1,6 +1,5 @@
 import { unreachable } from "@uzmoi/ut/ils";
-import type { AirModule } from "#air";
-import { type W, walk_air } from "../../air/walk";
+import { type AirModule, Walker } from "#air";
 import type { Export, Func, Global, Import, Module } from "./module";
 import {
   type FuncType,
@@ -41,22 +40,18 @@ export const convert = (air_module: AirModule): Module => {
 
         const locals: ValType[] = [];
 
-        const collect_local_refs: W<null> = {
-          air(air, w) {
-            walk_air(air, w);
-            if (air.type === "def") {
-              local_refs.set(air.id, local_refs.size);
-              const type = ty(air.init.ty);
-              if (type == null) {
-                throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");
-              }
-              locals.push(type);
+        const infer_walker = new Walker((air) => {
+          if (air.type === "def") {
+            local_refs.set(air.id, local_refs.size);
+            const type = ty(air.init.ty);
+            if (type == null) {
+              throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");
             }
-          },
-          context: null,
-        };
+            locals.push(type);
+          }
+        });
 
-        collect_local_refs.air(item.body, collect_local_refs);
+        infer_walker.walk_air(item.body, null);
 
         funcs.push({
           id: item.id,

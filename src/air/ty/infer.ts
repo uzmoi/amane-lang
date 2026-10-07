@@ -1,11 +1,11 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import type { Air, AirModule } from "../air";
-import { type W, walk_air } from "../walk";
+import { Walker } from "../walk";
 import { InferenceContext } from "./infer_context";
 import { ty } from "./ty";
 
 // TODO: neverを含む式/文をneverにする。
-export const infer_air_type = (air: Air, ctx: InferenceContext) => {
+const infer_air_type = (air: Air, ctx: InferenceContext) => {
   switch (air.type) {
     case "def": {
       ctx.unify(ty.ref(air.id), air.init.ty!);
@@ -83,53 +83,20 @@ export const infer_air_type = (air: Air, ctx: InferenceContext) => {
   }
 };
 
+const infer_walker = new Walker(infer_air_type);
+
+const apply_walker = new Walker((air, ctx: InferenceContext) => {
+  if ("ty" in air) {
+    air.ty = ctx.deref(air.ty!);
+  }
+});
+
 export const infer_type = (
   module: AirModule,
   ctx = new InferenceContext(),
 ): AirModule => {
-  const infer: W<InferenceContext> = {
-    air(air, w) {
-      walk_air(air, w);
-      infer_air_type(air, w.context);
-    },
-    context: ctx,
-  };
-
-  for (const item of module.items) {
-    switch (item.type) {
-      case "def": {
-        infer.air(item.init, infer);
-        break;
-      }
-      case "fn": {
-        infer.air(item.body, infer);
-        break;
-      }
-    }
-  }
-
-  const ap: W<InferenceContext> = {
-    air(air, w) {
-      walk_air(air, w);
-      if ("ty" in air) {
-        air.ty = w.context.deref(air.ty!);
-      }
-    },
-    context: ctx,
-  };
-
-  for (const item of module.items) {
-    switch (item.type) {
-      case "def": {
-        ap.air(item.init, ap);
-        break;
-      }
-      case "fn": {
-        ap.air(item.body, ap);
-        break;
-      }
-    }
-  }
+  infer_walker.walk_module(module, ctx);
+  apply_walker.walk_module(module, ctx);
 
   return module;
 };

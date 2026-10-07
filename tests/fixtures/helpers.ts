@@ -7,16 +7,13 @@ import {
   infer_type,
   type Ty,
   ty,
+  Walker,
 } from "#air";
 import { parse_art } from "#art";
-import { type W, walk_air } from "../../src/air/walk";
 
-const collect_breaks = (air: Air, w?: W<Set<BlockId>>) => {
-  w ??= { air: collect_breaks, context: new Set() };
-  if (air.type === "break") w.context.add(air.id);
-  walk_air(air, w);
-  return w.context;
-};
+const collect_breaks = new Walker((air: Air, breaks: Set<BlockId>) => {
+  if (air.type === "break") breaks.add(air.id);
+});
 
 export const art_infer = (source: string, vars: Ty[] = []) => {
   const air = parse_art(source);
@@ -37,9 +34,10 @@ export const art_infer = (source: string, vars: Ty[] = []) => {
     ],
   };
 
-  const ctx = new InferenceContext({
-    breaks: collect_breaks(air),
-  });
+  const breaks = new Set<BlockId>();
+  collect_breaks.walk_module(mod, breaks);
+
+  const ctx = new InferenceContext({ breaks });
   for (const [index, type] of vars.entries()) {
     ctx.unify(ty.ref(index as Id), type);
   }

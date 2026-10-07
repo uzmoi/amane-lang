@@ -1,60 +1,97 @@
-import type { Air } from "./air";
+import { unreachable } from "@uzmoi/ut/ils";
+import type { Air, AirModule, AirModuleItem } from "./air";
 
-export interface W<C> {
-  air(air: Air, w: W<C>): void;
-  context: C;
-}
+export class Walker<T> {
+  constructor(
+    readonly air: (air: Air, context: T) => void,
+    readonly module_item?: (air_module_item: AirModuleItem, context: T) => void,
+  ) {}
 
-export const walk_air = <C>(air: Air, w: W<C>) => {
-  switch (air.type) {
-    case "def": {
-      w.air(air.init, w);
-      break;
-    }
-    case "assign": {
-      w.air(air.value, w);
-      break;
-    }
-    case "ref": {
-      break;
-    }
-    case "return": {
-      if (air.value != null) {
-        w.air(air.value, w);
+  walk_module(module: AirModule, context: T) {
+    for (const item of module.items) {
+      this.module_item?.(item, context);
+
+      switch (item.type) {
+        case "def": {
+          this.walk_air(item.init, context);
+          break;
+        }
+        case "fn": {
+          this.walk_air(item.body, context);
+          break;
+        }
+        default: {
+          unreachable<typeof item>();
+        }
       }
-      break;
-    }
-    case "call": {
-      w.air(air.callee, w);
-      for (const arg of air.args) {
-        w.air(arg, w);
-      }
-      break;
-    }
-    case "block": {
-      for (const stmt of air.body) {
-        w.air(stmt, w);
-      }
-      if (air.last != null) {
-        w.air(air.last, w);
-      }
-      break;
-    }
-    case "loop": {
-      w.air(air.body, w);
-      break;
-    }
-    case "break": {
-      break;
-    }
-    case "if": {
-      w.air(air.cond, w);
-      w.air(air.then_body, w);
-      w.air(air.else_body, w);
-      break;
-    }
-    case "const.int": {
-      break;
     }
   }
-};
+
+  walk_air(air: Air, context: T) {
+    switch (air.type) {
+      case "def": {
+        this.walk_air(air.init, context);
+        break;
+      }
+      case "assign": {
+        this.walk_air(air.value, context);
+        break;
+      }
+      case "ref": {
+        break;
+      }
+      case "return": {
+        if (air.value != null) {
+          this.walk_air(air.value, context);
+        }
+        break;
+      }
+      case "call": {
+        this.walk_air(air.callee, context);
+        for (const arg of air.args) {
+          this.walk_air(arg, context);
+        }
+        break;
+      }
+      case "block": {
+        for (const stmt of air.body) {
+          this.walk_air(stmt, context);
+        }
+        if (air.last != null) {
+          this.walk_air(air.last, context);
+        }
+        break;
+      }
+      case "loop": {
+        this.walk_air(air.body, context);
+        break;
+      }
+      case "break": {
+        break;
+      }
+      case "if": {
+        this.walk_air(air.cond, context);
+        this.walk_air(air.then_body, context);
+        this.walk_air(air.else_body, context);
+        break;
+      }
+      case "const.bool": {
+        break;
+      }
+      case "const.int": {
+        break;
+      }
+      case "const.float": {
+        break;
+      }
+      case "const.string": {
+        break;
+      }
+      default: {
+        unreachable<typeof air>();
+      }
+    }
+
+    this.air(air, context);
+  }
+}
