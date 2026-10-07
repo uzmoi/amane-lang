@@ -31,7 +31,7 @@ describe("convert", () => {
         {
           id: 0 as Id,
           signature: 0,
-          local_refs: new Map(),
+          local_refs: [],
           locals: [],
           body: art_infer("0"),
         },

@@ -42,7 +42,7 @@ export interface Import {
 export interface Func {
   id: Id;
   signature: number;
-  local_refs: Map<Id, number>;
+  local_refs: readonly Id[];
   locals: readonly ValType[];
   body: Air | null;
 }
@@ -227,7 +227,7 @@ export const write_module = (writer: Writer, module: Module) => {
 
         write_air(writer, func.body, {
           get_variable_entry(id) {
-            const local_idx = func.local_refs.get(id);
+            const local_idx = func.local_refs.indexOf(id);
             if (local_idx != null) {
               return { type: "local", index: local_idx };
             }

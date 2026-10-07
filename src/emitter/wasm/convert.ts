@@ -34,15 +34,12 @@ export const convert = (air_module: AirModule): Module => {
         );
         const signature = get_type_index(types, type);
 
-        const local_refs = new Map(
-          item.params.map((param, index) => [param.id, index]),
-        );
-
+        const local_refs = item.params.map((param) => param.id);
         const locals: ValType[] = [];
 
         const infer_walker = new Walker((air) => {
           if (air.type === "def") {
-            local_refs.set(air.id, local_refs.size);
+            local_refs.push(air.id);
             const type = ty(air.init.ty);
             if (type == null) {
               throw new Error("変数の型がvoidなわけ無いじゃん。ナメてる？");

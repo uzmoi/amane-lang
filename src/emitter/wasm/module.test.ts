@@ -24,13 +24,7 @@ describe("write_module", () => {
       export_func: {
         types: [{ kind: "func", params: [], return: [] }],
         funcs: [
-          {
-            id: 0 as Id,
-            signature: 0,
-            local_refs: new Map(),
-            locals: [],
-            body: null,
-          },
+          { id: 0 as Id, signature: 0, local_refs: [], locals: [], body: null },
         ],
         exports: [{ name: "noop", desc: ImportExportDesc.func, idx: 0 }],
       },
@@ -57,13 +51,7 @@ describe("write_module", () => {
       start: {
         types: [{ kind: "func", params: [], return: [] }],
         funcs: [
-          {
-            id: 0 as Id,
-            signature: 0,
-            local_refs: new Map(),
-            locals: [],
-            body: null,
-          },
+          { id: 0 as Id, signature: 0, local_refs: [], locals: [], body: null },
         ],
         start: { idx: 0 },
       },
@@ -91,13 +79,7 @@ describe("write_module", () => {
       types: [{ kind: "func", params: [], return: [] }],
       imports: [],
       funcs: [
-        {
-          id: 0 as Id,
-          signature: 0,
-          local_refs: new Map(),
-          locals: [],
-          body: null,
-        },
+        { id: 0 as Id, signature: 0, local_refs: [], locals: [], body: null },
       ],
       tables: [],
       memories: [],
