@@ -1,7 +1,8 @@
 import * as P from "parsea";
 import { error } from "parsea/internal";
 import type { Air, AirModuleItem, BlockId, Id } from "../air";
-import type { Ty } from "../ty";
+// biome-ignore lint/style/useNamingConvention: _
+import { type Ty, ty as ty_ } from "../ty";
 import { Lexer, type Token } from "./lexer";
 
 const token = (type: Token["type"]) =>
@@ -101,8 +102,17 @@ const air = P.lazy((): P.Parser<Air, Token> => {
 });
 
 const statement = P.choice([
-  P.seq([keyword("let").then(ref_id), delimiter("=").then(air)]).map(
-    ([id, init]): Air => ({ type: "def", id, init }),
+  P.seq([
+    keyword("let").then(ref_id),
+    ty_anno.option(),
+    delimiter("=").then(air),
+  ]).map(
+    ([id, ref_ty, init]): Air => ({
+      type: "def",
+      id,
+      ref_ty: ref_ty ?? ty_.ref(id),
+      init,
+    }),
   ),
 
   P.seq([ref_id, delimiter("=").then(air)]).map(

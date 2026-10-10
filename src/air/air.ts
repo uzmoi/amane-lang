@@ -44,6 +44,7 @@ export type Air = { ty?: Ty | undefined } & (
 export interface AirDef {
   type: "def";
   id: Id;
+  ref_ty: Ty;
   init: Air;
 }
 

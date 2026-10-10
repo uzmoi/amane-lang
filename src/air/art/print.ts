@@ -25,7 +25,9 @@ export const print_ty = (ty: Ty): string => {
 export const print_air = (air: Air): string => {
   switch (air.type) {
     case "def": {
-      return `let %${air.id} = ${print_air(air.init)}`;
+      return air.ref_ty.type === "ref" && air.ref_ty.id === air.id
+        ? `let %${air.id} = ${print_air(air.init)}`
+        : `let %${air.id}: ${print_ty(air.ref_ty)} = ${print_air(air.init)}`;
     }
     case "assign": {
       return `%${air.id} = ${print_air(air.value)}`;

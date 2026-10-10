@@ -148,6 +148,7 @@ test("def", () => {
   expect(art("let %0 = 0")).toEqual({
     type: "def",
     id: 0,
+    ref_ty: ty.ref(0 as Id),
     init: art("0"),
   });
 });

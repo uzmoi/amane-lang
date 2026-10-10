@@ -72,7 +72,7 @@ export const lower_statement = (
       const init = lower_expression(stmt.init, ctx);
       const { id } = ctx.scope.def(stmt.dest.name, stmt.dest.loc);
       // TODO: stmt.ty;
-      return { type: "def", id, init };
+      return { type: "def", id, ref_ty: ty.ref(id), init };
     }
     case "Expression": {
       return lower_expression(stmt.expr, ctx);

@@ -48,6 +48,7 @@ describe("block", () => {
     "break #0",
     "if %0 then %1 else %2",
     "let %0 = 0",
+    "let %0: i64 = 0",
     "%0 = 0",
   ])("%o", (art_code) => {
     expect(print_air(art(art_code))).toBe(art_code);

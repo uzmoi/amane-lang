@@ -8,7 +8,7 @@ import { ty } from "./ty";
 const infer_air_type = (air: Air, ctx: InferenceContext) => {
   switch (air.type) {
     case "def": {
-      ctx.unify(ty.ref(air.id), air.init.ty!);
+      ctx.unify(air.ref_ty, air.init.ty!);
       air.ty = ty.void;
       break;
     }
