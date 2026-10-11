@@ -135,8 +135,15 @@ export const lower_expression = (
       ctx.block.pop();
       return { type: "loop", id, body };
     }
+    case "Continue": {
+      const id = ctx.block.ref("continue", expr.loc);
+      if (id == null) {
+        throw new Error("target block was not found");
+      }
+      return { type: "continue", id };
+    }
     case "Break": {
-      const id = ctx.block.break(expr.loc);
+      const id = ctx.block.ref("break", expr.loc);
       if (id == null) {
         throw new Error("target block for break was not found");
       }

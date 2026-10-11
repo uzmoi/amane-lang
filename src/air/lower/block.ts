@@ -4,7 +4,7 @@ import type { BlockId } from "../air";
 export interface Block {
   id: BlockId;
   loc: SourceLocation;
-  breaks: SourceLocation[];
+  refs: { type: "break" | "continue"; loc: SourceLocation }[];
 }
 
 export class BlockAnalyzer {
@@ -16,16 +16,16 @@ export class BlockAnalyzer {
   #block_id = 0;
   push_block(loc: SourceLocation) {
     const id = this.#block_id++ as BlockId;
-    this.#blocks.push({ id, loc, breaks: [] });
+    this.#blocks.push({ id, loc, refs: [] });
     return id;
   }
   pop() {
     this.#blocks.pop();
   }
 
-  break(loc: SourceLocation): BlockId | undefined {
+  ref(type: "break" | "continue", loc: SourceLocation): BlockId | undefined {
     const block = this.#blocks.at(-1);
-    block?.breaks.push(loc);
+    block?.refs.push({ type, loc });
     return block?.id;
   }
 }

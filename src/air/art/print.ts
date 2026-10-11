@@ -51,6 +51,9 @@ export const print_air = (air: Air): string => {
     case "loop": {
       return `loop #${air.id} ${print_air(air.body)}`;
     }
+    case "continue": {
+      return `continue #${air.id}`;
+    }
     case "break": {
       return `break #${air.id}`;
     }

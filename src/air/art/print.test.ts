@@ -45,6 +45,7 @@ describe("block", () => {
     "{ 0 }",
     "{ 0; 1; 2 }",
     "loop #0 {}",
+    "continue #0",
     "break #0",
     "if %0 then %1 else %2",
     "let %0 = 0",

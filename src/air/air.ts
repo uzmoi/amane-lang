@@ -36,6 +36,7 @@ export type Air = { ty?: Ty | undefined } & (
   | AirCall
   | AirBlock
   | AirLoop
+  | AirContinue
   | AirBreak
   | AirIf
   | AirConst
@@ -80,6 +81,11 @@ export interface AirLoop {
   type: "loop";
   id: BlockId;
   body: Air;
+}
+
+export interface AirContinue {
+  type: "continue";
+  id: BlockId;
 }
 
 export interface AirBreak {

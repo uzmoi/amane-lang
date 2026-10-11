@@ -74,6 +74,10 @@ const air = P.lazy((): P.Parser<Air, Token> => {
       .then(P.seq([block_id, air]))
       .map(([id, body]): Air => ({ type: "loop", id, body })),
 
+    keyword("continue")
+      .then(block_id)
+      .map<Air>((id) => ({ type: "continue", id })),
+
     keyword("break")
       .then(block_id)
       .map<Air>((id) => ({ type: "break", id })),

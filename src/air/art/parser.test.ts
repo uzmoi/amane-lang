@@ -131,6 +131,10 @@ test("loop", () => {
   });
 });
 
+test("continue", () => {
+  expect(art("continue #0")).toEqual({ type: "continue", id: 0 });
+});
+
 test("break", () => {
   expect(art("break #0")).toEqual({ type: "break", id: 0 });
 });

@@ -166,6 +166,10 @@ describe("expression", () => {
     );
   });
 
+  test("Continue", () => {
+    expect(parse(Expression, "continue")).toEqual(node("Continue"));
+  });
+
   test("Break", () => {
     expect(parse(Expression, "break")).toEqual(node("Break"));
   });

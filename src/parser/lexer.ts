@@ -20,6 +20,7 @@ export const keywords = new Set([
   "else",
   "loop",
   "break",
+  "continue",
   "let",
   "do",
   "fn",

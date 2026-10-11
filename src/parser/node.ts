@@ -43,6 +43,8 @@ export type LoopExpression<T = never> = NodeExtend<"Loop", T> & {
   body: Expression<T>;
 };
 
+export type ContinueExpression<T = never> = NodeExtend<"Continue", T>;
+
 export type BreakExpression<T = never> = NodeExtend<"Break", T>;
 
 export type ReturnExpression<T = never> = NodeExtend<"Return", T> & {
@@ -63,6 +65,7 @@ export type Expression<T = never> =
   | BlockExpression<T>
   | IfExpression<T>
   | LoopExpression<T>
+  | ContinueExpression<T>
   | BreakExpression<T>
   | ReturnExpression<T>
   | CallExpression<T>;

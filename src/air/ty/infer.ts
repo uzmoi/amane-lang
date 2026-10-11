@@ -47,6 +47,7 @@ const infer_air_type = (air: Air, ctx: InferenceContext) => {
       air.ty = ctx.exists_breaks_for(air.id) ? ty.void : ty.never;
       break;
     }
+    case "continue":
     case "break": {
       air.ty = ty.never;
       break;

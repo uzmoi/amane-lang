@@ -51,6 +51,7 @@ export const Expression: P.Parser<N.Expression<ParserExt>, Token> = P.lazy(() =>
     BlockExpression,
     IfExpression,
     LoopExpression,
+    ContinueExpression,
     BreakExpression,
     ReturnExpression,
   ]).flatMap(tail),
@@ -154,6 +155,13 @@ const LoopExpression = P.seq([keyword("loop"), Expression]).map(
 const BreakExpression = keyword("break").map(
   (token): N.BreakExpression<ParserExt> => ({
     type: "Break",
+    loc: token,
+  }),
+);
+
+const ContinueExpression = keyword("continue").map(
+  (token): N.ContinueExpression<ParserExt> => ({
+    type: "Continue",
     loc: token,
   }),
 );
