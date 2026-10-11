@@ -1,4 +1,4 @@
-import { equals_arrays } from "#common/utils.js";
+import { equals_arrays } from "#common/utils";
 import type { Id } from "../air";
 
 // any is top type

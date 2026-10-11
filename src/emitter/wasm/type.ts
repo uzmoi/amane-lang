@@ -1,6 +1,6 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import type { Ty } from "#air";
-import { equals_arrays } from "#common/utils.js";
+import { equals_arrays } from "#common/utils";
 
 export const empty_type = 0x40;
 
