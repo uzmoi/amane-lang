@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
   "files": { "ignoreUnknown": true },
   "vcs": {
     "enabled": true,
@@ -9,9 +9,6 @@
   "formatter": {
     "indentStyle": "space"
   },
-  "assist": {
-    "actions": { "recommended": true }
-  },
   "linter": {
     "enabled": true,
     "includes": ["**", "!**/*.d.ts"],
@@ -20,7 +17,7 @@
       "test": "all"
     },
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "correctness": {
         "noEmptyCharacterClassInRegex": "off",
         "useImportExtensions": "off"
