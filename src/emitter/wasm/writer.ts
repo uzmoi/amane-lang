@@ -7,7 +7,7 @@ export class Writer {
   #ptr = 0;
 
   emit_binary() {
-    return new Uint8Array(this.#buffer, 0, this.#ptr);
+    return this.#bytes.slice(0, this.#ptr);
   }
 
   consume(n: number) {

@@ -11,9 +11,7 @@ export default {
     );
   },
   serialize(value: Uint8Array) {
-    // wabt.js が TypedArray の offset と length に対応していないため、新しい配列として作り直す。
-    const buffer = new Uint8Array(value);
-    const wasm_module = wabt.readWasm(buffer, {});
+    const wasm_module = wabt.readWasm(value, {});
 
     wasm_module.validate();
 
