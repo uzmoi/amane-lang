@@ -1,12 +1,13 @@
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import pc from "picocolors";
-import { version } from "../..";
 import { commands } from "./commands";
 import { Repl } from "./repl";
 
 export const start_repl = async () => {
-  stdout.write(`Welcome to amane v${version}. For help, enter :help.\n`);
+  stdout.write(
+    `Welcome to amane v${import.meta.env.VERSION}. For help, enter :help.\n`,
+  );
 
   const repl = new Repl();
 

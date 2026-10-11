@@ -1,5 +1,4 @@
 import { cac } from "cac";
-import { version } from "..";
 import { start_repl } from "./repl";
 
 export const main = () => {
@@ -13,7 +12,7 @@ export const main = () => {
   });
 
   cli.help();
-  cli.version(version);
+  cli.version(import.meta.env.VERSION);
   cli.parse();
 };
 
