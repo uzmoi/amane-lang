@@ -113,6 +113,8 @@ const Ident = token(TokenType.Ident).map(
 const Ty = Ident;
 const TyAnno = operator(":").then(Ty);
 
+const BlockLabel = operator(":").then(Ident);
+
 const BlockExpression = P.seq([
   delimiter("{"),
   P.lazy(() => Statement)
@@ -144,25 +146,35 @@ const IfExpression = P.seq([
   }),
 );
 
-const LoopExpression = P.seq([keyword("loop"), Expression]).map(
-  ([loopToken, body]): N.LoopExpression<ParserExt> => ({
+const LoopExpression = P.seq([
+  keyword("loop"),
+  BlockLabel.option(null),
+  Expression,
+]).map(
+  ([loopToken, label, body]): N.LoopExpression<ParserExt> => ({
     type: "Loop",
+    label,
     body,
     loc: loc(loopToken, body.loc),
   }),
 );
 
-const BreakExpression = keyword("break").map(
-  (token): N.BreakExpression<ParserExt> => ({
+const BreakExpression = P.seq([keyword("break"), BlockLabel.option(null)]).map(
+  ([breakToken, label]): N.BreakExpression<ParserExt> => ({
     type: "Break",
-    loc: token,
+    label,
+    loc: loc(breakToken, label?.loc ?? breakToken),
   }),
 );
 
-const ContinueExpression = keyword("continue").map(
-  (token): N.ContinueExpression<ParserExt> => ({
+const ContinueExpression = P.seq([
+  keyword("continue"),
+  BlockLabel.option(null),
+]).map(
+  ([continueToken, label]): N.ContinueExpression<ParserExt> => ({
     type: "Continue",
-    loc: token,
+    label,
+    loc: continueToken,
   }),
 );
 

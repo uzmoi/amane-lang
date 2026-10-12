@@ -40,12 +40,17 @@ export type IfExpression<T = never> = NodeExtend<"If", T> & {
 };
 
 export type LoopExpression<T = never> = NodeExtend<"Loop", T> & {
+  label: IdentExpression<T> | null;
   body: Expression<T>;
 };
 
-export type ContinueExpression<T = never> = NodeExtend<"Continue", T>;
+export type ContinueExpression<T = never> = NodeExtend<"Continue", T> & {
+  label: IdentExpression<T> | null;
+};
 
-export type BreakExpression<T = never> = NodeExtend<"Break", T>;
+export type BreakExpression<T = never> = NodeExtend<"Break", T> & {
+  label: IdentExpression<T> | null;
+};
 
 export type ReturnExpression<T = never> = NodeExtend<"Return", T> & {
   body: Expression<T> | null;

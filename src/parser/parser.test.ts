@@ -162,16 +162,18 @@ describe("expression", () => {
 
   test("Loop", () => {
     expect(parse(Expression, "loop body")).toEqual(
-      node("Loop", { body: node("Ident", { name: "body" }) }),
+      node("Loop", { label: null, body: node("Ident", { name: "body" }) }),
     );
   });
 
   test("Continue", () => {
-    expect(parse(Expression, "continue")).toEqual(node("Continue"));
+    expect(parse(Expression, "continue")).toEqual(
+      node("Continue", { label: null }),
+    );
   });
 
   test("Break", () => {
-    expect(parse(Expression, "break")).toEqual(node("Break"));
+    expect(parse(Expression, "break")).toEqual(node("Break", { label: null }));
   });
 
   describe("Return", () => {

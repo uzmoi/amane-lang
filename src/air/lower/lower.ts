@@ -130,23 +130,17 @@ export const lower_expression = (
       };
     }
     case "Loop": {
-      const id = ctx.block.push_block(expr.loc);
+      const id = ctx.block.push_block(expr.loc, expr.label?.name);
       const body = lower_expression(expr.body, ctx);
       ctx.block.pop();
       return { type: "loop", id, body };
     }
     case "Continue": {
-      const id = ctx.block.ref("continue", expr.loc);
-      if (id == null) {
-        throw new Error("target block was not found");
-      }
+      const id = ctx.block.ref("continue", expr.loc, expr.label?.name);
       return { type: "continue", id };
     }
     case "Break": {
-      const id = ctx.block.ref("break", expr.loc);
-      if (id == null) {
-        throw new Error("target block for break was not found");
-      }
+      const id = ctx.block.ref("break", expr.loc, expr.label?.name);
       return { type: "break", id };
     }
     case "Return": {
