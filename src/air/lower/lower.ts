@@ -1,7 +1,7 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import { type ast, type Loc, parse_number_literal } from "#parser";
-import type { Air, AirImport, AirModule, AirModuleItem, Id } from "../air";
-import { type Ty, ty } from "../ty";
+import type { Air, AirImport, AirModule, AirModuleItem } from "../air";
+import { ty } from "../ty";
 import { BlockAnalyzer } from "./block";
 import { Scope } from "./scope";
 
@@ -31,17 +31,16 @@ export const lower_module_item = (
 ): (() => AirModuleItem) => {
   switch (item.type) {
     case "Fn": {
-      const { id } = ctx.scope.def(item.name.name, item.name.loc);
+      const id = ctx.scope.def(item.name.name, item.name.loc);
       return () => {
         ctx.block.push_fn();
         ctx.scope.push();
 
-        const params: { id: Id; ty: Ty }[] = [];
         // TODO: ty
-        for (const [param, _ty] of item.params) {
-          const { id } = ctx.scope.def(param.name, param.loc);
-          params.push({ id, ty: ty.any });
-        }
+        const params = item.params.map(([param, _ty]) => {
+          const id = ctx.scope.def(param.name, param.loc);
+          return { id, ty: ty.any };
+        });
 
         // item.ret_ty
         const ret_ty = ty.any;
@@ -70,7 +69,7 @@ export const lower_statement = (
   switch (stmt.type) {
     case "Let": {
       const init = lower_expression(stmt.init, ctx);
-      const { id } = ctx.scope.def(stmt.dest.name, stmt.dest.loc);
+      const id = ctx.scope.def(stmt.dest.name, stmt.dest.loc);
       // TODO: stmt.ty;
       return { type: "def", id, ref_ty: ty.ref(id), init };
     }
@@ -105,11 +104,8 @@ export const lower_expression = (
       // return { type: "tuple", elements };
     }
     case "Ident": {
-      const entry = ctx.scope.ref(expr.name, expr.loc);
-      if (entry == null) {
-        throw new Error(`${expr.name} is undefined`);
-      }
-      return { type: "ref", id: entry.id };
+      const id = ctx.scope.ref(expr.name, expr.loc);
+      return { type: "ref", id };
     }
     case "Block": {
       ctx.scope.push();
@@ -122,12 +118,10 @@ export const lower_expression = (
       return { type: "block", body, last };
     }
     case "If": {
-      return {
-        type: "if",
-        cond: lower_expression(expr.cond, ctx),
-        then_body: lower_expression(expr.then_body, ctx),
-        else_body: lower_expression(expr.else_body, ctx),
-      };
+      const cond = lower_expression(expr.cond, ctx);
+      const then_body = lower_expression(expr.then_body, ctx);
+      const else_body = lower_expression(expr.else_body, ctx);
+      return { type: "if", cond, then_body, else_body };
     }
     case "Loop": {
       const id = ctx.block.push_block(expr.loc, expr.label?.name);
@@ -151,11 +145,9 @@ export const lower_expression = (
       return { type: "return", value };
     }
     case "Call": {
-      return {
-        type: "call",
-        callee: lower_expression(expr.callee, ctx),
-        args: expr.args.map((arg) => lower_expression(arg, ctx)),
-      };
+      const callee = lower_expression(expr.callee, ctx);
+      const args = expr.args.map((arg) => lower_expression(arg, ctx));
+      return { type: "call", callee, args };
     }
     default: {
       unreachable<typeof expr>();

@@ -20,27 +20,25 @@ export class Scope {
     this.#scopes.pop();
   }
 
-  def(name: string, loc: SourceLocation): ScopeEntry {
+  def(name: string, loc: SourceLocation): Id {
     const current_scope = this.#scopes.at(-1) ?? this.root_scope;
 
-    const entry: ScopeEntry = {
-      id: this.vars.length as Id,
-      name,
-      def: loc,
-      refs: [],
-    };
+    const id = this.vars.length as Id;
+    const entry: ScopeEntry = { id, name, def: loc, refs: [] };
     this.vars.push(entry);
     current_scope.set(name, entry);
-    return entry;
+    return id;
   }
 
-  ref(name: string, loc: SourceLocation): ScopeEntry | undefined {
+  ref(name: string, loc: SourceLocation): Id {
     for (const scope of [this.root_scope, ...this.#scopes].reverse()) {
       const entry = scope.get(name);
       if (entry != null) {
         entry.refs.push(loc);
-        return entry;
+        return entry.id;
       }
     }
+
+    throw new Error(`Variable '${name}' is not defined.`);
   }
 }
