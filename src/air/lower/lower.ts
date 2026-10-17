@@ -1,29 +1,19 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
 import { type ast, type Loc, parse_number_literal } from "#parser";
-import type { Air, AirImport, AirModule, AirModuleItem } from "../air";
+import type { Air, AirModule, AirModuleItem } from "../air";
 import { ty } from "../ty";
-import { BlockAnalyzer } from "./block";
-import { Scope } from "./scope";
+import { LowerContext } from "./context";
 
-export const lower = (module: ast.Module<Loc>): AirModule => {
-  const ctx: LowerContext = {
-    scope: new Scope(),
-    block: new BlockAnalyzer(),
-    imports: [],
-  };
-
+export const lower = (
+  module: ast.Module<Loc>,
+  ctx = new LowerContext(),
+): AirModule => {
   const items = module.items
     .map((item) => lower_module_item(item, ctx))
     .map((low) => low());
 
   return { imports: ctx.imports, items };
 };
-
-interface LowerContext {
-  scope: Scope;
-  block: BlockAnalyzer;
-  imports: AirImport[];
-}
 
 export const lower_module_item = (
   item: ast.ModuleItem<Loc>,

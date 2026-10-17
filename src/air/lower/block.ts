@@ -9,19 +9,22 @@ export interface Block {
 }
 
 export class BlockAnalyzer {
-  #blocks: (Block | null)[] = [];
+  readonly blocks: Block[] = [];
+  readonly #block_stack: (Block | null)[] = [];
 
   push_fn() {
-    this.#blocks.push(null);
+    this.#block_stack.push(null);
   }
   #block_id = 0;
-  push_block(loc: SourceLocation, label: string | undefined) {
+  push_block(loc: SourceLocation, label: string | undefined): BlockId {
     const id = this.#block_id++ as BlockId;
-    this.#blocks.push({ id, label: label ?? null, loc, refs: [] });
+    const block: Block = { id, label: label ?? null, loc, refs: [] };
+    this.blocks.push(block);
+    this.#block_stack.push(block);
     return id;
   }
   pop() {
-    this.#blocks.pop();
+    this.#block_stack.pop();
   }
 
   ref(
@@ -31,9 +34,9 @@ export class BlockAnalyzer {
   ): BlockId {
     const block =
       label == null
-        ? this.#blocks.at(-1)
+        ? this.#block_stack.at(-1)
         : // null (fn) に到達したら null を返す。
-          this.#blocks.findLast(
+          this.#block_stack.findLast(
             (block) => block == null || block.label === label,
           );
 
