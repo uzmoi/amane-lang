@@ -23,7 +23,6 @@ export const lower_module_item = (
     case "Fn": {
       const id = ctx.scope.def(item.name.name, item.name.loc);
       return () => {
-        ctx.block.push_fn();
         ctx.scope.push();
 
         // TODO: ty
@@ -38,7 +37,6 @@ export const lower_module_item = (
         const body = lower_expression(item.body, ctx);
 
         ctx.scope.pop();
-        ctx.block.pop();
 
         return { type: "fn", id, params, ret_ty, body };
       };

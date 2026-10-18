@@ -5,16 +5,18 @@ export interface Block {
   id: BlockId;
   label: string | null;
   loc: SourceLocation;
-  refs: { type: "break" | "continue"; loc: SourceLocation }[];
+  refs: BlockRef[];
+}
+
+export interface BlockRef {
+  type: "break" | "continue";
+  loc: SourceLocation;
 }
 
 export class BlockAnalyzer {
   readonly blocks: Block[] = [];
-  readonly #block_stack: (Block | null)[] = [];
+  readonly #block_stack: Block[] = [];
 
-  push_fn() {
-    this.#block_stack.push(null);
-  }
   #block_id = 0;
   push_block(loc: SourceLocation, label: string | undefined): BlockId {
     const id = this.#block_id++ as BlockId;
@@ -35,10 +37,7 @@ export class BlockAnalyzer {
     const block =
       label == null
         ? this.#block_stack.at(-1)
-        : // null (fn) に到達したら null を返す。
-          this.#block_stack.findLast(
-            (block) => block == null || block.label === label,
-          );
+        : this.#block_stack.findLast((block) => block.label === label);
 
     if (block == null) {
       throw new Error(
