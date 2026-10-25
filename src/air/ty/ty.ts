@@ -29,6 +29,11 @@ export const ty = {
   ref: (id: Id): Ty => ({ type: "ref", id }),
 } satisfies Record<Ty["type"], Ty | ((...args: never) => Ty)>;
 
+export const is_never_ty = (ty: Ty) => ty.type === "never";
+export const is_void_ty = (ty: Ty) => ty.type === "void";
+export const is_fn_ty = (ty: Ty) => ty.type === "fn";
+export const is_ref_ty = (ty: Ty) => ty.type === "ref";
+
 export const equals_ty = (a: Ty, b: Ty): boolean => {
   if (a.type === "fn" && b.type === "fn") {
     return (

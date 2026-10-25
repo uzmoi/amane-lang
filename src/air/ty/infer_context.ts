@@ -1,3 +1,4 @@
+import { unreachable } from "@uzmoi/ut/ils";
 import type { BlockId, Id } from "../air";
 import { TypeMismatchError } from "./error";
 import { equals_ty, type Ty } from "./ty";
@@ -54,5 +55,16 @@ export class InferenceContext {
 
   exists_breaks_for(block_id: BlockId): boolean {
     return this.#breaks.has(block_id);
+  }
+
+  #current_fn_ret_ty: Ty | null = null;
+  set_current_fn_ret_ty(ty: Ty | null) {
+    this.#current_fn_ret_ty = ty;
+  }
+  get_current_fn_ret_ty(): Ty {
+    return (
+      this.#current_fn_ret_ty ??
+      unreachable("Cannot return outside of a function.")
+    );
   }
 }

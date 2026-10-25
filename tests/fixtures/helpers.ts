@@ -4,7 +4,8 @@ import {
   type BlockId,
   type Id,
   InferenceContext,
-  infer_type,
+  infer_ty_module_items,
+  infer_ty_module_root,
   type Ty,
   ty,
   Walker,
@@ -42,6 +43,7 @@ export const art_infer = (source: string, vars: Ty[] = []) => {
     ctx.unify(ty.ref(index as Id), type);
   }
 
-  infer_type(mod, ctx);
+  infer_ty_module_root(mod, ctx);
+  infer_ty_module_items(mod, ctx);
   return air;
 };
