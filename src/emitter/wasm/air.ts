@@ -1,10 +1,13 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
-import type { Air, Id } from "#air";
+import type { Air, BlockId, Id } from "#air";
 import { Opcode } from "./opcode";
 import { empty_type, ty } from "./type";
 import type { Writer } from "./writer";
 
 export interface FuncContext {
+  push_block(id: BlockId): void;
+  pop_block(): void;
+  get_label_for(id: BlockId): number;
   get_variable_entry(id: Id): { type: "global" | "local"; index: number };
   get_func_index(id: Id): number;
 }
@@ -81,22 +84,31 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       break;
     }
     case "loop": {
+      const block_type = ty(air.ty) ?? empty_type;
+
+      writer.u8(Opcode.block);
+      writer.u8(block_type);
       writer.u8(Opcode.loop);
-      writer.u8(ty(air.ty) ?? empty_type); // block type
+      writer.u8(block_type);
+
+      ctx.push_block(air.id);
       write_air(writer, air.body, ctx);
+      ctx.pop_block();
+
+      writer.u8(Opcode.end);
       writer.u8(Opcode.end);
       break;
     }
     case "continue": {
-      // TODO: BlockIdを使う
       writer.u8(Opcode.br);
-      writer.u32leb128(0);
+      const label = ctx.get_label_for(air.id);
+      writer.u32leb128(label);
       break;
     }
     case "break": {
-      // TODO: BlockIdを使う
       writer.u8(Opcode.br);
-      writer.u32leb128(0);
+      const label = ctx.get_label_for(air.id);
+      writer.u32leb128(label + 1);
       break;
     }
     case "if": {

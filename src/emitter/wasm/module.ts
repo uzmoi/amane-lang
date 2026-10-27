@@ -1,5 +1,5 @@
 import { todo, unreachable } from "@uzmoi/ut/ils";
-import type { Air, Id } from "#air";
+import type { Air, BlockId, Id } from "#air";
 import { write_air } from "./air";
 import { Opcode } from "./opcode";
 import type { CompositeType, RefType, ValType } from "./type";
@@ -166,6 +166,15 @@ export const write_module = (writer: Writer, module: Module) => {
       writer.u8(global.type);
       writer.u8(global.mut ? 1 : 0);
       write_air(writer, global.expr, {
+        push_block() {
+          todo();
+        },
+        pop_block() {
+          todo();
+        },
+        get_label_for() {
+          todo();
+        },
         get_variable_entry() {
           todo();
         },
@@ -224,8 +233,20 @@ export const write_module = (writer: Writer, module: Module) => {
             .map((i) => i.id),
           ...globals.map((global) => global.id),
         ];
+        const block_stack: BlockId[] = [];
 
         write_air(writer, func.body, {
+          push_block(id) {
+            block_stack.push(id);
+          },
+          pop_block() {
+            block_stack.pop();
+          },
+          get_label_for(id) {
+            const index = block_stack.lastIndexOf(id);
+            if (index === -1) unreachable();
+            return (block_stack.length - 1 - index) * 2;
+          },
           get_variable_entry(id) {
             const local_idx = func.local_refs.indexOf(id);
             if (local_idx != null) {
