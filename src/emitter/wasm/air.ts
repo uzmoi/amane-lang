@@ -2,6 +2,7 @@ import { todo, unreachable } from "@uzmoi/ut/ils";
 import type { Air, BlockId, Id } from "#air";
 import { Opcode } from "./opcode";
 import { empty_type, ty } from "./type";
+import { s32, s64 } from "./utils";
 import type { Writer } from "./writer";
 
 export interface FuncContext {
@@ -127,24 +128,44 @@ export const write_air = (writer: Writer, air: Air, ctx: FuncContext) => {
       break;
     }
     case "const.int": {
-      writer.u8(
-        // biome-ignore format: match式
-        air.ty?.type === "i32" ? Opcode.i32_const :
-        air.ty?.type === "i64" ? Opcode.i64_const :
-        unreachable(),
-      );
-      // FIXME: 64bit対応
-      writer.u32leb128(Number(air.value));
+      switch (air.ty.type) {
+        case "i32": {
+          writer.u8(Opcode.i32_const);
+          writer.sleb128(s32(air.value));
+          break;
+        }
+        case "i64": {
+          writer.u8(Opcode.i64_const);
+          writer.sleb128(s64(air.value));
+          break;
+        }
+        default: {
+          unreachable(
+            `const.int must be typed as i32 or i64, but it was typed as ${air.ty.type}`,
+          );
+        }
+      }
       break;
     }
     case "const.float": {
-      writer.u8(
-        // biome-ignore format: match式
-        air.ty?.type === "f32" ? Opcode.f32_const :
-        air.ty?.type === "f64" ? Opcode.f64_const :
-        unreachable(),
-      );
-      return todo();
+      switch (air.ty.type) {
+        case "f32": {
+          writer.u8(Opcode.f32_const);
+          writer.f32(air.value);
+          break;
+        }
+        case "f64": {
+          writer.u8(Opcode.f64_const);
+          writer.f64(air.value);
+          break;
+        }
+        default: {
+          unreachable(
+            `const.float must be typed as f32 or f64, but it was typed as ${air.ty.type}`,
+          );
+        }
+      }
+      break;
     }
     case "const.string": {
       return todo();

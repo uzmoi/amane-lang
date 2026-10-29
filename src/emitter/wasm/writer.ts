@@ -3,6 +3,7 @@ import { leb128size } from "./utils";
 
 export class Writer {
   #buffer = new ArrayBuffer(1024, { maxByteLength: 64 * 1024 }); // 64 KiB
+  #dv = new DataView(this.#buffer);
   #bytes = new Uint8Array(this.#buffer);
   #ptr = 0;
 
@@ -24,12 +25,8 @@ export class Writer {
     this.#bytes[this.consume(1)] = value;
   }
 
-  u32be(number: number) {
-    const i = this.consume(4);
-    this.#bytes[i] = (number >> 24) & 0xff;
-    this.#bytes[i + 1] = (number >> 16) & 0xff;
-    this.#bytes[i + 2] = (number >> 8) & 0xff;
-    this.#bytes[i + 3] = number & 0xff;
+  u32be(value: number) {
+    this.#dv.setUint32(this.consume(4), value);
   }
 
   u32leb128(n: number) {
@@ -42,6 +39,32 @@ export class Writer {
 
       this.u8(byte);
     } while (n !== 0);
+  }
+
+  sleb128(value: bigint) {
+    for (;;) {
+      const byte = Number(value & 0x7fn) as u8;
+
+      value >>= 7n;
+
+      // (0n >> 7n) == 0n
+      // (-1n >> 7n) == -1n
+      // 最終byte且つ0x40のbitが立っていない（負の数の場合は2の補数表現なので反転する）
+      if ((value === 0n && !(byte & 0x40)) || (value === -1n && byte & 0x40)) {
+        this.u8(byte);
+        break;
+      }
+
+      this.u8((byte | 0x80) as u8);
+    }
+  }
+
+  f32(value: number) {
+    this.#dv.setFloat32(this.consume(4), value, true);
+  }
+
+  f64(value: number) {
+    this.#dv.setFloat64(this.consume(8), value, true);
   }
 
   fixup_size(ptr: number, hint = 1) {

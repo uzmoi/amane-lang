@@ -33,3 +33,19 @@ export const run_length_encoding = <T>(
 
   return result;
 };
+
+export const s32 = (i: bigint): bigint => {
+  // 2n ** 31n;
+  if (i < 2147483648n) return i;
+
+  // 2n ** 32n;
+  return i - 4294967296n;
+};
+
+export const s64 = (i: bigint): bigint => {
+  // 2n ** 63n;
+  if (i < 9223372036854775808n) return i;
+
+  // 2n ** 64n;
+  return i - 18446744073709551616n;
+};

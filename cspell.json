@@ -15,6 +15,7 @@
     "parsea",
     "popcnt",
     "rotr",
+    "sleb",
     "tsdown",
     "tyof",
     "typecheck",
