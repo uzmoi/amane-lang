@@ -115,12 +115,8 @@ const infer_ty = (air: Air, ctx: InferenceContext): Ty => {
     }
     case "loop": {
       const body_ty = infer_ty(air.body, ctx);
-      if (is_never_ty(body_ty)) {
-        air.ty = ty.never;
-        break;
-      }
 
-      if (!is_void_ty(body_ty)) {
+      if (!is_never_ty(body_ty) && !is_void_ty(body_ty)) {
         throw new TypeMismatchError(body_ty, ty.void);
       }
 
