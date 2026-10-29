@@ -249,7 +249,7 @@ export const write_module = (writer: Writer, module: Module) => {
           },
           get_variable_entry(id) {
             const local_idx = func.local_refs.indexOf(id);
-            if (local_idx != null) {
+            if (local_idx !== -1) {
               return { type: "local", index: local_idx };
             }
 
