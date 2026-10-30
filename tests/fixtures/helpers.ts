@@ -35,6 +35,11 @@ export const art_infer = (source: string, vars: Ty[] = []) => {
     ],
   };
 
+  infer_module(mod, vars);
+  return air;
+};
+
+export const infer_module = (mod: AirModule, vars: Ty[] = []) => {
   const breaks = new Set<BlockId>();
   collect_breaks.walk_module(mod, breaks);
 
@@ -45,5 +50,5 @@ export const art_infer = (source: string, vars: Ty[] = []) => {
 
   infer_ty_module_root(mod, ctx);
   infer_ty_module_items(mod, ctx);
-  return air;
+  return mod;
 };

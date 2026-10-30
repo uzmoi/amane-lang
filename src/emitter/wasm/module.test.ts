@@ -44,8 +44,8 @@ describe("write_module", () => {
       },
       global: {
         globals: [
-          { id: 0 as Id, type: NumType.i32, mut: false, expr: art_infer("0") },
-          { id: 1 as Id, type: NumType.i32, mut: true, expr: art_infer("0") },
+          { id: 0 as Id, type: NumType.i64, mut: false, expr: art_infer("0") },
+          { id: 1 as Id, type: NumType.i64, mut: true, expr: art_infer("0") },
         ],
       },
       start: {
