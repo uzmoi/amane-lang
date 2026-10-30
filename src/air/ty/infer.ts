@@ -16,7 +16,8 @@ import {
 const infer_ty = (air: Air, ctx: InferenceContext): Ty => {
   if (air.ty != null) return air.ty;
 
-  switch (air.type) {
+  // biome-ignore lint/suspicious/noConfusingLabels: 何でswitch文に対応していないんですか？
+  outer: switch (air.type) {
     case "def": {
       const init_ty = infer_ty(air.init, ctx);
       if (is_never_ty(init_ty)) {
@@ -92,7 +93,7 @@ const infer_ty = (air: Air, ctx: InferenceContext): Ty => {
         const arg_ty = infer_ty(arg, ctx);
         if (is_never_ty(arg_ty)) {
           air.ty = ty.never;
-          break;
+          break outer;
         }
 
         ctx.unify(arg_ty, param_ty);
@@ -106,7 +107,7 @@ const infer_ty = (air: Air, ctx: InferenceContext): Ty => {
         const body_ty = infer_ty(body, ctx);
         if (is_never_ty(body_ty)) {
           air.ty = ty.never;
-          break;
+          break outer;
         }
       }
 
