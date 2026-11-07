@@ -31,7 +31,7 @@ const infer_ty = (air: Air, ctx: InferenceContext): Ty => {
         throw new VoidVariableError();
       }
 
-      ctx.unify(air.ref_ty, init_ty);
+      ctx.unify(init_ty, air.ref_ty);
       air.ref_ty = ctx.deref(air.ref_ty);
 
       air.ty = ty.void;
@@ -68,7 +68,7 @@ const infer_ty = (air: Air, ctx: InferenceContext): Ty => {
       }
 
       const fn_ret_ty = ctx.get_current_fn_ret_ty();
-      ctx.unify(fn_ret_ty, value_ty);
+      ctx.unify(value_ty, fn_ret_ty);
 
       air.ty = ty.never;
       break;
