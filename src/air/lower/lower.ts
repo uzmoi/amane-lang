@@ -3,6 +3,7 @@ import { type ast, type Loc, parse_number_literal } from "#parser";
 import type { Air, AirModule, AirModuleItem } from "../air";
 import { ty } from "../ty";
 import { LowerContext } from "./context";
+import { ty_from } from "./ty";
 
 export const lower = (
   module: ast.Module<Loc>,
@@ -25,14 +26,12 @@ export const lower_module_item = (
       return () => {
         ctx.scope.push();
 
-        // TODO: ty
-        const params = item.params.map(([param, _ty]) => {
+        const params = item.params.map(([param, ty]) => {
           const id = ctx.scope.def(param.name, param.loc);
-          return { id, ty: ty.any };
+          return { id, ty: ty_from(ty, ctx) };
         });
 
-        // item.ret_ty
-        const ret_ty = ty.any;
+        const ret_ty = ty_from(item.ret_ty, ctx);
 
         const body = lower_expression(item.body, ctx);
 
@@ -58,8 +57,8 @@ export const lower_statement = (
     case "Let": {
       const init = lower_expression(stmt.init, ctx);
       const id = ctx.scope.def(stmt.dest.name, stmt.dest.loc);
-      // TODO: stmt.ty;
-      return { type: "def", id, ref_ty: ty.ref(id), init };
+      const ref_ty = stmt.ty == null ? ty.ref(id) : ty_from(stmt.ty, ctx);
+      return { type: "def", id, ref_ty, init };
     }
     case "Expression": {
       return lower_expression(stmt.expr, ctx);
