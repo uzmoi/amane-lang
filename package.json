@@ -19,6 +19,10 @@
   },
   "keywords": [],
   "author": "uzmoi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uzmoi/amane-lang.git"
+  },
   "license": "MIT",
   "imports": {
     "#common/*": "./src/common/*.ts",
